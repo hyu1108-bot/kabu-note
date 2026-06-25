@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かぶの記録ノート</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --ink:#1c1c1a;
+    --paper:#f7f5ef;
+    --paper-raised:#ffffff;
+    --line:#dedad0;
+    --gain:#0f6e56;
+    --gain-bg:#e1f5ee;
+    --loss:#993c1d;
+    --loss-bg:#faece7;
+    --muted:#7a766c;
+    --accent:#b3401f;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin:0 0 6px;
+  }
+  h1{
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 4px;
+    letter-spacing:0.01em;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:14px;
+    margin:0 0 28px;
+  }
+  .period-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .period-bar label{
+    margin:0;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .period-bar select{
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-raised);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:13px;
+    color:var(--ink);
+  }
+  #custom-range{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  #custom-range input{
+    width:auto;
+    padding:7px 8px;
+    font-size:13px;
+  }
+  #custom-range span{
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  .summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:28px;
+  }
+  .summary-cell{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 14px;
+  }
+  .summary-label{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.04em;
+    margin:0 0 6px;
+  }
+  .summary-value{
+    font-family:'Space Mono', monospace;
+    font-size:22px;
+    font-weight:700;
+    margin:0;
+  }
+  .gain-text{ color:var(--gain); }
+  .loss-text{ color:var(--loss); }
+
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:24px;
+  }
+  .panel h2{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel h2::before{
+    content:"";
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .form-grid .full{ grid-column:1 / -1; }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  input{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+  }
+  input:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .btn-row{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+  }
+  button{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:10px 18px;
+    border:1px solid var(--ink);
+    border-radius:20px;
+    background:var(--ink);
+    color:var(--paper);
+    cursor:pointer;
+  }
+  button:hover{ opacity:0.85; }
+  button.ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+  }
+
+  .trade-list{ display:flex; flex-direction:column; gap:10px; }
+  .trade{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .trade-main{ min-width:0; }
+  .trade-name{ font-weight:700; font-size:14px; margin:0 0 3px; }
+  .trade-detail{ font-size:12px; color:var(--muted); margin:0; }
+  .trade-tag{
+    display:inline-block;
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.04em;
+    padding:2px 8px;
+    margin-top:6px;
+    background:var(--paper);
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .trade-right{ text-align:right; flex-shrink:0; }
+  .trade-pnl{ font-family:'Space Mono', monospace; font-size:17px; font-weight:700; margin:0; }
+  .trade-roi{ font-family:'Space Mono', monospace; font-size:12px; margin:2px 0 6px; color:var(--muted); }
+  .del{
+    border:none;
+    background:none;
+    color:var(--muted);
+    font-size:11px;
+    padding:2px 0;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .del:hover{ color:var(--loss); }
+
+  .empty{
+    text-align:center;
+    padding:36px 20px;
+    color:var(--muted);
+    font-size:13px;
+    background:var(--paper-raised);
+    border:1px dashed var(--line);
+    border-radius:14px;
+  }
+
+  @media (max-width:480px){
+    .form-grid{ grid-template-columns:1fr; }
+    .summary{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">my stock notebook</p>
+  <h1>かぶの記録ノート</h1>
+  <p class="sub">買った値段と売った値段を入れるだけ。損益と利益率はノートがぜんぶ計算してくれます。データはこの端末にちゃんと残ります。</p>
+
+  <div class="period-bar">
+    <label for="period-select">期間</label>
+    <select id="period-select">
+      <option value="all">すべて</option>
+      <option value="this-month" selected>今月</option>
+      <option value="last-month">前月</option>
+      <option value="custom">期間を指定</option>
+    </select>
+    <div id="custom-range" style="display:none;">
+      <input type="date" id="range-from">
+      <span>〜</span>
+      <input type="date" id="range-to">
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-cell">
+      <p class="summary-label">いま投資してる金額</p>
+      <p class="summary-value" id="sum-invested">¥0</p>
+    </div>
+    <div class="summary-cell">
+      <p class="summary-label">確定した損益</p>
+      <p class="summary-value" id="sum-pnl">¥0</p>
+    </div>
+    <div class="summary-cell">
+      <p class="summary-label">利益率</p>
+      <p class="summary-value" id="sum-roi">0%</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>新しい取引を記録</h2>
+    <div class="form-grid">
+      <div>
+        <label for="in-code">銘柄コード</label>
+        <input id="in-code" type="text" placeholder="例: 6036" inputmode="numeric">
+      </div>
+      <div>
+        <label for="in-name">銘柄名</label>
+        <input id="in-name" type="text" placeholder="例: KeePer技研">
+      </div>
+      <div>
+        <label for="in-qty">何株？</label>
+        <input id="in-qty" type="number" min="0" step="1" placeholder="1">
+      </div>
+      <div>
+        <label for="in-buy">いくらで買った？（円）</label>
+        <input id="in-buy" type="number" min="0" step="0.1" placeholder="例: 2874">
+      </div>
+      <div>
+        <label for="in-sell">いくらで売った？（円）</label>
+        <input id="in-sell" type="number" min="0" step="0.1" placeholder="まだ売ってないなら空欄でOK">
+      </div>
+      <div>
+        <label for="in-date">日付</label>
+        <input id="in-date" type="date">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button id="add-btn">ノートに書く</button>
+    </div>
+    <p class="hint">銘柄コードか銘柄名、どちらかを入れれば自動でもう一方を埋めます。覚えるほど賢くなります。</p>
+  </div>
+
+  <div class="panel">
+    <h2>これまでの記録</h2>
+    <div id="list-area"></div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'trade-pnl-entries';
+const DICT_KEY = 'stock-name-dict';
+let trades = [];
+let stockDict = {
+  '2585': 'ライフドリンクカンパニー',
+  '3154': 'メディアスホールディングス',
+  '3197': 'すかいらーくホールディングス',
+  '4203': '住友ベークライト',
+  '5020': 'ENEOSホールディングス',
+  '5586': 'ラボロ・AI',
+  '6036': 'KeePer技研',
+  '7818': 'トランザクション',
+  '8058': '三菱商事',
+  '8593': '三菱HCキャピタル',
+  '9064': 'ヤマトホールディングス',
+  '9560': 'プログリット'
+};
+
+function yen(n){
+  const r = Math.round(n);
+  const sign = r < 0 ? '-' : (r > 0 ? '+' : '');
+  return sign + '¥' + Math.abs(r).toLocaleString();
+}
+function pct(n){
+  const r = Math.round(n * 10) / 10;
+  const sign = r > 0 ? '+' : '';
+  return sign + r.toFixed(1) + '%';
+}
+
+async function loadTrades(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    trades = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    trades = [];
+  }
+  try{
+    const rawDict = localStorage.getItem(DICT_KEY);
+    if(rawDict){
+      stockDict = Object.assign({}, stockDict, JSON.parse(rawDict));
+    }
+  }catch(e){
+    // 辞書未保存の場合は初期値のまま
+  }
+  render();
+}
+
+async function saveDict(){
+  try{
+    localStorage.setItem(DICT_KEY, JSON.stringify(stockDict));
+  }catch(e){
+    console.error('辞書の保存に失敗しました', e);
+  }
+}
+
+function lookupByCode(code){
+  return stockDict[code] || null;
+}
+
+function lookupByName(name){
+  const exact = Object.entries(stockDict).find(([, n]) => n === name);
+  if(exact) return exact[0];
+  const partial = Object.entries(stockDict).find(([, n]) => n.includes(name) || name.includes(n));
+  return partial ? partial[0] : null;
+}
+
+function rememberPair(code, name){
+  if(code && name){
+    if(stockDict[code] !== name){
+      stockDict[code] = name;
+      saveDict();
+    }
+  }
+}
+
+async function saveTrades(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
+  }catch(e){
+    console.error('保存に失敗しました', e);
+  }
+}
+
+function calcEntry(t){
+  const invested = t.qty * t.buy;
+  if(t.sell === null || t.sell === undefined || t.sell === ''){
+    return { invested, pnl: null, roi: null, realized: false };
+  }
+  const sellTotal = t.qty * t.sell;
+  const pnl = sellTotal - invested;
+  const roi = invested > 0 ? (pnl / invested) * 100 : 0;
+  return { invested, pnl, roi, realized: true };
+}
+
+function render(){
+  const listArea = document.getElementById('list-area');
+  const { from, to } = getPeriodRange();
+  const visibleTrades = trades.filter(t => inRange(t.date, from, to));
+
+  let totalInvested = 0;
+  let totalPnl = 0;
+  let hasRealized = false;
+
+  if(visibleTrades.length === 0){
+    listArea.innerHTML = trades.length === 0
+      ? '<div class="empty">まだ記録がありません。上から最初の取引を書いてみましょう。</div>'
+      : '<div class="empty">この期間の記録はありません。</div>';
+  } else {
+    const sorted = [...visibleTrades].sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+    listArea.innerHTML = '<div class="trade-list">' + sorted.map(t => {
+      const c = calcEntry(t);
+      let rightHtml;
+      if(c.realized){
+        const cls = c.pnl >= 0 ? 'gain-text' : 'loss-text';
+        rightHtml = `
+          <p class="trade-pnl ${cls}">${yen(c.pnl)}</p>
+          <p class="trade-roi ${cls}">${pct(c.roi)}</p>
+        `;
+      } else {
+        rightHtml = `<p class="trade-pnl" style="color:var(--muted); font-size:13px;">まだ保有中</p>`;
+      }
+      const detail = c.realized
+        ? `${t.qty}株 取得${t.buy.toLocaleString()}円 → 売却${t.sell.toLocaleString()}円`
+        : `${t.qty}株 取得${t.buy.toLocaleString()}円（未売却）`;
+      return `
+        <div class="trade" data-id="${t.id}">
+          <div class="trade-main">
+            <p class="trade-name">${t.code ? t.code + ' ' : ''}${escapeHtml(t.name || '無題')}</p>
+            <p class="trade-detail">${detail}</p>
+            <span class="trade-tag">${t.date || '日付未設定'}</span>
+          </div>
+          <div class="trade-right">
+            ${rightHtml}
+            <br>
+            <button class="del" data-id="${t.id}">削除</button>
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+
+    document.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        trades = trades.filter(t => t.id !== id);
+        saveTrades();
+        render();
+      });
+    });
+
+    trades.forEach(t => {
+      if(!inRange(t.date, from, to)) return;
+      const c = calcEntry(t);
+      if(c.realized){
+        totalInvested += c.invested;
+        totalPnl += c.pnl;
+        hasRealized = true;
+      }
+    });
+  }
+
+  document.getElementById('sum-invested').textContent = '¥' + Math.round(totalInvested).toLocaleString();
+  const pnlEl = document.getElementById('sum-pnl');
+  pnlEl.textContent = yen(totalPnl);
+  pnlEl.className = 'summary-value ' + (totalPnl > 0 ? 'gain-text' : totalPnl < 0 ? 'loss-text' : '');
+
+  const roiEl = document.getElementById('sum-roi');
+  const roi = totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
+  roiEl.textContent = hasRealized ? pct(roi) : '0%';
+  roiEl.className = 'summary-value ' + (roi > 0 ? 'gain-text' : roi < 0 ? 'loss-text' : '');
+}
+
+function getPeriodRange(){
+  const sel = document.getElementById('period-select').value;
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  if(sel === 'all'){
+    return { from: null, to: null };
+  }
+  if(sel === 'this-month'){
+    const from = new Date(y, m, 1);
+    const to = new Date(y, m + 1, 0);
+    return { from: toISO(from), to: toISO(to) };
+  }
+  if(sel === 'last-month'){
+    const from = new Date(y, m - 1, 1);
+    const to = new Date(y, m, 0);
+    return { from: toISO(from), to: toISO(to) };
+  }
+  if(sel === 'custom'){
+    const from = document.getElementById('range-from').value || null;
+    const to = document.getElementById('range-to').value || null;
+    return { from, to };
+  }
+  return { from: null, to: null };
+}
+
+function toISO(d){
+  return d.toISOString().slice(0,10);
+}
+
+function inRange(dateStr, from, to){
+  if(!dateStr) return true;
+  if(from && dateStr < from) return false;
+  if(to && dateStr > to) return false;
+  return true;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  const code = document.getElementById('in-code').value.trim();
+  const name = document.getElementById('in-name').value.trim();
+  const qty = parseFloat(document.getElementById('in-qty').value);
+  const buy = parseFloat(document.getElementById('in-buy').value);
+  const sellRaw = document.getElementById('in-sell').value;
+  const sell = sellRaw === '' ? null : parseFloat(sellRaw);
+  const date = document.getElementById('in-date').value;
+
+  if(!name || isNaN(qty) || isNaN(buy) || qty <= 0 || buy <= 0){
+    alert('銘柄名・株数・取得単価は入れてね。');
+    return;
+  }
+
+  trades.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    code, name, qty, buy, sell, date: date || new Date().toISOString().slice(0,10)
+  });
+
+  rememberPair(code, name);
+  saveTrades();
+  render();
+
+  document.getElementById('in-code').value = '';
+  document.getElementById('in-name').value = '';
+  document.getElementById('in-qty').value = '';
+  document.getElementById('in-buy').value = '';
+  document.getElementById('in-sell').value = '';
+  document.getElementById('in-date').value = '';
+});
+
+loadTrades();
+
+document.getElementById('period-select').addEventListener('change', (e) => {
+  document.getElementById('custom-range').style.display = e.target.value === 'custom' ? 'flex' : 'none';
+  render();
+});
+document.getElementById('range-from').addEventListener('change', render);
+document.getElementById('range-to').addEventListener('change', render);
+
+document.getElementById('in-code').addEventListener('input', () => {
+  const codeEl = document.getElementById('in-code');
+  const nameEl = document.getElementById('in-name');
+  const code = codeEl.value.trim();
+  if(code.length >= 4 && !nameEl.value.trim()){
+    const found = lookupByCode(code);
+    if(found){ nameEl.value = found; }
+  }
+});
+
+document.getElementById('in-name').addEventListener('input', () => {
+  const codeEl = document.getElementById('in-code');
+  const nameEl = document.getElementById('in-name');
+  const name = nameEl.value.trim();
+  if(name.length >= 2 && !codeEl.value.trim()){
+    const found = lookupByName(name);
+    if(found){ codeEl.value = found; }
+  }
+});
+</script>
+</body>
+</html>
