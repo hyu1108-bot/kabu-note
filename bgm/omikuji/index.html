@@ -293,6 +293,21 @@
     text-underline-offset: 4px;
   }
 
+  .sound-toggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    background: rgba(10, 17, 40, 0.6);
+    border: 1px solid rgba(232, 213, 163, 0.35);
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+
   .hint {
     margin-top: 28px;
     color: rgba(232, 213, 163, 0.35);
@@ -304,6 +319,7 @@
 <body>
 
 <div class="stars" id="stars"></div>
+<button class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="音のオン・オフ">🔔 音あり</button>
 
 <div class="container">
   <div class="eyebrow">宇宙銀行より</div>
@@ -394,6 +410,68 @@
     timing: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><circle cx="32" cy="32" r="18"/><line x1="32" y1="32" x2="32" y2="20" stroke-linecap="round"/><line x1="32" y1="32" x2="41" y2="36" stroke-linecap="round"/></g></svg>`
   };
 
+  // ---- 音（Web Audioで合成。音声ファイル不要） ----
+  let soundOn = true;
+  try { soundOn = localStorage.getItem('omikujiSound') !== 'off'; } catch (e) {}
+  let audioCtx = null;
+
+  function updateSoundLabel() {
+    document.getElementById('soundToggle').textContent = soundOn ? '🔔 音あり' : '🔕 音なし';
+  }
+
+  function toggleSound() {
+    soundOn = !soundOn;
+    try { localStorage.setItem('omikujiSound', soundOn ? 'on' : 'off'); } catch (e) {}
+    updateSoundLabel();
+  }
+
+  function ctx() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  // やわらかい単音（ゆっくり立ち上がって、長く消えていく）
+  function tone(ac, freq, start, dur, vol, type) {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(vol, start + 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    osc.connect(gain).connect(ac.destination);
+    osc.start(start);
+    osc.stop(start + dur + 0.05);
+  }
+
+  // 扉が開く音：低い響き＋きらめく上昇音
+  function playOpenSound() {
+    if (!soundOn) return;
+    const ac = ctx();
+    if (!ac) return;
+    const t = ac.currentTime;
+    tone(ac, 110, t, 2.2, 0.08, 'sine');      // 低い響き
+    tone(ac, 164.8, t, 2.0, 0.05, 'sine');
+    [659.3, 830.6, 987.8, 1318.5].forEach((f, i) => {
+      tone(ac, f, t + 0.12 + i * 0.12, 1.6, 0.05, 'sine');  // きらめき
+    });
+  }
+
+  // 結果が出る音：やさしい和音
+  function playResultSound() {
+    if (!soundOn) return;
+    const ac = ctx();
+    if (!ac) return;
+    const t = ac.currentTime;
+    [440, 554.4, 659.3].forEach((f) => tone(ac, f, t, 2.4, 0.04, 'sine'));
+    tone(ac, 880, t + 0.05, 2.0, 0.025, 'triangle');
+  }
+
   let drawn = false;
   let lastIndex = -1;
   const SITE_URL = 'https://fanciful-syrniki-92720d.netlify.app/';
@@ -424,6 +502,7 @@
 
     drawBtn.disabled = true;
     gateWrap.classList.add('open');
+    playOpenSound();
     gateSvg.classList.add('opening');
     hint.style.opacity = '0';
 
@@ -446,6 +525,7 @@
       document.getElementById('resultTag').textContent = pick.tag;
       document.getElementById('resultMessage').textContent = pick.message;
       result.classList.add('visible');
+      playResultSound();
       requestAnimationFrame(() => {
         result.classList.add('show');
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -464,6 +544,7 @@
   }
 
   createStars();
+  updateSoundLabel();
 </script>
 
 </body>
