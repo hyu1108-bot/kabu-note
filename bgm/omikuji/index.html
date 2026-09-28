@@ -206,6 +206,7 @@
     font-size: 19px;
     line-height: 1.9;
     letter-spacing: 0.03em;
+    white-space: pre-line;
   }
 
   .again-btn {
@@ -222,6 +223,52 @@
 
   .again-btn:hover {
     color: var(--gold);
+  }
+
+  .next {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .next-label {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold-dim);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    margin-bottom: 2px;
+  }
+
+  .next-link {
+    display: block;
+    border: 1px solid rgba(232, 213, 163, 0.45);
+    color: var(--gold-bright);
+    text-decoration: none;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    padding: 14px 16px;
+    transition: background 0.3s ease;
+  }
+
+  .next-link:hover {
+    background: rgba(232, 213, 163, 0.08);
+  }
+
+  .next-link small {
+    display: block;
+    margin-top: 4px;
+    color: rgba(232, 213, 163, 0.55);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .next-kindle {
+    color: rgba(232, 213, 163, 0.55);
+    font-size: 12px;
+    text-underline-offset: 4px;
   }
 
   .hint {
@@ -272,6 +319,18 @@
       <div class="result-tag" id="resultTag">888 — 無限の兆し</div>
       <div class="result-message" id="resultMessage"></div>
     </div>
+    <div class="next">
+      <div class="next-label">— この扉の先へ —</div>
+      <a class="next-link" href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ/streams" target="_blank" rel="noopener">
+        🌕 豊かさの音を流しながら眠る
+        <small>宇宙銀行の金運ライブ（月・水・土）</small>
+      </a>
+      <a class="next-link" href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener">
+        📖 今週の「見えない入金」を記帳する
+        <small>ワーク帳『残高を見るのが怖いあなたへ』（紙の本）</small>
+      </a>
+      <a class="next-kindle" href="https://www.amazon.co.jp/dp/B0H5SV8JMM" target="_blank" rel="noopener">Kindle版はこちら</a>
+    </div>
     <button class="again-btn" id="againBtn" onclick="reset()">もう一度、扉の前に立つ</button>
   </div>
 
@@ -284,7 +343,7 @@
     { cat: "888", tag: "888 — 無限の兆し", message: "終わりのない豊かさが、\n今日という日に流れ込んでいます。" },
     { cat: "snake", tag: "白蛇 — 気づきの合図", message: "白蛇があなたのそばを\nそっと通り過ぎました。" },
     { cat: "snake", tag: "白蛇 — 気づきの合図", message: "見えないところで、\n何かが良い方向へ動いています。" },
-    { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "あなたの宇宙銀行口座に、\n小さな豊かさが入金されました。" },
+    { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "あなたの宇宙銀行に、\n小さな豊かさが届きました。" },
     { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "今日の行いは、\nすべて宇宙銀行に記録されています。" },
     { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "眠っている間に、\nあなたの潜在意識が整理を始めます。" },
     { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "考えすぎなくていい日です。\n感じるままで大丈夫。" },
