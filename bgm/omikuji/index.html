@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>宇宙銀行おみくじ</title>
+<meta name="description" content="扉を開くと、今日のあなたへの金運メッセージが届きます。宇宙銀行からの小さなプレゼントです。">
+<meta property="og:title" content="宇宙銀行おみくじ">
+<meta property="og:description" content="扉を開くと、今日のあなたへの金運メッセージが届きます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fanciful-syrniki-92720d.netlify.app/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a1128">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎴</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
 
@@ -158,11 +166,14 @@
   }
 
   .result {
+    display: none;
     margin-top: 32px;
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
+
+  .result.visible { display: block; }
 
   .result.show {
     opacity: 1;
@@ -207,6 +218,17 @@
     line-height: 1.9;
     letter-spacing: 0.03em;
     white-space: pre-line;
+  }
+
+  .share-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232, 213, 163, 0.4);
+    padding-bottom: 2px;
   }
 
   .again-btn {
@@ -331,6 +353,7 @@
       </a>
       <a class="next-kindle" href="https://www.amazon.co.jp/dp/B0H5SV8JMM" target="_blank" rel="noopener">Kindle版はこちら</a>
     </div>
+    <a class="share-link" id="shareLink" href="#" target="_blank" rel="noopener">𝕏 このメッセージをシェアする</a><br>
     <button class="again-btn" id="againBtn" onclick="reset()">もう一度、扉の前に立つ</button>
   </div>
 
@@ -356,7 +379,7 @@
     { cat: "888", tag: "888 — 無限の兆し", message: "数字の888は、\nあなたがすでに満たされている証です。" },
     { cat: "snake", tag: "白蛇 — 気づきの合図", message: "夢の中で何かを見たら、\nそれは宇宙からの手紙かもしれません。" },
     { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "誰かに優しくしたことも、\n立派な預金になっています。" },
-    { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "今日流したこの音が、\n静かにあなたの中に残ります。" },
+    { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "今日受け取ったこの言葉が、\n静かにあなたの中に残ります。" },
     { cat: "calm", tag: "安心 — 今日のあなたへ", message: "何も変わらない一日にも、\n確かな豊かさが流れています。" },
     { cat: "gate", tag: "金の扉 — 開かれる時", message: "今日この扉を開いたことが、\nもうひとつの一歩です。" }
   ];
@@ -372,6 +395,8 @@
   };
 
   let drawn = false;
+  let lastIndex = -1;
+  const SITE_URL = 'https://fanciful-syrniki-92720d.netlify.app/';
 
   function createStars() {
     const container = document.getElementById('stars');
@@ -402,13 +427,29 @@
     gateSvg.classList.add('opening');
     hint.style.opacity = '0';
 
-    const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
+    let index;
+    do {
+      index = Math.floor(Math.random() * fortunes.length);
+    } while (index === lastIndex);
+    lastIndex = index;
+    const pick = fortunes[index];
+
+    const shareText = `宇宙銀行おみくじ🎴\n【${pick.tag}】\n${pick.message.replace('\n', '')}\n`;
+    document.getElementById('shareLink').href =
+      'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) +
+      '&url=' + encodeURIComponent(SITE_URL) +
+      '&hashtags=' + encodeURIComponent('宇宙銀行,金運');
 
     setTimeout(() => {
+      const result = document.getElementById('result');
       document.getElementById('resultIcon').innerHTML = icons[pick.cat];
       document.getElementById('resultTag').textContent = pick.tag;
       document.getElementById('resultMessage').textContent = pick.message;
-      document.getElementById('result').classList.add('show');
+      result.classList.add('visible');
+      requestAnimationFrame(() => {
+        result.classList.add('show');
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }, 700);
   }
 
@@ -416,7 +457,8 @@
     drawn = false;
     document.getElementById('gateWrap').classList.remove('open');
     document.getElementById('gateSvg').classList.remove('opening');
-    document.getElementById('result').classList.remove('show');
+    document.getElementById('result').classList.remove('show', 'visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('drawBtn').disabled = false;
     document.getElementById('hint').style.opacity = '1';
   }
