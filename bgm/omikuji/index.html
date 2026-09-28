@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宇宙銀行おみくじ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --deep-blue: #0a1128;
+    --deep-blue-2: #131c3d;
+    --gold: #e8d5a3;
+    --gold-bright: #f4e4b8;
+    --gold-dim: #c9b070;
+    --emerald: #1b4d3e;
+    --cream: #f5f0e6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    background: radial-gradient(ellipse at center, var(--deep-blue-2) 0%, var(--deep-blue) 70%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px 80px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    background: var(--gold);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.6; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold-dim);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold-bright);
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0 0 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .subtitle {
+    color: rgba(232, 213, 163, 0.6);
+    font-size: 13px;
+    margin-bottom: 40px;
+    letter-spacing: 0.05em;
+  }
+
+  .gate-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 40px;
+  }
+
+  .gate-svg {
+    width: 100%;
+    height: 100%;
+    transition: filter 0.6s ease;
+  }
+
+  .gate-svg.opening {
+    filter: drop-shadow(0 0 24px rgba(232, 213, 163, 0.5));
+  }
+
+  .door-left, .door-right {
+    transform-origin: center;
+    transition: transform 1.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .gate-wrap.open .door-left {
+    transform: translateX(-14px) scaleX(0.3);
+    opacity: 0;
+  }
+
+  .gate-wrap.open .door-right {
+    transform: translateX(14px) scaleX(0.3);
+    opacity: 0;
+  }
+
+  .door-left, .door-right {
+    transition: transform 1.1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.1s ease;
+  }
+
+  .light-burst {
+    opacity: 0;
+    transition: opacity 0.8s ease 0.3s;
+  }
+
+  .gate-wrap.open .light-burst {
+    opacity: 1;
+  }
+
+  .draw-btn {
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color: var(--deep-blue);
+    border: none;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 14px 40px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px rgba(232, 213, 163, 0.25);
+  }
+
+  .draw-btn:hover {
+    box-shadow: 0 4px 28px rgba(232, 213, 163, 0.4);
+  }
+
+  .draw-btn:active {
+    transform: scale(0.97);
+  }
+
+  .draw-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  .result {
+    margin-top: 32px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .result.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .result-frame {
+    border: 1px solid rgba(232, 213, 163, 0.3);
+    padding: 28px 24px;
+    position: relative;
+  }
+
+  .result-frame::before, .result-frame::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--gold-dim);
+  }
+
+  .result-frame::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .result-frame::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .result-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+  }
+
+  .result-tag {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold-dim);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    margin-bottom: 14px;
+  }
+
+  .result-message {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--cream);
+    font-size: 19px;
+    line-height: 1.9;
+    letter-spacing: 0.03em;
+  }
+
+  .again-btn {
+    margin-top: 24px;
+    background: none;
+    border: none;
+    color: rgba(232, 213, 163, 0.5);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .again-btn:hover {
+    color: var(--gold);
+  }
+
+  .hint {
+    margin-top: 28px;
+    color: rgba(232, 213, 163, 0.35);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="eyebrow">MEMBERS ONLY</div>
+  <h1>宇宙銀行おみくじ</h1>
+  <p class="subtitle">今日、あなたに開かれる扉</p>
+
+  <div class="gate-wrap" id="gateWrap">
+    <svg class="gate-svg" id="gateSvg" viewBox="0 0 220 220">
+      <circle class="light-burst" cx="110" cy="100" r="70" fill="url(#glow)" />
+      <defs>
+        <radialGradient id="glow">
+          <stop offset="0%" stop-color="#f4e4b8" stop-opacity="0.9" />
+          <stop offset="100%" stop-color="#f4e4b8" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <rect x="20" y="30" width="180" height="150" rx="2" fill="none" stroke="#c9b070" stroke-width="1.5" opacity="0.5" />
+      <g class="door-left">
+        <rect x="24" y="34" width="86" height="142" fill="#131c3d" stroke="#e8d5a3" stroke-width="1.5" />
+        <line x1="40" y1="50" x2="40" y2="160" stroke="#c9b070" stroke-width="0.5" opacity="0.6" />
+        <circle cx="102" cy="105" r="4" fill="#e8d5a3" />
+      </g>
+      <g class="door-right">
+        <rect x="110" y="34" width="86" height="142" fill="#131c3d" stroke="#e8d5a3" stroke-width="1.5" />
+        <line x1="180" y1="50" x2="180" y2="160" stroke="#c9b070" stroke-width="0.5" opacity="0.6" />
+        <circle cx="118" cy="105" r="4" fill="#e8d5a3" />
+      </g>
+    </svg>
+  </div>
+
+  <button class="draw-btn" id="drawBtn" onclick="drawFortune()">扉を開く</button>
+
+  <div class="result" id="result">
+    <div class="result-frame">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-tag" id="resultTag">888 — 無限の兆し</div>
+      <div class="result-message" id="resultMessage"></div>
+    </div>
+    <button class="again-btn" id="againBtn" onclick="reset()">もう一度、扉の前に立つ</button>
+  </div>
+
+  <p class="hint" id="hint">タップして、今日のメッセージを受け取ってください</p>
+</div>
+
+<script>
+  const fortunes = [
+    { cat: "888", tag: "888 — 無限の兆し", message: "あなたの中の888が、\n静かに目を覚まし始めています。" },
+    { cat: "888", tag: "888 — 無限の兆し", message: "終わりのない豊かさが、\n今日という日に流れ込んでいます。" },
+    { cat: "snake", tag: "白蛇 — 気づきの合図", message: "白蛇があなたのそばを\nそっと通り過ぎました。" },
+    { cat: "snake", tag: "白蛇 — 気づきの合図", message: "見えないところで、\n何かが良い方向へ動いています。" },
+    { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "あなたの宇宙銀行口座に、\n小さな豊かさが入金されました。" },
+    { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "今日の行いは、\nすべて宇宙銀行に記録されています。" },
+    { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "眠っている間に、\nあなたの潜在意識が整理を始めます。" },
+    { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "考えすぎなくていい日です。\n感じるままで大丈夫。" },
+    { cat: "calm", tag: "安心 — 今日のあなたへ", message: "今日のあなたは、\nもう十分がんばっています。" },
+    { cat: "calm", tag: "安心 — 今日のあなたへ", message: "不安に思う必要はありません。\nあなたはもう大丈夫です。" },
+    { cat: "gate", tag: "金の扉 — 開かれる時", message: "小さな金の扉が、\nまた一つ開かれました。" },
+    { cat: "gate", tag: "金の扉 — 開かれる時", message: "焦らなくていい。\n扉は、開くべき時に開きます。" },
+    { cat: "timing", tag: "宇宙的タイミング", message: "今は、種をまく時。\n芽が出るのは、また別の日です。" },
+    { cat: "timing", tag: "宇宙的タイミング", message: "宇宙のリズムは、\nあなたの味方をしています。" },
+    { cat: "888", tag: "888 — 無限の兆し", message: "数字の888は、\nあなたがすでに満たされている証です。" },
+    { cat: "snake", tag: "白蛇 — 気づきの合図", message: "夢の中で何かを見たら、\nそれは宇宙からの手紙かもしれません。" },
+    { cat: "bank", tag: "宇宙銀行 — 入金の兆し", message: "誰かに優しくしたことも、\n立派な預金になっています。" },
+    { cat: "mind", tag: "潜在意識 — 深層のささやき", message: "今日流したこの音が、\n静かにあなたの中に残ります。" },
+    { cat: "calm", tag: "安心 — 今日のあなたへ", message: "何も変わらない一日にも、\n確かな豊かさが流れています。" },
+    { cat: "gate", tag: "金の扉 — 開かれる時", message: "今日この扉を開いたことが、\nもうひとつの一歩です。" }
+  ];
+
+  const icons = {
+    888: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><circle cx="20" cy="32" r="13"/><circle cx="44" cy="32" r="13"/><circle cx="32" cy="18" r="5" opacity="0.6"/></g></svg>`,
+    snake: `<svg viewBox="0 0 64 64"><path d="M14 46 Q14 30 26 30 Q38 30 38 18 Q38 10 30 10" fill="none" stroke="#e8d5a3" stroke-width="2.5" stroke-linecap="round"/><circle cx="30" cy="10" r="3" fill="#e8d5a3"/></svg>`,
+    bank: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><rect x="14" y="26" width="36" height="24" /><path d="M10 26 L32 12 L54 26" stroke-linejoin="round"/><line x1="22" y1="30" x2="22" y2="46"/><line x1="32" y1="30" x2="32" y2="46"/><line x1="42" y1="30" x2="42" y2="46"/></g></svg>`,
+    mind: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><circle cx="32" cy="30" r="16"/><path d="M32 46 Q32 54 26 58" stroke-linecap="round"/><circle cx="32" cy="30" r="4" opacity="0.6"/></g></svg>`,
+    calm: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2" stroke-linecap="round"><path d="M14 38 Q32 24 50 38"/><circle cx="32" cy="20" r="3" fill="#e8d5a3" stroke="none"/></g></svg>`,
+    gate: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><rect x="12" y="14" width="14" height="36"/><rect x="38" y="14" width="14" height="36"/><path d="M8 14 L56 14" opacity="0.5"/></g></svg>`,
+    timing: `<svg viewBox="0 0 64 64"><g fill="none" stroke="#e8d5a3" stroke-width="2"><circle cx="32" cy="32" r="18"/><line x1="32" y1="32" x2="32" y2="20" stroke-linecap="round"/><line x1="32" y1="32" x2="41" y2="36" stroke-linecap="round"/></g></svg>`
+  };
+
+  let drawn = false;
+
+  function createStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 40; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 2 + 1;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = (Math.random() * 4) + 's';
+      container.appendChild(star);
+    }
+  }
+
+  function drawFortune() {
+    if (drawn) return;
+    drawn = true;
+
+    const gateWrap = document.getElementById('gateWrap');
+    const gateSvg = document.getElementById('gateSvg');
+    const drawBtn = document.getElementById('drawBtn');
+    const hint = document.getElementById('hint');
+
+    drawBtn.disabled = true;
+    gateWrap.classList.add('open');
+    gateSvg.classList.add('opening');
+    hint.style.opacity = '0';
+
+    const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
+
+    setTimeout(() => {
+      document.getElementById('resultIcon').innerHTML = icons[pick.cat];
+      document.getElementById('resultTag').textContent = pick.tag;
+      document.getElementById('resultMessage').textContent = pick.message;
+      document.getElementById('result').classList.add('show');
+    }, 700);
+  }
+
+  function reset() {
+    drawn = false;
+    document.getElementById('gateWrap').classList.remove('open');
+    document.getElementById('gateSvg').classList.remove('opening');
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('drawBtn').disabled = false;
+    document.getElementById('hint').style.opacity = '1';
+  }
+
+  createStars();
+</script>
+
+</body>
+</html>
