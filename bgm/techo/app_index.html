@@ -304,10 +304,7 @@ function show(n){
      <a class="next-link" href="https://www.amazon.co.jp/s?k=%E3%81%8A%E9%87%91%E3%81%AE%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%82%92%E6%9B%B8%E3%81%8D%E3%81%8B%E3%81%88%E3%82%8B%E6%89%8B%E5%B8%B3" target="_blank" rel="noopener">📔 この言葉を、1週間ずつ手帳に書いていく<small>『お金のブロックを書きかえる手帳』（日付なし）</small></a>
      <a class="next-link" href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener">📖 不安をほどくワークを続ける<small>ワーク帳『残高を見るのが怖いあなたへ』（紙の本）</small></a>
 </div>
-   <div class="help"><b>つらさが続くときは、ひとりで抱えずに</b>
-     <p>借金や支払いが苦しいとき、眠れない・気持ちが沈む日が続くときは、専門の窓口に相談してみてください。相談は無料です。</p>
-     <span>⚖️ お金・借金の相談：「法テラス」で検索</span>
-     <span>🌿 こころの相談：「まもろうよ こころ」で検索（厚生労働省）</span></div>`;
+   <div class="help"><b>つらさが続くときは、ひとりで抱えずに</b><p>お金の相談は「法テラス」、こころの相談は「まもろうよ こころ」で検索を（どちらも無料）。</p></div>`;
   document.getElementById("copy").onclick=e=>{navigator.clipboard.writeText(w).then(()=>e.target.textContent="コピーしました",()=>getSelection().selectAllChildren(document.getElementById("word")))};
   document.getElementById("save").onclick=e=>{const L=load();L.unshift({t:Date.now(),v,w,a,m:document.getElementById("memo").value.trim(),done:false});store(L);e.target.textContent="記録しました";e.target.disabled=true};
   const t=new Date(),u=new Date(Date.now()+864e5),p=n=>String(n).padStart(2,"0"),f=d=>`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
