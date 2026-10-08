@@ -283,7 +283,7 @@ function drawBook(){
    ${e.m?`<div class="m">メモ：${esc(e.m)}</div>`:""}
    <label class="chk"><input type="checkbox" data-k="${k}" ${e.done?"checked":""}>今日ひとつだけ：${esc(e.a)}</label>
    <button class="del" data-x="${k}">この記録を消す</button></div>`}).join(""):`<p class="empty">まだ何も書かれていません。「言葉をえらぶ」で言葉を見つけて、「記録に残す」を押すと、ここに日付つきで残ります。</p>`}</div>
-   <p class="note">記録はこの端末のこのブラウザだけに保存されます。履歴を消すと記録も消えます。</p>`;
+   <p class="note">記録はこのスマホのこのブラウザだけに保存されます。機種変更や履歴の削除で消えることがあります。<br>ずっと残したい方は、言葉の画面の「💬 LINEに送る」で自分に送っておくと安心です。</p>`;
   book.querySelectorAll("[data-k]").forEach(c=>c.onchange=()=>{const L=load();L[c.dataset.k].done=c.checked;store(L)});
   book.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{const L=load();L.splice(b.dataset.x,1);store(L);drawBook()});
 }
