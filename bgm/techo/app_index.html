@@ -78,7 +78,12 @@ textarea{font:inherit;width:100%;box-sizing:border-box;min-height:80px;backgroun
 .grp .chips{margin:0}
 .grp .chip{border-color:color-mix(in srgb,var(--gc) 45%,transparent)}
 .grp .chip[aria-pressed="true"]{background:var(--gc);border-color:var(--gc);color:#1a1630}
-.gsel{margin-top:8px;color:var(--mute);font-size:14px}
+.gsel{margin-top:8px;color:var(--gold);font-size:15px;font-weight:700;scroll-margin-top:16px}
+.gsel::after{content:" ↓ ここから選んでください";color:var(--mute);font-weight:400;font-size:13px}
+.flash~.opt{animation:rise .45s ease both}
+.res{animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.flash~.opt,.res{animation:none}}
 @media (max-width:480px){.grp{grid-template-columns:1fr;gap:6px}}
 [hidden]{display:none!important}
 .ice-top b{text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
@@ -230,7 +235,7 @@ const GROUPS=[
 let cat="借金・支払い";
 function drawPick(){
   pick.innerHTML=GROUPS.map(g=>`<div class="grp" style="--gc:${g.col}"><div class="gh"><span class="gi">${g.icon}</span>${g.name}</div><div class="chips">${g.cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}</div></div>`).join("")+`<div class="gsel">「${cat}」の口ぐせ</div>`;
-  pick.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawPick()});
+  pick.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawPick();const g=pick.querySelector(".gsel");g.classList.add("flash");g.scrollIntoView({behavior:"smooth",block:"start"})});
   ITEMS.forEach((it,n)=>{if(it[0]!==cat)return;const b=document.createElement("button");b.className="opt";b.textContent="「"+it[1]+"」";b.onclick=()=>show(n);pick.appendChild(b)})}
 drawPick();
 function show(n){
