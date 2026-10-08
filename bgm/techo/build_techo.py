@@ -53,7 +53,7 @@ w=0
 for m in range(12):
     cal='<div class="cal">'+''.join(f'<div class="h{" sun" if d=="日" else ""}">{d}</div>' for d in "月火水木金土日")+''.join('<div></div>' for _ in range(35))+'</div>'
     page(f'''<div class="ttl"><span>　　　月</span><small>MONTHLY</small></div>
-<div class="box"><b>今月のテーマ（○をつける）</b><div class="themes"><span>🪙 お金</span><span>🌱 夢・仕事</span><span>🤝 人とのつながり</span><span>🌿 からだ</span></div></div>
+<div class="box"><b>今月のテーマ（○をつける）</b><div class="themes"><span><svg class="ic" viewBox="0 0 20 20" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><rect x="7.6" y="7.6" width="4.8" height="4.8"/></svg>お金</span><span><svg class="ic" viewBox="0 0 20 20" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18V9"/><path d="M10 11C10 7 7 5 3 5C3 9 6 11 10 11Z"/><path d="M10 9C10 5 13 3 17 3C17 7 14 9 10 9Z"/></svg>夢・仕事</span><span><svg class="ic" viewBox="0 0 20 20" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="6" r="2.6"/><circle cx="13.5" cy="7" r="2.3"/><path d="M2.5 17C2.5 13 4.5 11 7 11S11.5 13 11.5 17"/><path d="M11 12.5C11.8 11.6 12.6 11.2 13.5 11.2C15.8 11.2 17.5 13 17.5 16.5"/></svg>人とのつながり</span><span><svg class="ic" viewBox="0 0 20 20" fill="none" stroke="#222" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16C4 8 9 3.5 17 3.5C17 11.5 12.5 16 4 16Z"/><path d="M4 16L12 8"/></svg>からだ</span></div></div>
 <div class="box"><b>今月の口ぐせ</b><div class="ln"></div><div class="hint">思いつかないときは、アプリ「心のブロック診断」で選んでみてください（使い方のページのQRコードから）</div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
     page(f'''<div class="ttl"><span>今月の記録</span><small>月末に</small></div>
 <div class="box"><b>新しい言葉を言えた日に○</b><div class="nums">{" ".join(str(i) for i in range(1,16))}<br>{" ".join(str(i) for i in range(16,32))}</div></div>
@@ -112,6 +112,7 @@ p{{margin:0}}
 .box{{border:.6pt solid #888;border-radius:2mm;padding:1.5mm 3mm}}
 .box b{{font-size:8pt;letter-spacing:.05em}}
 .themes{{display:flex;justify-content:space-around;font-size:9.5pt;padding:1mm 0}}
+.themes span{{display:inline-flex;align-items:center;gap:1.2mm}} .ic{{width:4.2mm;height:4.2mm}}
 .hint{{font-size:7.5pt;color:#555;margin-top:1mm}}
 .nums{{font-size:9pt;letter-spacing:.12em;line-height:2}}
 .cal{{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:6mm repeat(5,1fr);flex:1;border-top:.6pt solid #888;border-left:.6pt solid #888}}
