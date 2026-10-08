@@ -278,8 +278,8 @@ function show(n){
    "&text="+encodeURIComponent("今日ひとつだけ："+a)+"&dates="+f(t)+"/"+f(u)+
    "&details="+encodeURIComponent("✦ 今日の新しい言葉\n「"+w+"」\n朝と寝る前に、声に出して3回\n\n心の声：「"+v+"」\n奥にある思い："+h+"\n\n心のブロック診断 https://kokoro-block.netlify.app/");
   document.getElementById("share").onclick=e=>{const txt="✦ "+w+"\n今日ひとつだけ："+a+"\n（心の声：「"+v+"」）\nhttps://kokoro-block.netlify.app/";
-    if(navigator.share){navigator.share({title:"心のブロック診断",text:txt}).catch(()=>{})}
-    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。LINEに貼りつけてください",()=>{})}};
+    if(/iPhone|iPad|Android/i.test(navigator.userAgent)){location.href="https://line.me/R/share?text="+encodeURIComponent(txt)}
+    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。パソコンではLINEに貼りつけてください（スマホならLINEが直接開きます）",()=>{})}};
   document.getElementById("back").onclick=()=>{res.hidden=true;pick.hidden=false;scrollTo(0,0)};
   scrollTo(0,0);
 }
