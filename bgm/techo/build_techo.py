@@ -6,6 +6,8 @@ cats=[]
 for it in items:
     if it[0] not in cats: cats.append(it[0])
 F=os.environ.get('FONT_DIR',os.path.abspath('fonts'))
+KIN='file://'+os.path.join(os.path.dirname(os.path.abspath(__file__)),'kinas.png')
+def kinas(msg,size=22,side='left'): return f'<div class="kn {side}"><img src="{KIN}" style="width:{size}mm"><div class="kb">{msg}</div></div>'
 import qrcode,qrcode.image.svg,io
 URL='https://kokoro-block.netlify.app/'
 _b=io.BytesIO();qrcode.make(URL,image_factory=qrcode.image.svg.SvgPathImage,box_size=10,border=1).save(_b)
@@ -20,18 +22,20 @@ def iceberg(top,under,w=100):
 P=[]
 def page(h,cls=''): P.append(f'<section class="pg {cls}">{h}</section>')
 # 1 title
-page('''<div class="cover"><p class="small">宇宙銀行の日付なし手帳</p><h1>お金のブロックを<br>書きかえる手帳</h1><p class="sub">口ぐせの奥にある思いこみに気づいて<br>新しい言葉で1週間ずつ<br>仕事・人間関係・こころまで</p><p class="small">日付なし・いつからでも始められます</p><p class="au">ヒュー</p></div>''')
+page(f'''<div class="cover"><p class="small">宇宙銀行の日付なし手帳</p><h1>お金のブロックを<br>書きかえる手帳</h1><p class="sub">口ぐせの奥にある思いこみに気づいて<br>新しい言葉で1週間ずつ<br>仕事・人間関係・こころまで</p><p class="small">日付なし・いつからでも始められます</p><img src="{KIN}" class="kcover"><p class="au">ヒュー</p></div>''')
 page('<div class="center small">この手帳は、自分の気持ちに気づくためのものです。<br>結果や効果を約束するものではありません。<br><br>借金や支払いが苦しいとき、眠れない・気持ちが沈む日が続くときは、<br>ひとりで抱えずに専門の窓口へ相談してください。<br>お金・借金の相談：「法テラス」で検索<br>こころの相談：「まもろうよ こころ」で検索（厚生労働省）</div>')
 page(f'''<h2>はじめに　氷山の一角</h2>
 <p>「節約しなきゃ」「借金を返すぞ」「人生をやり直したい」。<br>ふだん心の中でつぶやいている口ぐせは、氷山の一角です。</p>
 {iceberg('見えている口ぐせ<br><b>「節約しなきゃ」</b>','水面の下の思いこみ<br><b>いつも足りない</b>')}
-<p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>''')
+<p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>
+{kinas("はじめまして、キーナスです。<br>いっしょに、1週間ずつ<br>やっていこうね。",17)}''')
 page(f'''<h2>この手帳の使い方</h2>
 <div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月のテーマ（お金・夢と仕事・人とのつながり・こころとからだ）に○をつけ、よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。口ぐせがすぐに出てこないときは、アプリで選んでから書けば大丈夫です。</p></div>
 <div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、こころの月（満ちてる・ふつう・ざわざわ）と眠りの☆に○をつけます。「今日ひとつだけ」ができたら□にチェック。</p></div>
 <div class="step"><b>3　週末</b><p>「今週の窓口」に、受け取ったことと、あずけたいことを書きます。</p></div>
 <div class="step"><b>4　月の終わり</b><p>新しい言葉を言えた日に○をつけ、今月の記録を書きます。</p></div>
-<div class="note">書けない日があっても大丈夫。日付は入っていないので、空いたら次のページからまた始めましょう。</div>
+{kinas("書けない日があっても、<br>だいじょうぶ。<br>次のページから、また始めよう。",18,"right")}
+<div class="note" style="display:none">書けない日があっても大丈夫。日付は入っていないので、空いたら次のページからまた始めましょう。</div>
 {qrbox('スマホで読みとると「心のブロック診断」が開きます。口ぐせを選ぶと新しい言葉が出て、TODOをGoogleカレンダーに入れたり、LINEに送ったりもできます。')}
 <div class="step"><b>新しい言葉の言い方</b><p>朝と寝る前に、声に出して3回。心がざわついても、言いなれるほど、なじんでいきます。</p></div>''')
 page(f'''<h2>今年のわたしの口ぐせ</h2><p>思いつくままに書き出してみましょう。お金・仕事・家族・恋愛・からだ、なんでも。</p>
@@ -57,7 +61,8 @@ for m in range(12):
 <div class="box"><b>今月の口ぐせ</b><div class="ln"></div><div class="hint">思いつかないときは、アプリ「心のブロック診断」で選んでみてください（使い方のページのQRコードから）</div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
     page(f'''<div class="ttl"><span>今月の記録</span><small>月末に</small></div>
 <div class="box"><b>新しい言葉を言えた日に○</b><div class="nums">{" ".join(str(i) for i in range(1,16))}<br>{" ".join(str(i) for i in range(16,32))}</div></div>
-<div class="box"><b>今月うけとったもの</b>{ln(4)}</div><div class="box"><b>気づいたこと・メモ</b>{ln(7)}</div>''','R')
+<div class="box"><b>今月うけとったもの</b>{ln(4)}</div><div class="box"><b>気づいたこと・メモ</b>{ln(5)}</div>
+{kinas("今月も、おつかれさま。<br>窓口は、いつでも開いているよ。",16,"right")}''','R')
     for _ in range(5):
         it=order[w];w+=1
         page(f'''<div class="ttl"><span>　　月　　日〜</span><small>WEEKLY</small></div>
@@ -97,7 +102,7 @@ p{{margin:0}}
 .cover{{display:flex;flex-direction:column;justify-content:center;gap:6mm;height:100%;text-align:center}}
 .sub{{font-family:M;font-size:11pt}} .small{{font-size:9pt}} .au{{font-family:M;font-size:13pt;margin-top:20mm}}
 .center{{margin:auto;text-align:center}}
-.ice{{position:relative;width:88%;margin:0 auto;aspect-ratio:360/400}}
+.ice{{position:relative;width:74%;margin:0 auto;aspect-ratio:360/400}}
 .ice svg{{position:absolute;inset:0;width:100%;height:100%}}
 .it{{position:absolute;top:1%;left:0;right:0;text-align:center;font-size:8.5pt}}
 .it b,.iu b{{font-size:11pt;font-family:M}}
@@ -113,6 +118,9 @@ p{{margin:0}}
 .box b{{font-size:8pt;letter-spacing:.05em}}
 .themes{{display:flex;justify-content:space-around;font-size:9.5pt;padding:1mm 0}}
 .themes span{{display:inline-flex;align-items:center;gap:1.2mm}} .ic{{width:4.2mm;height:4.2mm}}
+.kn{{display:flex;align-items:center;gap:3mm}} .kn.right{{flex-direction:row-reverse}}
+.kb{{border:.7pt solid #222;border-radius:4mm;padding:2mm 3.5mm;font-size:9pt;line-height:1.7;position:relative;background:#fff}}
+.kcover{{width:30mm;margin:0 auto}}
 .hint{{font-size:7.5pt;color:#555;margin-top:1mm}}
 .nums{{font-size:9pt;letter-spacing:.12em;line-height:2}}
 .cal{{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:6mm repeat(5,1fr);flex:1;border-top:.6pt solid #888;border-left:.6pt solid #888}}
