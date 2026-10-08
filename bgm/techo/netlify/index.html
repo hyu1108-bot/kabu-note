@@ -110,6 +110,9 @@ textarea{font:inherit;width:100%;box-sizing:border-box;min-height:80px;backgroun
 .ck{display:flex;gap:10px;align-items:flex-start;font-size:16px}
 .ck input{width:22px;height:22px;flex:none;margin-top:3px;accent-color:#e6c46a}
 .chal .link{font:inherit;background:none;border:0;color:var(--mute);text-decoration:underline;font-size:13px;align-self:flex-start;cursor:pointer;padding:0}
+.done{background:var(--gold);color:#1a1630;font-weight:700;border-radius:10px;padding:10px 14px;text-align:center;animation:rise .4s ease both}
+.done.half{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.tiny2{font-size:13px;color:var(--mute)}
 .chal-start{width:100%;font-size:17px;padding:14px}
 .next{display:flex;flex-direction:column;gap:10px;margin-top:8px;padding-top:18px;border-top:1px solid var(--line)}
 .next-label{text-align:center;color:var(--gold);letter-spacing:.15em;font-size:14px}
@@ -355,7 +358,7 @@ function drawChal(){
   const s0=new Date(p[0],p[1]-1,p[2]),t=new Date();t.setHours(0,0,0,0);
   const day=Math.floor((t-s0)/864e5)+1,today=dkey(new Date()),L=c.log[today]||{};
   const dots=Array.from({length:7},(_,i)=>{const d=new Date(s0);d.setDate(d.getDate()+i);const g=c.log[dkey(d)]||{};
-    const cls=g.said&&g.did?"full":(g.said||g.did)?"half":"";return `<span class="dot ${cls} ${i+1===day?"now":""}">${i+1}</span>`}).join("");
+    const cls=g.said&&g.did?"full":(g.said||g.did)?"half":"";return `<span class="dot ${cls} ${i+1===day?"now":""}">${cls==="full"?"✓":i+1}</span>`}).join("");
   chal.hidden=false;
   if(day>7){
     chal.innerHTML=`<div class="chal"><div class="chal-h">✦ 7日間おつかれさまでした</div><div class="chal-w">「${w}」</div><div class="dots">${dots}</div>
@@ -369,6 +372,8 @@ function drawChal(){
    <p class="chal-q">今日は、どうでしたか？</p>
    <label class="ck"><input type="checkbox" id="csaid" ${L.said?"checked":""}> 声に出して言えた</label>
    <label class="ck"><input type="checkbox" id="cdid" ${L.did?"checked":""}> 今日ひとつだけ：${a}</label>
+   ${L.said&&L.did?`<div class="done">✨ ${day}日目、達成！ 記録しました</div>`:(L.said||L.did)?`<div class="done half">✓ 記録しました（あと1つで${day}日目達成）</div>`:""}
+   <p class="tiny2">達成した日は、上の丸が金色になります。${Object.values(c.log).filter(g=>g.said&&g.did).length}日 達成</p>
    <button class="link" id="cstop">チャレンジをやめる</button></div>`;
   const upd=()=>{const c2=getC();c2.log[today]={said:document.getElementById("csaid").checked,did:document.getElementById("cdid").checked};putC(c2);drawChal()};
   document.getElementById("csaid").onchange=upd;document.getElementById("cdid").onchange=upd;
