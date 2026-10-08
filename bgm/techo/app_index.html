@@ -254,7 +254,7 @@ function show(n){
    <div class="step"><span class="label" style="text-align:center">✦ 新しい言葉 ✦</span><div class="word" id="word">${w}</div><p class="side">朝と寝る前に、声に出して3回</p></div>
    <div class="step act"><span class="label">今日ひとつだけ</span><p>${a}</p></div>
    <div class="step"><label class="label" for="memo">メモ（なくてもOK）</label><textarea id="memo" placeholder="例：今日はポイントで500円分受け取れた"></textarea></div>
-   <div class="row"><button class="btn" id="save">記録に残す</button><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">📝 メモアプリに送る</button><button class="btn ghost" id="copy">言葉をコピー</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>`;
+   <div class="row"><button class="btn" id="save">記録に残す</button><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">💬 LINEに送る</button><button class="btn ghost" id="copy">言葉をコピー</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>`;
   document.getElementById("copy").onclick=e=>{navigator.clipboard.writeText(w).then(()=>e.target.textContent="コピーしました",()=>getSelection().selectAllChildren(document.getElementById("word")))};
   document.getElementById("save").onclick=e=>{const L=load();L.unshift({t:Date.now(),v,w,a,m:document.getElementById("memo").value.trim(),done:false});store(L);e.target.textContent="記録しました";e.target.disabled=true};
   const t=new Date(),u=new Date(Date.now()+864e5),p=n=>String(n).padStart(2,"0"),f=d=>`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
@@ -263,7 +263,7 @@ function show(n){
    "&details="+encodeURIComponent("✦ 今日の新しい言葉\n「"+w+"」\n朝と寝る前に、声に出して3回\n\n心の声：「"+v+"」\n奥にある思い："+h+"\n\n心のブロック診断 https://kokoro-block.netlify.app/");
   document.getElementById("share").onclick=e=>{const txt="✦ "+w+"\n今日ひとつだけ："+a+"\n（心の声：「"+v+"」）\nhttps://kokoro-block.netlify.app/";
     if(navigator.share){navigator.share({title:"心のブロック診断",text:txt}).catch(()=>{})}
-    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。メモアプリに貼りつけてください",()=>{})}};
+    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。LINEに貼りつけてください",()=>{})}};
   document.getElementById("back").onclick=()=>{res.hidden=true;pick.hidden=false;scrollTo(0,0)};
   scrollTo(0,0);
 }
