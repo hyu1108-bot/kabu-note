@@ -261,7 +261,8 @@ function show(n){
    <div class="step"><span class="label" style="text-align:center">✦ 新しい言葉 ✦</span><div class="word" id="word">${w}</div><p class="side">朝と寝る前に、声に出して3回</p></div>
    <div class="step act"><span class="label">今日ひとつだけ</span><p>${a}</p></div>
    <div class="step"><label class="label" for="memo">メモ（なくてもOK）</label><textarea id="memo" placeholder="例：今日はポイントで500円分受け取れた"></textarea></div>
-   <div class="row"><button class="btn" id="save">記録に残す</button><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">💬 LINEに送る</button><button class="btn ghost" id="copy">言葉をコピー</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>`;
+   <div class="row"><button class="btn" id="save">記録に残す</button><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">💬 LINEのKeepメモに送る</button><button class="btn ghost" id="copy">言葉をコピー</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>
+   <p class="note">💬 LINEが開いたら、送り先で「Keepメモ」を選ぶと、自分だけに残せます。</p>`;
   document.getElementById("copy").onclick=e=>{navigator.clipboard.writeText(w).then(()=>e.target.textContent="コピーしました",()=>getSelection().selectAllChildren(document.getElementById("word")))};
   document.getElementById("save").onclick=e=>{const L=load();L.unshift({t:Date.now(),v,w,a,m:document.getElementById("memo").value.trim(),done:false});store(L);e.target.textContent="記録しました";e.target.disabled=true};
   const t=new Date(),u=new Date(Date.now()+864e5),p=n=>String(n).padStart(2,"0"),f=d=>`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
@@ -270,7 +271,7 @@ function show(n){
    "&details="+encodeURIComponent("✦ 今日の新しい言葉\n「"+w+"」\n朝と寝る前に、声に出して3回\n\n心の声：「"+v+"」\n奥にある思い："+h+"\n\n心のブロック診断 https://kokoro-block.netlify.app/");
   document.getElementById("share").onclick=e=>{const txt="✦ "+w+"\n今日ひとつだけ："+a+"\n（心の声：「"+v+"」）\nhttps://kokoro-block.netlify.app/";
     if(/iPhone|iPad|Android/i.test(navigator.userAgent)){location.href="https://line.me/R/share?text="+encodeURIComponent(txt)}
-    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。パソコンではLINEに貼りつけてください（スマホならLINEが直接開きます）",()=>{})}};
+    else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。パソコンではLINEのKeepメモに貼りつけてください（スマホならLINEが直接開きます）",()=>{})}};
   document.getElementById("back").onclick=()=>{res.hidden=true;pick.hidden=false;scrollTo(0,0)};
   scrollTo(0,0);
 }
@@ -290,7 +291,7 @@ function drawBook(){
    ${e.m?`<div class="m">メモ：${esc(e.m)}</div>`:""}
    <label class="chk"><input type="checkbox" data-k="${k}" ${e.done?"checked":""}>今日ひとつだけ：${esc(e.a)}</label>
    <button class="del" data-x="${k}">この記録を消す</button></div>`}).join(""):`<p class="empty">まだ何も書かれていません。「言葉をえらぶ」で言葉を見つけて、「記録に残す」を押すと、ここに日付つきで残ります。</p>`}</div>
-   <p class="note">記録はこのスマホのこのブラウザだけに保存されます。機種変更や履歴の削除で消えることがあります。<br>ずっと残したい方は、言葉の画面の「💬 LINEに送る」で自分に送っておくと安心です。</p>`;
+   <p class="note">記録はこのスマホのこのブラウザだけに保存されます。機種変更や履歴の削除で消えることがあります。<br>ずっと残したい方は、言葉の画面の「💬 LINEのKeepメモに送る」で残しておくと安心です。</p>`;
   book.querySelectorAll("[data-k]").forEach(c=>c.onchange=()=>{const L=load();L[c.dataset.k].done=c.checked;store(L)});
   book.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{const L=load();L.splice(b.dataset.x,1);store(L);drawBook()});
 }
