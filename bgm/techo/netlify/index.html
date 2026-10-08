@@ -102,6 +102,9 @@ textarea{font:inherit;width:100%;box-sizing:border-box;min-height:80px;backgroun
 .next-link{display:block;text-decoration:none;color:var(--fg);background:var(--panel);border:1px solid var(--gold);border-radius:12px;padding:14px 16px;font-weight:700}
 .next-link small{display:block;font-weight:400;color:var(--mute);font-size:13px;margin-top:2px}
 .next-link:hover,.next-link:focus-visible{background:#1c2856;outline:none}
+.help{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--mute)}
+.help b{color:var(--fg)}
+.help a{color:var(--fg)}
 .next-kindle{text-align:center;color:var(--mute);font-size:13px}
 .ice-top b{text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
 </style>
@@ -286,7 +289,11 @@ function show(n){
    <div class="next"><div class="next-label">— この扉の先へ —</div>
      <a class="next-link" href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ/streams" target="_blank" rel="noopener">🌙 今夜、この言葉と一緒に眠る<small>宇宙銀行の金運ライブ（月・土 18時〜朝まで）</small></a>
      <a class="next-link" href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener">📖 不安をほどくワークを続ける<small>ワーク帳『残高を見るのが怖いあなたへ』（紙の本）</small></a>
-     <a class="next-kindle" href="https://www.amazon.co.jp/dp/B0H5SV8JMM" target="_blank" rel="noopener">Kindle版はこちら</a></div>`;
+     <a class="next-kindle" href="https://www.amazon.co.jp/dp/B0H5SV8JMM" target="_blank" rel="noopener">Kindle版はこちら</a></div>
+   <div class="help"><b>つらさが続くときは、ひとりで抱えずに</b>
+     <p>借金や支払いが苦しいとき、眠れない・気持ちが沈む日が続くときは、専門の窓口に相談してみてください。相談は無料です。</p>
+     <a href="https://www.houterasu.or.jp/" target="_blank" rel="noopener">⚖️ お金・借金の相談：法テラス</a>
+     <a href="https://www.mhlw.go.jp/mamorouyokokoro/" target="_blank" rel="noopener">🌿 こころの相談：まもろうよ こころ（厚生労働省）</a></div>`;
   document.getElementById("copy").onclick=e=>{navigator.clipboard.writeText(w).then(()=>e.target.textContent="コピーしました",()=>getSelection().selectAllChildren(document.getElementById("word")))};
   document.getElementById("save").onclick=e=>{const L=load();L.unshift({t:Date.now(),v,w,a,m:document.getElementById("memo").value.trim(),done:false});store(L);e.target.textContent="記録しました";e.target.disabled=true};
   const t=new Date(),u=new Date(Date.now()+864e5),p=n=>String(n).padStart(2,"0"),f=d=>`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
