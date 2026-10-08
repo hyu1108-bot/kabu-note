@@ -339,7 +339,7 @@
     <div class="balance-box">
       <div class="balance-label">本日の入金</div>
       <div class="balance-today" id="today-amount"></div>
-      <div class="balance-label" style="margin-top:10px;">これまでの確定保有残高</div>
+      <div class="balance-label" style="margin-top:10px;">これまでに積み上げた豊かさ</div>
       <div class="balance-value" id="balance-amount"></div>
       <div class="balance-note" id="balance-note"></div>
     </div>
@@ -465,7 +465,7 @@
       note = "今夜の分は、もう記帳済みです。また明日の夜にお越しください🌙";
     }
     if (balance >= 888 && balance - todayTotal < 888 && last !== todayKey) {
-      note = "残高が 888 を超えました✨ 宇宙銀行の扉が、また一枚ひらきました。";
+      note = "積み上げた豊かさが 888 を超えました✨ 宇宙銀行の扉が、また一枚ひらきました。";
     }
 
     document.getElementById('today-amount').innerText = "+ " + todayTotal.toLocaleString() + " エナジー";
@@ -475,7 +475,7 @@
     document.getElementById('receipt-message').innerText = plan.msg;
     document.getElementById('details-container').innerHTML = items.map(it => '<div class="detail-item"><span class="detail-name">' + it.name + '</span><span class="detail-val">+' + it.val + '</span></div>').join('');
 
-    const shareText = "宇宙銀行の残高照会窓口で、今夜の豊かさを記帳しました✨ 確定保有残高 " + balance.toLocaleString() + " エナジー";
+    const shareText = "宇宙銀行の残高照会窓口で、今夜の豊かさを記帳しました✨ これまでに積み上げた豊かさ " + balance.toLocaleString() + " エナジー";
     document.getElementById('btn-share').href =
       "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText) +
       "&url=" + encodeURIComponent(location.origin + location.pathname);
