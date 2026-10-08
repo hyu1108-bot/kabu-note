@@ -1,0 +1,940 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>宇宙銀行｜幸福フローゲーム</title>
+  <style>
+    /* 夜空の盤面ゲーム：上に数字、中央に5×5のすごろく盤、下に出来事カード */
+    :root {
+      color-scheme: dark;
+      --bg: #0b111e;
+      --panel: #141d33;
+      --panel-2: #1a243d;
+      --gold: #dfb76c;
+      --gold-light: #f5e7c2;
+      --text: #f0f4f8;
+      --sub: #a0aec0;
+      --green: #48bb78;
+      --rose: #f6a5a5;
+      --sky: #90cdf4;
+      --paper: #fdfbf7;
+      --ink: #2d3748;
+      --brown: #744210;
+      --c-pay: #3b3015;
+      --c-small: #173a2c;
+      --c-big: #1d3557;
+      --c-work: #3a2a4d;
+      --c-hap: #4a2026;
+      --c-star: #2f3a12;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      background-image: radial-gradient(circle at 50% 10%, #1e293b 0%, #0b111e 75%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 14px 16px 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app { width: 100%; max-width: 480px; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(223,183,108,0.3);
+      border-radius: 16px;
+      padding: 18px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    h1 { font-size: 1.3rem; color: var(--gold); letter-spacing: 0.05em; text-align: center; }
+    .lead { font-size: 0.95rem; color: var(--sub); line-height: 1.7; text-align: center; margin: 8px 0 14px; }
+
+    .btn {
+      display: block; width: 100%; padding: 15px 12px; border: none; border-radius: 10px;
+      font-size: 1.05rem; font-weight: bold; cursor: pointer; font-family: inherit; line-height: 1.5;
+      text-align: center; text-decoration: none;
+    }
+    .btn-gold { background: linear-gradient(135deg, #f0cf86, #b38938); color: var(--bg); }
+    .btn-ghost { background: transparent; color: var(--gold-light); border: 1px solid var(--gold); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn:focus-visible, button:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+
+    /* ── スタート画面 ── */
+    .hero-img { width: 100%; border-radius: 12px; display: block; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 12px; }
+    .rules { background: var(--panel-2); border-radius: 12px; padding: 14px; font-size: 0.95rem; line-height: 1.75; margin-bottom: 12px; }
+    .rules b { color: var(--gold-light); }
+    .today { border: 1px dashed var(--gold); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.95rem; line-height: 1.7; }
+    .today .label { color: var(--gold); font-weight: bold; font-size: 0.85rem; letter-spacing: 0.08em; }
+    .stamps { display: flex; justify-content: space-between; gap: 6px; margin: 8px 0 4px; }
+    .stamps span {
+      flex: 1; aspect-ratio: 1; max-width: 46px; border-radius: 50%;
+      border: 1px solid rgba(223,183,108,0.5); display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: var(--sub);
+    }
+    .stamps span.on { background: radial-gradient(circle at 35% 35%, #fff4cf, #dfb76c 60%, #a8792c); color: var(--bg); font-weight: bold; border-color: transparent; }
+    .stamp-note { font-size: 0.85rem; color: var(--sub); }
+
+    /* ── ゲーム画面 ── */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+    .topbar h1 { font-size: 1.05rem; text-align: left; }
+    .week { font-size: 0.9rem; color: var(--gold-light); white-space: nowrap; }
+    .sound { background: none; border: 1px solid rgba(223,183,108,0.5); color: var(--gold-light); border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .stat { background: var(--panel-2); border-radius: 10px; padding: 8px 10px; }
+    .stat .k { font-size: 0.78rem; color: var(--sub); }
+    .stat .v { font-size: 1.25rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+    .v.cash { color: var(--gold-light); }
+    .v.inc { color: var(--green); }
+    .v.cost { color: var(--rose); }
+    .v.flow { color: var(--sky); }
+    .flash { animation: flash 0.6s ease; }
+    @keyframes flash { 30% { transform: scale(1.18); } }
+
+    .race { margin-bottom: 10px; }
+    .race-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--sub); margin-bottom: 4px; }
+    .race-bar { position: relative; height: 14px; background: rgba(246,165,165,0.25); border-radius: 8px; overflow: hidden; }
+    .race-fill { height: 100%; width: 0; background: linear-gradient(90deg, #dfb76c, #48bb78); transition: width 0.7s ease; }
+
+    .board {
+      display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr);
+      gap: 4px; aspect-ratio: 1; width: 100%; margin-bottom: 12px;
+    }
+    .cell {
+      border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 0.68rem; line-height: 1.25; text-align: center; padding: 2px; position: relative;
+      border: 1px solid rgba(255,255,255,0.08); color: var(--text);
+    }
+    .cell .ico { font-size: 1.05rem; line-height: 1; margin-bottom: 2px; }
+    .t-pay { background: var(--c-pay); border-color: rgba(223,183,108,0.6); }
+    .t-small { background: var(--c-small); }
+    .t-big { background: var(--c-big); }
+    .t-work { background: var(--c-work); }
+    .t-hap { background: var(--c-hap); }
+    .t-star { background: var(--c-star); }
+    .cell.here { box-shadow: 0 0 0 2px var(--gold-light), 0 0 14px rgba(245,231,194,0.7); z-index: 1; }
+    .cell.here::after {
+      content: ""; position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, #f0cf86 50%, #b38938); box-shadow: 0 0 8px #f0cf86;
+    }
+
+    .center {
+      grid-column: 2 / 5; grid-row: 2 / 5; border-radius: 12px; overflow: hidden; position: relative;
+      background: radial-gradient(ellipse at 50% 120%, #233457 0%, #0e1628 65%);
+      border: 1px solid rgba(223,183,108,0.25);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 8px;
+    }
+    .dice {
+      width: 64px; height: 64px; border-radius: 14px; background: var(--paper); color: var(--ink);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5), inset 0 -4px 0 #d8d2c4;
+    }
+    .dice.rolling { animation: roll 0.12s linear infinite; }
+    @keyframes roll { 50% { transform: rotate(14deg) scale(1.06); } }
+    .roll-btn { width: auto; padding: 10px 18px; font-size: 1rem; }
+    .center-note { font-size: 0.78rem; color: var(--sub); text-align: center; line-height: 1.5; }
+
+    /* ── 出来事カード ── */
+    .event { background: var(--panel-2); border-radius: 14px; overflow: hidden; border: 1px solid rgba(223,183,108,0.25); min-height: 120px; }
+    .event img { width: 100%; display: block; aspect-ratio: 16/7; object-fit: cover; }
+    .event-body { padding: 14px; }
+    .event-tag { font-size: 0.8rem; font-weight: bold; letter-spacing: 0.08em; color: var(--gold); }
+    .event-title { font-size: 1.1rem; font-weight: bold; margin: 4px 0 8px; line-height: 1.5; }
+    .event-text { font-size: 0.98rem; line-height: 1.75; margin-bottom: 12px; }
+    .event-quote { font-size: 0.9rem; color: var(--gold-light); border-left: 3px solid var(--gold); padding-left: 10px; margin-bottom: 12px; line-height: 1.7; }
+    .deal { display: flex; gap: 8px; margin-bottom: 12px; }
+    .deal div { flex: 1; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px; text-align: center; }
+    .deal .k { font-size: 0.75rem; color: var(--sub); }
+    .deal .v { font-size: 1.15rem; font-weight: bold; }
+    .event textarea {
+      width: 100%; min-height: 64px; border-radius: 8px; border: 1px solid rgba(223,183,108,0.5);
+      background: rgba(11,17,30,0.8); color: #fff; font-size: 1rem; padding: 10px; font-family: inherit; margin-bottom: 10px; resize: vertical;
+    }
+    .actions { display: flex; flex-direction: column; gap: 8px; }
+    .result-line { font-size: 1rem; font-weight: bold; color: var(--green); margin-bottom: 10px; }
+    .result-line.minus { color: var(--rose); }
+
+    .toast {
+      position: fixed; left: 50%; top: 18px; transform: translateX(-50%);
+      background: rgba(20,29,51,0.95); border: 1px solid var(--gold); color: var(--gold-light);
+      padding: 10px 16px; border-radius: 999px; font-weight: bold; font-size: 0.95rem; z-index: 10;
+      animation: toast 2.2s ease forwards; pointer-events: none; white-space: nowrap;
+    }
+    @keyframes toast { 0% { opacity: 0; transform: translate(-50%, -10px); } 12%, 80% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+
+    .coin {
+      position: fixed; width: 16px; height: 16px; border-radius: 50%; pointer-events: none; z-index: 9;
+      background: radial-gradient(circle at 35% 35%, #fff4cf, #dfb76c 55%, #a8792c);
+      box-shadow: 0 0 8px rgba(223,183,108,0.9);
+      animation: fall 1.2s ease-in forwards;
+    }
+    @keyframes fall { from { transform: translateY(-30px); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(260px); opacity: 0; } }
+
+    /* ── 結果 ── */
+    .end { background: var(--paper); color: var(--ink); border-radius: 14px; overflow: hidden; }
+    .end img { width: 100%; display: block; aspect-ratio: 16/8; object-fit: cover; }
+    .end-body { padding: 18px 14px; }
+    .end-badge { display: inline-block; background: var(--gold); color: var(--bg); font-weight: bold; font-size: 0.85rem; padding: 4px 12px; border-radius: 999px; }
+    .end-title { font-size: 1.3rem; font-weight: bold; color: var(--brown); margin: 10px 0; line-height: 1.5; text-wrap: balance; }
+    .end-msg { font-size: 1rem; line-height: 1.8; background: #edf2f7; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+    .end-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .end-grid div { background: #fffaf0; border-radius: 8px; padding: 8px; text-align: center; font-size: 0.8rem; color: var(--brown); }
+    .end-grid b { display: block; font-size: 1.2rem; color: var(--ink); }
+    .password { background: #fffaf0; border: 1px dashed var(--gold); border-radius: 10px; padding: 12px; text-align: center; color: var(--brown); line-height: 1.7; margin-bottom: 12px; font-size: 0.95rem; }
+    .password b { display: block; font-size: 1.4rem; color: var(--ink); letter-spacing: 0.05em; }
+    .words { text-align: center; font-size: 1rem; color: var(--brown); margin-bottom: 14px; line-height: 1.7; }
+    .end .actions a, .end .actions button { font-size: 1rem; }
+    .b-yt { background: #c53030; color: #fff; }
+    .b-ch { background: #9b2c2c; color: #fff; }
+    .b-book { background: #2b6cb0; color: #fff; }
+    .b-x { background: #1a202c; color: #fff; }
+    .b-note { background: #fff; color: var(--brown); border: 1px solid var(--gold); }
+    .b-retry { background: transparent; color: #718096; border: 1px solid #cbd5e0; }
+    .book-note { font-size: 0.85rem; color: #4a5568; text-align: center; margin-top: -2px; line-height: 1.6; }
+
+    .notebook { display: none; background: #fffaf0; border-radius: 10px; padding: 12px; margin-top: 10px; color: var(--ink); font-size: 0.92rem; line-height: 1.7; max-height: 260px; overflow-y: auto; }
+    .notebook p { border-bottom: 1px dashed #e2d3b0; padding: 6px 0; }
+    .notebook small { color: #718096; }
+
+    .namu { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+    .namu-face {
+      flex: none; width: 52px; height: 52px; border-radius: 50%; overflow: hidden;
+      background: radial-gradient(circle at 35% 30%, #fff4cf, #dfb76c 60%, #a8792c);
+      display: flex; align-items: center; justify-content: center; color: var(--bg); font-weight: bold; font-size: 0.85rem;
+      border: 2px solid var(--gold-light);
+    }
+    .namu-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .namu-bubble {
+      position: relative; flex: 1; min-width: 0; background: var(--paper); color: var(--ink);
+      border-radius: 12px; padding: 9px 12px; font-size: 0.92rem; line-height: 1.65;
+    }
+    .namu-bubble::before { content: ""; position: absolute; left: -7px; top: 16px; border: 7px solid transparent; border-right-color: var(--paper); border-left: 0; }
+    .namu-name { font-size: 0.72rem; color: var(--brown); font-weight: bold; letter-spacing: 0.06em; }
+
+    .chip { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 999px; color: var(--bg); margin-left: 6px; vertical-align: middle; }
+    .rare-tag { background: linear-gradient(90deg, #f6e05e, #f687b3, #90cdf4); color: var(--bg); }
+    .event.rare { box-shadow: 0 0 0 2px #f6e05e, 0 0 24px rgba(246,224,94,0.6); }
+
+    .harm-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+    .harm-mini div { background: var(--panel-2); border-radius: 8px; padding: 5px 4px; text-align: center; font-size: 0.72rem; color: var(--sub); }
+    .harm-mini b { display: block; font-size: 1rem; font-variant-numeric: tabular-nums; }
+
+    .radar-wrap { background: #fffaf0; border-radius: 10px; padding: 10px; margin-bottom: 12px; text-align: center; }
+    .radar-type { font-size: 1.15rem; font-weight: bold; color: var(--brown); margin-top: 4px; }
+    .radar-desc { font-size: 0.92rem; color: #4a5568; line-height: 1.7; margin-top: 4px; }
+
+    [hidden] { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+<div class="app">
+
+  <!-- スタート -->
+  <section class="panel" id="start">
+    <h1>宇宙銀行｜幸福フローゲーム</h1>
+    <p class="lead">不安のラットレースを抜け出して<br>「幸福の国」へ向かう、12週間のすごろく</p>
+    <img class="hero-img" src="img/img_183.jpg" alt="水面に輝くダイヤモンド">
+    <div class="rules">
+      <b>あそびかた</b><br>
+      サイコロをふって盤をすすみます。<b>給料日</b>を通るたびに、幸福キャッシュが入ります。<br>
+      <b>小さな幸せ・大きな幸せ</b>を手に入れると、毎月の<b>幸福収入</b>がふえます。<br>
+      <b>窓口ワーク</b>をすると、毎月の<b>不安コスト</b>がへります。<br>
+      12週間のうちに、<b>幸福収入が不安コストを超えたら</b>「幸福の国」へ脱出です。<br>
+      幸せは<b>健康・夢・人間関係・お金</b>の4分野。4つとも満たして脱出すると、特別なエンディングが待っています。
+    </div>
+    <div class="namu" id="namu-start"></div>
+    <div class="today" id="today-box"></div>
+    <div class="today">
+      <div class="label">しあわせ図鑑</div>
+      <div id="zukan-note"></div>
+    </div>
+    <div class="today">
+      <div class="label">記帳スタンプ</div>
+      <div class="stamps" id="stamps"></div>
+      <div class="stamp-note" id="stamp-note"></div>
+    </div>
+    <button class="btn btn-gold" id="btn-start" type="button">今日の盤面であそぶ（音が出ます）</button>
+  </section>
+
+  <!-- ゲーム -->
+  <section class="panel" id="game" hidden>
+    <div class="topbar">
+      <h1>幸福フローゲーム</h1>
+      <span class="week" id="week"></span>
+      <button class="sound" id="btn-sound" type="button">音 ON</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">幸福キャッシュ（手持ち）</div><div class="v cash" id="s-cash"></div></div>
+      <div class="stat"><div class="k">給料日のおさいふ</div><div class="v flow" id="s-flow"></div></div>
+      <div class="stat"><div class="k">毎月の幸福収入</div><div class="v inc" id="s-inc"></div></div>
+      <div class="stat"><div class="k">毎月の不安コスト</div><div class="v cost" id="s-cost"></div></div>
+    </div>
+
+    <div class="race">
+      <div class="race-row"><span>幸福収入</span><span id="race-text"></span><span>不安コスト</span></div>
+      <div class="race-bar"><div class="race-fill" id="race-fill"></div></div>
+    </div>
+
+    <div class="harm-mini" id="harm-mini"></div>
+
+    <div class="board" id="board">
+      <div class="center">
+        <div class="dice" id="dice">🎲</div>
+        <button class="btn btn-gold roll-btn" id="btn-roll" type="button">サイコロをふる</button>
+        <div class="center-note" id="center-note">給料日を通ると<br>おさいふにキャッシュが入ります</div>
+      </div>
+    </div>
+
+    <div class="event" id="event"></div>
+  </section>
+
+  <!-- 結果 -->
+  <section class="end" id="end" hidden>
+    <img id="end-img" src="img/img_183.jpg" alt="">
+    <div class="end-body">
+      <span class="end-badge" id="end-badge"></span>
+      <div class="end-title" id="end-title"></div>
+      <div class="namu" id="namu-end"></div>
+      <div class="end-msg" id="end-msg"></div>
+      <div class="radar-wrap">
+        <div style="font-size:0.85rem;color:#744210;font-weight:bold;">あなたの幸福度（HARM）</div>
+        <svg id="radar" viewBox="0 0 240 220" width="100%" style="max-width:280px;" role="img" aria-label="健康・夢・人間関係・お金の4分野のバランス"></svg>
+        <div class="radar-type" id="radar-type"></div>
+        <div class="radar-desc" id="radar-desc"></div>
+      </div>
+      <div class="end-grid">
+        <div>幸福収入<b id="e-inc"></b></div>
+        <div>不安コスト<b id="e-cost"></b></div>
+        <div>手に入れた幸せ<b id="e-assets"></b></div>
+        <div>窓口ワーク<b id="e-works"></b></div>
+        <div>しあわせ図鑑<b id="e-zukan"></b></div>
+        <div>今日のベスト<b id="e-best"></b></div>
+      </div>
+      <div class="password">
+        今日の合言葉（今日あそんだ人みんな共通）
+        <b id="password"></b>
+        今日の動画のコメント欄に「合言葉 ＋ 888」と書いて、<br>今夜の幸福を受け取ってくださいね
+      </div>
+      <div class="words" id="words"></div>
+      <div class="actions">
+        <a class="btn b-ch" href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ/videos" target="_blank" rel="noopener">▶︎ 今日の17時の動画にコメントしに行く</a>
+        <a class="btn b-yt" href="https://youtu.be/Mc6bef3Rxa8" target="_blank" rel="noopener">432Hz 睡眠用BGMで幸福を受け取って眠る</a>
+        <a class="btn b-book" href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener">📖 ワーク帳『残高を見るのが怖いあなたへ』</a>
+        <div class="book-note">窓口ワークを紙に書いて、12週間じっくり続けたい方はこちら（Kindle・紙の本）</div>
+        <a class="btn b-x" id="btn-share" href="#" target="_blank" rel="noopener">結果をXでシェアする</a>
+        <button class="btn b-note" id="btn-note" type="button">わたしの記帳ノートを見る</button>
+        <div class="notebook" id="notebook"></div>
+        <button class="btn b-retry" id="btn-retry" type="button">もう一度あそぶ</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===== 設定 ===== */
+const WEEKS = 12;
+const SALARY = 70;          // 給料日に入る「お仕事の幸福」
+const START_CASH = 40;
+const START_COST = 45;
+const CH_URL = "https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ/videos";
+
+const TYPES = {
+  pay:   { cls: "t-pay",   ico: "💰", name: "給料日" },
+  small: { cls: "t-small", ico: "🌿", name: "小さな幸せ" },
+  big:   { cls: "t-big",   ico: "🏠", name: "大きな幸せ" },
+  work:  { cls: "t-work",  ico: "🏦", name: "窓口ワーク" },
+  hap:   { cls: "t-hap",   ico: "🌧", name: "ハプニング" },
+  star:  { cls: "t-star",  ico: "🌠", name: "流れ星" }
+};
+
+// HARMの法則：H健康・A夢・R人間関係・Mお金
+const HARM = {
+  H: { name: "健康", long: "健康・からだ", color: "#68d391" },
+  A: { name: "夢", long: "夢・自己実現", color: "#f6ad55" },
+  R: { name: "人間関係", long: "人間関係・つながり", color: "#f687b3" },
+  M: { name: "お金", long: "お金・暮らし", color: "#f0cf86" }
+};
+
+const SMALL = [
+  { area: "H", title: "朝の白湯と深呼吸", text: "朝いちばんに白湯を飲んで、ゆっくり3回深呼吸。一日のはじまりが、少しやわらかくなります。", price: 20, inc: 6, img: "img_39.jpg" },
+  { area: "H", title: "1日10分のおさんぽ", text: "空を見上げて歩く10分間。体も心も、めぐりがよくなります。", price: 25, inc: 7, img: "img_75.jpg" },
+  { area: "H", title: "432Hzで眠る習慣", text: "眠る前に宇宙銀行の音楽を小さく流す。不安を預けて眠れる夜がふえていきます。", price: 25, inc: 7, img: "img_30.jpg" },
+  { area: "A", title: "1日15分の好きな時間", text: "誰のためでもない、自分の好きなことをする15分。小さな夢が、ここから育ちます。", price: 20, inc: 6, img: "img_102.jpg" },
+  { area: "A", title: "夢ノートを書く", text: "「いつかやりたいこと」を1行だけノートに書く。書いた夢は、少しずつ近づいてきます。", price: 25, inc: 7, img: "img_66.jpg" },
+  { area: "R", title: "家族とゆっくり晩ごはん", text: "テレビを消して、今日あったことを話しながらの晩ごはん。いちばん身近な豊かさです。", price: 30, inc: 8, img: "img_120.jpg" },
+  { area: "R", title: "久しぶりの友人に連絡", text: "ふと思い出した友人に「元気？」と送ってみる。返ってきた一言が、心をあたためます。", price: 20, inc: 6, img: "img_12.jpg" },
+  { area: "M", title: "小さな先取り積立", text: "給料日に、ほんの少しだけ先に取り分けておく。「ある」という安心が毎月ふえていきます。", price: 30, inc: 8, img: "img_48.jpg" },
+  { area: "M", title: "ありがとう日記", text: "寝る前に、受け取ったものに「ありがとう」をひとつ書く。受け取っていたものに毎日気づけます。", price: 25, inc: 7, img: "img_183.jpg" }
+];
+
+const BIG = [
+  { area: "R", title: "心から話せる仲間の会", text: "同じ方向を向いて、高め合える仲間ができました。困ったときに支え合える、大きな安心です。", price: 80, inc: 18, img: "img_93.jpg" },
+  { area: "A", title: "好きなことを小さく発信する", text: "好きなことを、自分のペースで発信しはじめました。届いた「ありがとう」が、毎月の幸福になります。", price: 90, inc: 20, img: "img_129.jpg" },
+  { area: "R", title: "家族との小旅行", text: "近場の温泉へ1泊2日。家族の笑顔の記憶は、ずっと減らない資産です。", price: 100, inc: 22, img: "img_192.jpg" },
+  { area: "H", title: "からだを整える習慣", text: "週に一度のストレッチ教室。体が軽くなると、気持ちまで前を向きます。", price: 80, inc: 18, img: "img_75.jpg" },
+  { area: "M", title: "家計の見える化", text: "1か月のお金の流れを、ざっくり紙に書き出しました。見えた瞬間、不安がひとつ小さくなりました。", price: 80, inc: 18, img: "img_48.jpg" }
+];
+
+// たまにしか出ないレアカード（幸せのマスに止まったとき約1割）
+const RARE = [
+  { area: "R", title: "満月の夜の家族旅行", text: "満月の夜、海辺の宿で家族そろって月を見上げました。一生ものの記憶です。", price: 60, inc: 25, img: "img_30.jpg" },
+  { area: "A", title: "夢がひとつ叶った日", text: "ずっと書き続けていた夢ノートの1行が、ついに現実になりました。", price: 60, inc: 25, img: "img_183.jpg" },
+  { area: "H", title: "朝日とともに目覚める暮らし", text: "目覚ましより先に、朝日で自然に目が覚めるようになりました。体の芯から整っています。", price: 50, inc: 22, img: "img_39.jpg" },
+  { area: "M", title: "宇宙銀行の黄金の通帳", text: "これまでの記帳が積み重なって、通帳が金色に輝きはじめました。", price: 60, inc: 25, img: "img_192.jpg" }
+];
+
+// ハプニング（HARMの4分野で起こる。お金の分野はワーク帳 第1章の思い込み）
+const HAP = [
+  { area: "M", title: "「お金は苦労しないと入ってこない」の声", text: "がんばらないと受け取ってはいけない気がして、小さな受け取りに気づけなくなりました。", cost: 5, cash: 0, cure: "記帳ノート" },
+  { area: "M", title: "「自分には運がない」の声", text: "いいことはほかの人に起こる気がして、身の回りのラッキーが見えにくくなりました。", cost: 5, cash: 0, cure: "今週のラッキー" },
+  { area: "M", title: "「お金はいつか尽きる」の声", text: "支払いのたびに「減った」と感じて、胸がざわっとしました。", cost: 5, cash: 0, cure: "ありがとう払い" },
+  { area: "M", title: "急な家電の故障", text: "洗濯機が動かなくなりました。思いがけない出費です。", cost: 0, cash: 25, cure: "" },
+  { area: "H", title: "季節の変わり目に体調をくずした", text: "無理がたたって、寝込んでしまいました。体からの「休んで」のサインです。", cost: 3, cash: 15, cure: "" },
+  { area: "R", title: "SNSで人と比べてしまった", text: "キラキラした投稿を見て、自分の暮らしが小さく見えてしまいました。", cost: 4, cash: 0, cure: "不安のお預け入れ" },
+  { area: "A", title: "「いまさら遅い」の声", text: "やりたいことを思い浮かべたのに、「この歳で」と心の中でブレーキがかかりました。", cost: 5, cash: 0, cure: "" },
+  { area: "M", title: "疲れて衝動買い", text: "クタクタの帰り道、いらないものまで買ってしまいました。", cost: 0, cash: 15, cure: "" }
+];
+
+const STAR = [
+  { title: "思いがけない臨時収入", text: "忘れていた払い戻しが届きました。", cash: 30 },
+  { title: "ポイントがたまっていた", text: "スーパーのポイントが、いつの間にかたくさんたまっていました。", cash: 15 },
+  { title: "おすそ分けをいただいた", text: "お隣さんから、畑の野菜をたくさんいただきました。", cash: 15 },
+  { title: "宝くじが少し当たった", text: "なんとなく買った宝くじが、少しだけ当たりました。", cash: 40 }
+];
+
+// 窓口係なむちゃんのセリフ
+const NAMU = {
+  start: ["宇宙銀行の窓口へようこそ。今日もおつかれさまでした。いっしょに12週間すごしましょうね。", "いらっしゃいませ。今日の盤面は、今日だけの特別な盤面ですよ。"],
+  pay: ["給料日です！お仕事の幸福、ちゃんと入金されましたよ。", "今月もよくがんばりました。記帳しておきますね。"],
+  buy: ["すてきな幸せを手に入れましたね。毎月、ちゃんとめぐってきますよ。", "その選択、わたしも好きです。"],
+  rare: ["わっ、めったに出ないレアカードです！今日のあなたは、宇宙銀行に愛されていますね。"],
+  pass: ["見送るのも大切な選択です。また出会えますよ。"],
+  work: ["窓口の用事、いっしょにやりましょう。数分で終わりますよ。"],
+  workDone: ["記帳しました。あなたの不安が、少し軽くなりましたね。", "おあずかりしました。今夜は安心して眠ってくださいね。"],
+  hap: ["ハプニングでしたね…でも大丈夫。数字は、あなたの価値ではありませんよ。", "そんな日もあります。深呼吸して、次の週へいきましょう。"],
+  star: ["流れ星です！あなたは、思っているよりたくさん受け取っていますね。"],
+  escape: ["おめでとうございます！幸福の国へようこそ。ずっと見ていましたよ。"],
+  fail: ["12週間おつかれさまでした。あと少しでしたね。窓口は、明日も開いていますよ。"]
+};
+function namuLine(key) { const a = NAMU[key]; return a[Math.floor(Math.random() * a.length)]; }
+
+// ワーク帳 第2章「6つの窓口ワーク」
+const WORKS = [
+  { key: "wallet", title: "ワーク1　財布の窓口整理", text: "レシートを全部出して、お札の向きをそろえて、使っていないカードを1枚抜きます。整ったお財布に「いつもありがとう」。", quote: "変わるのは、お金の量ではなく、お金に触れたときのあなたの気持ちです。", mode: "do", doLabel: "お財布を整えた", cut: 6, img: "img_183.jpg" },
+  { key: "kicho", title: "ワーク2　記帳ノート", text: "今週受け取ったものを、ひとつ書いてみましょう。お釣りの端数、ポイント、誰かの「ありがとう」、お金の形をしていなくてかまいません。", quote: "あなたは、思っているよりたくさん受け取っています。", mode: "write", placeholder: "例：子どもに「ごはんおいしい」と言われた", doLabel: "記帳する", cut: 7, cash: 5, img: "img_102.jpg" },
+  { key: "lucky", title: "ワーク3　今週のラッキー", text: "今週あった小さなラッキーを、ひとつ書いてみましょう。", quote: "小さなラッキーを大事にできる人のところに、ラッキーは集まってきます。", mode: "write", placeholder: "例：信号が全部青だった", doLabel: "記帳する", cut: 6, cash: 5, img: "img_12.jpg" },
+  { key: "arigato", title: "ワーク4　ありがとう払い", text: "最近お金を払った場面を思い出して、心の中で「ありがとう」。お店の人に、手に入れたものに、旅立っていくお金に。", quote: "お金は減るのではなく、めぐっていくもの。", mode: "do", doLabel: "心の中で「ありがとう」", cut: 5, img: "img_129.jpg" },
+  { key: "azuke", title: "ワーク5　不安のお預け入れ", text: "お金の不安をひとつ書いて、宇宙銀行に預けましょう。消さなくていい、預けるだけで大丈夫です。", quote: "不安は、消さなくていい。預けるだけで大丈夫。", mode: "write", placeholder: "例：来月の車検代が払えるか不安", doLabel: "宇宙銀行に預ける", cut: 8, img: "img_30.jpg" },
+  { key: "zandaka", title: "ワーク6　残高確認", text: "開く前に「数字はわたしの価値ではない」と心の中で言って、3回ゆっくり息を吐きます。今日はどこまでできそうですか？", quote: "どんな数字でも、「ここから満ちていく」。", mode: "zandaka", cut: 8, img: "img_48.jpg" }
+];
+
+// 曜日ごとの窓口（ワーク帳のリズム＝チャンネルの曜日テーマ）
+const DAY_THEME = {
+  0: { name: "日曜日", theme: "不安を手放して、新しい週を迎える日", work: "azuke" },
+  1: { name: "月曜日", theme: "週のはじまりに、お財布の身支度をする日", work: "wallet" },
+  2: { name: "火曜日", theme: "払うたびに「ありがとう」を言う日", work: "arigato" },
+  3: { name: "水曜日", theme: "払うたびに「ありがとう」を言う日", work: "arigato" },
+  4: { name: "木曜日", theme: "思いがけない受け取りに気づく日", work: "kicho" },
+  5: { name: "金曜日", theme: "運を味方にする日", work: "lucky" },
+  6: { name: "土曜日", theme: "今の自分を確かめる窓口の日", work: "zandaka" }
+};
+
+const WORDS = [
+  "残高を見るのが怖いのは、お金を大切にしてきた証です。",
+  "数字は、あなたの価値ではありません。",
+  "今日の残高は、今日の記録。明日はまた、新しい一日です。",
+  "不安は、消さなくていい。預けるだけで大丈夫。",
+  "あなたは、思っているよりたくさん受け取っています。",
+  "お金は減るのではなく、めぐっていくもの。",
+  "できなかった日があっても、窓口はいつでも開いています。",
+  "ここまで来たあなたは、もう大丈夫です。"
+];
+const PASSES = ["金の鍵がひらく", "満ちる月の窓口", "黄金の扉がひらく", "光の泉があふれる", "星の通帳に記帳", "宇宙の金庫が満ちる", "銀河の窓口へようこそ", "めぐる金貨の夜", "満月の通帳", "流れ星の入金"];
+
+/* ===== 日替わりの乱数 ===== */
+const now = new Date();
+const dateKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+function seedFrom(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuffleWith(arr, rnd) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+const dayRnd = mulberry(seedFrom("uchu" + dateKey));
+const todayTheme = DAY_THEME[now.getDay()];
+const todayWord = WORDS[Math.floor(dayRnd() * WORDS.length)];
+const todayPass = PASSES[Math.floor(dayRnd() * PASSES.length)];
+
+// 盤面：0,4,8,12が給料日。残り12マスは日替わりで並べる
+const BOARD_POS = [0,1,2,3,4,9,14,19,24,23,22,21,20,15,10,5]; // 5×5の外周（時計回り）
+const others = shuffleWith(["small","small","small","small","work","work","work","work","hap","hap","star","big"], dayRnd);
+const LAYOUT = [];
+for (let i = 0, k = 0; i < 16; i++) LAYOUT.push(i % 4 === 0 ? "pay" : others[k++]);
+
+/* ===== 保存（この端末だけ） ===== */
+function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+/* ===== 音（Web Audioで合成） ===== */
+let actx = null, soundOn = true;
+function audio() {
+  if (!soundOn) return null;
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
+  } catch (e) { return null; }
+  return actx;
+}
+function tone(freq, start, dur, type, vol) {
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || "sine"; o.frequency.value = freq;
+  const t = a.currentTime + start;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(a.destination);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+const SFX = {
+  coin() { [0, 0.07].forEach((s, i) => { tone(i ? 2637 : 1976, s, 0.35, "sine", 0.18); tone(i ? 5274 : 3951, s, 0.2, "sine", 0.05); }); },
+  coins(n) { for (let i = 0; i < n; i++) { const s = i * 0.09; tone(1976 + Math.random() * 600, s, 0.3, "sine", 0.12); } },
+  kiran() { tone(2637, 0, 1.2, "sine", 0.15); tone(3951, 0.04, 1.0, "sine", 0.08); tone(5274, 0.08, 0.8, "triangle", 0.04); },
+  shararan() { [1047, 1319, 1568, 2093, 2637, 3136, 4186].forEach((f, i) => tone(f, i * 0.06, 0.9, "triangle", 0.09)); },
+  dice() { for (let i = 0; i < 9; i++) tone(180 + Math.random() * 220, i * 0.07, 0.05, "square", 0.04); },
+  step() { tone(988, 0, 0.12, "sine", 0.08); },
+  hap() { tone(330, 0, 0.5, "sine", 0.12); tone(247, 0.25, 0.7, "sine", 0.1); },
+  fanfare() { this.shararan(); [523, 659, 784, 1047].forEach(f => tone(f, 0.55, 1.6, "triangle", 0.08)); setTimeout(() => this.kiran(), 900); }
+};
+
+/* ===== 状態 ===== */
+let S;
+const $ = id => document.getElementById(id);
+
+function newState() {
+  const streak = load("uchu_game_stamps", []);
+  const bonus = streak.length >= 3 ? 10 : 0;
+  return { week: 0, pos: 0, cash: START_CASH + bonus, inc: 0, cost: START_COST, assets: [], works: 0, busy: false, done: false, bonus,
+           harm: { H: 0, A: 0, R: 0, M: 0 } };
+}
+function flow() { return SALARY + S.inc - S.cost; }
+
+const ALL_CARDS = SMALL.concat(BIG, RARE);
+
+function namuEl(text) {
+  const wrap = document.createElement('div');
+  wrap.className = 'namu';
+  const face = document.createElement('div');
+  face.className = 'namu-face';
+  if (window.namuMissing) { face.textContent = 'なむ'; }
+  else {
+    const im = document.createElement('img');
+    im.src = 'img/namu.png'; im.alt = 'なむちゃん';
+    im.onerror = () => { window.namuMissing = true; im.remove(); face.textContent = 'なむ'; };
+    face.appendChild(im);
+  }
+  const bub = document.createElement('div');
+  bub.className = 'namu-bubble';
+  bub.innerHTML = '<div class="namu-name">窓口係 なむちゃん</div>';
+  bub.appendChild(document.createTextNode(text));
+  wrap.appendChild(face); wrap.appendChild(bub);
+  return wrap;
+}
+function setNamu(boxId, text) { const b = $(boxId); b.innerHTML = ''; b.appendChild(namuEl(text).firstChild); b.appendChild(namuEl(text).lastChild); }
+
+function addToZukan(title) {
+  const z = load("uchu_zukan", []);
+  const isNew = !z.includes(title);
+  if (isNew) { z.push(title); save("uchu_zukan", z); }
+  return isNew;
+}
+
+/* ===== 描画 ===== */
+function buildBoard() {
+  const board = $('board');
+  board.querySelectorAll('.cell').forEach(c => c.remove());
+  LAYOUT.forEach((t, i) => {
+    const pos = BOARD_POS[i];
+    const c = document.createElement('div');
+    c.className = 'cell ' + TYPES[t].cls;
+    c.id = 'cell-' + i;
+    c.style.gridColumn = (pos % 5) + 1;
+    c.style.gridRow = Math.floor(pos / 5) + 1;
+    c.innerHTML = '<span class="ico">' + TYPES[t].ico + '</span>' + TYPES[t].name;
+    board.appendChild(c);
+  });
+}
+
+function render(flashKey) {
+  $('s-cash').textContent = S.cash;
+  $('s-inc').textContent = "+" + S.inc;
+  $('s-cost').textContent = "−" + S.cost;
+  const f = flow();
+  $('s-flow').textContent = (f >= 0 ? "+" : "") + f;
+  $('week').textContent = "第" + Math.min(S.week + 1, WEEKS) + "週 / " + WEEKS;
+  const pct = Math.min(100, Math.round(S.inc / S.cost * 100));
+  $('race-fill').style.width = pct + "%";
+  $('race-text').textContent = S.inc + " / " + S.cost + "（あと " + Math.max(0, S.cost - S.inc) + "）";
+  $('harm-mini').innerHTML = Object.keys(HARM).map(k =>
+    '<div>' + HARM[k].name + '<b style="color:' + HARM[k].color + '">' + S.harm[k] + '</b></div>').join('');
+  document.querySelectorAll('.cell').forEach(c => c.classList.remove('here'));
+  const here = $('cell-' + S.pos); if (here) here.classList.add('here');
+  if (flashKey) { const el = $(flashKey); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2300);
+}
+
+function coinRain(n) {
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'coin';
+    c.style.left = (15 + Math.random() * 70) + 'vw';
+    c.style.top = (60 + Math.random() * 60) + 'px';
+    c.style.animationDelay = (i * 0.07) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1500 + i * 70);
+  }
+}
+
+function showEvent(opts) {
+  const ev = $('event');
+  ev.innerHTML = '';
+  ev.classList.toggle('rare', !!opts.rare);
+  if (opts.img) { const im = document.createElement('img'); im.src = 'img/' + opts.img; im.alt = ''; ev.appendChild(im); }
+  const body = document.createElement('div'); body.className = 'event-body';
+  body.innerHTML = '<div class="event-tag">' + opts.tag +
+    (opts.area ? '<span class="chip" style="background:' + HARM[opts.area].color + '">' + HARM[opts.area].long + '</span>' : '') +
+    (opts.rare ? '<span class="chip rare-tag">レア</span>' : '') +
+    '</div><div class="event-title"></div><div class="event-text"></div>';
+  if (opts.namu) body.insertBefore(namuEl(opts.namu), body.firstChild);
+  body.querySelector('.event-title').textContent = opts.title;
+  body.querySelector('.event-text').textContent = opts.text;
+  if (opts.quote) { const q = document.createElement('div'); q.className = 'event-quote'; q.textContent = opts.quote; body.appendChild(q); }
+  if (opts.extra) body.appendChild(opts.extra);
+  const act = document.createElement('div'); act.className = 'actions';
+  (opts.buttons || []).forEach(b => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'btn ' + (b.ghost ? 'btn-ghost' : 'btn-gold');
+    btn.textContent = b.label; btn.disabled = !!b.disabled;
+    btn.onclick = b.onClick; act.appendChild(btn);
+  });
+  body.appendChild(act);
+  ev.appendChild(body);
+}
+
+function resultEvent(line, minus, after) {
+  const box = document.createElement('div');
+  box.className = 'result-line' + (minus ? ' minus' : '');
+  box.textContent = line;
+  return box;
+}
+
+/* ===== 進行 ===== */
+function roll() {
+  if (S.busy || S.done) return;
+  S.busy = true;
+  $('btn-roll').disabled = true;
+  const dice = $('dice');
+  dice.classList.add('rolling');
+  SFX.dice();
+  const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+  let t = 0;
+  const iv = setInterval(() => { dice.textContent = faces[Math.floor(Math.random() * 6)]; if (++t > 8) {
+    clearInterval(iv);
+    const n = 1 + Math.floor(Math.random() * 6);
+    dice.textContent = n;
+    dice.classList.remove('rolling');
+    move(n);
+  } }, 70);
+}
+
+function move(n) {
+  let left = n;
+  const stepFn = () => {
+    S.pos = (S.pos + 1) % 16;
+    SFX.step();
+    if (LAYOUT[S.pos] === "pay" && left > 1) payday(true);   // 通過した給料日
+    render();
+    if (--left > 0) setTimeout(stepFn, 260);
+    else setTimeout(land, 300);
+  };
+  setTimeout(stepFn, 200);
+}
+
+function payday(passing) {
+  const f = flow();
+  S.cash = Math.max(0, S.cash + f);
+  if (f > 0) { SFX.coins(Math.min(8, 3 + Math.round(f / 10))); coinRain(Math.min(14, 4 + Math.round(f / 8))); }
+  toast("給料日 " + (f >= 0 ? "+" : "") + f + (passing ? "（通過）" : ""));
+  render('s-cash');
+}
+
+function land() {
+  const t = LAYOUT[S.pos];
+  if (t === "pay") {
+    payday(false);
+    showEvent({ tag: "💰 給料日", title: "おさいふに幸福キャッシュが入りました", img: "img_192.jpg",
+      text: "お仕事の幸福 " + SALARY + " ＋ 幸福収入 " + S.inc + " − 不安コスト " + S.cost + "。幸福収入をふやして、不安コストをへらすほど、給料日がうれしくなります。",
+      namu: namuLine("pay"),
+      buttons: [{ label: "次の週へ", onClick: nextWeek }] });
+  } else if (t === "small" || t === "big") {
+    const isRare = Math.random() < 0.1;
+    const deck = isRare ? RARE : (t === "small" ? SMALL : BIG);
+    const card = deck[Math.floor(Math.random() * deck.length)];
+    if (isRare) { SFX.kiran(); setTimeout(() => SFX.shararan(), 250); }
+    const extra = document.createElement('div'); extra.className = 'deal';
+    extra.innerHTML = '<div><div class="k">必要な幸福キャッシュ</div><div class="v">' + card.price + '</div></div><div><div class="k">毎月の幸福収入</div><div class="v" style="color:var(--green)">+' + card.inc + '</div></div>';
+    const can = S.cash >= card.price;
+    showEvent({ tag: TYPES[t].ico + " " + TYPES[t].name, title: card.title, text: card.text, img: card.img, extra,
+      area: card.area, rare: isRare, namu: isRare ? namuLine("rare") : null,
+      buttons: [
+        { label: can ? "手に入れる（−" + card.price + "）" : "幸福キャッシュがあと " + (card.price - S.cash) + " たりません", disabled: !can, onClick: () => {
+          S.cash -= card.price; S.inc += card.inc; S.assets.push(card.title);
+          S.harm[card.area] += card.inc;
+          const isNew = addToZukan(card.title);
+          SFX.shararan(); coinRain(isRare ? 18 : 8); render('s-inc');
+          afterAction("「" + card.title + "」を手に入れました。毎月の幸福収入 +" + card.inc + "（" + HARM[card.area].name + "）" + (isNew ? "　図鑑に新しく登録されました" : ""), namuLine("buy"));
+        } },
+        { label: "今回は見送る", ghost: true, onClick: () => afterAction("今回は見送りました。", namuLine("pass")) }
+      ] });
+  } else if (t === "work") {
+    doWork(WORKS[Math.floor(Math.random() * WORKS.length)]);
+  } else if (t === "hap") {
+    const h = HAP[Math.floor(Math.random() * HAP.length)];
+    SFX.hap();
+    S.cost += h.cost; S.cash = Math.max(0, S.cash - h.cash);
+    S.harm[h.area] = Math.max(0, S.harm[h.area] - (h.cost || 3));
+    render(h.cost ? 's-cost' : 's-cash');
+    const effect = h.cost ? "毎月の不安コスト +" + h.cost : "幸福キャッシュ −" + h.cash;
+    showEvent({ tag: "🌧 ハプニング", title: h.title, text: h.text + "（" + effect + "）", img: "img_3.jpg", area: h.area, namu: namuLine("hap"),
+      quote: h.cure ? "窓口ワーク「" + h.cure + "」で、この声はやわらいでいきます。" : "数字は、あなたの価値ではありません。",
+      buttons: [{ label: "深呼吸して、次の週へ", onClick: nextWeek }] });
+  } else if (t === "star") {
+    const s = STAR[Math.floor(Math.random() * STAR.length)];
+    S.cash += s.cash; SFX.kiran(); setTimeout(() => SFX.coins(5), 300); coinRain(12); render('s-cash');
+    showEvent({ tag: "🌠 流れ星", title: s.title, text: s.text + "（幸福キャッシュ +" + s.cash + "）", img: "img_12.jpg", namu: namuLine("star"),
+      quote: "あなたは、思っているよりたくさん受け取っています。",
+      buttons: [{ label: "受け取って、次の週へ", onClick: nextWeek }] });
+  }
+}
+
+function doWork(w) {
+  const isToday = DAY_THEME[now.getDay()].work === w.key;
+  const mult = isToday ? 2 : 1;
+  const extra = document.createElement('div');
+  if (isToday) { const b = document.createElement('div'); b.className = 'result-line'; b.textContent = "今日は" + DAY_THEME[now.getDay()].name + "のワーク！効果が2倍です"; extra.appendChild(b); }
+  let ta = null;
+  if (w.mode === "write") { ta = document.createElement('textarea'); ta.id = 'work-input'; ta.placeholder = w.placeholder; ta.maxLength = 80; extra.appendChild(ta); }
+
+  const finish = (cut, cash, msg, text) => {
+    cut *= mult;
+    S.cost = Math.max(5, S.cost - cut);
+    if (cash) S.cash += cash * mult;
+    S.works++;
+    S.harm.M += cut;
+    if (text) {
+      const note = load("uchu_notebook", []);
+      note.unshift({ d: dateKey, w: w.title.replace(/^ワーク\d　/, ""), t: text });
+      save("uchu_notebook", note.slice(0, 60));
+    }
+    SFX.kiran(); render('s-cost');
+    afterAction(msg + "（毎月の不安コスト −" + cut + (cash ? "、幸福キャッシュ +" + cash * mult : "") + "）", namuLine("workDone"));
+  };
+
+  let buttons;
+  if (w.mode === "zandaka") {
+    buttons = [
+      { label: "残高を見られた", onClick: () => finish(w.cut, 0, "見られましたね。「ここから満ちていく」。", "残高を見られた") },
+      { label: "アプリに触れるだけできた", onClick: () => finish(w.cut - 2, 0, "触れられただけで、大きな一歩です。", "アプリに触れた") },
+      { label: "今日はまだ（それでも大丈夫）", ghost: true, onClick: () => finish(3, 0, "まだでも大丈夫。窓口はいつでも開いています。", "") }
+    ];
+  } else if (w.mode === "write") {
+    buttons = [
+      { label: w.doLabel, onClick: () => {
+        const v = (ta.value || "").trim();
+        if (!v) { ta.focus(); ta.placeholder = "ひとことで大丈夫です。" + w.placeholder; return; }
+        finish(w.cut, w.cash || 0, w.key === "azuke" ? "宇宙銀行にお預けしました。" : "記帳しました。", v);
+      } },
+      { label: "今日は書かずに進む", ghost: true, onClick: () => finish(2, 0, "書かない日があっても大丈夫です。", "") }
+    ];
+  } else {
+    buttons = [
+      { label: w.doLabel, onClick: () => finish(w.cut, 0, "できました。", "") },
+      { label: "今日はスキップ", ghost: true, onClick: () => finish(2, 0, "思い出せたときだけで十分です。", "") }
+    ];
+  }
+  showEvent({ tag: "🏦 宇宙銀行の窓口ワーク", title: w.title, text: w.text, quote: w.quote, img: w.img, extra, buttons, area: "M", namu: namuLine("work") });
+}
+
+function afterAction(msg, namuText) {
+  showEvent({ tag: "✨ 記帳されました", title: msg, text: "", namu: namuText || null, buttons: [{ label: "次の週へ", onClick: nextWeek }] });
+  checkEscape();
+}
+
+function checkEscape() {
+  if (!S.done && S.inc >= S.cost) {
+    S.done = true;
+    setTimeout(() => finishGame(true), 700);
+    return true;
+  }
+  return false;
+}
+
+function nextWeek() {
+  if (S.done) return;
+  if (checkEscape()) return;
+  S.week++;
+  if (S.week >= WEEKS) { S.done = true; finishGame(false); return; }
+  S.busy = false;
+  $('btn-roll').disabled = false;
+  render();
+  showEvent({ tag: "第" + (S.week + 1) + "週", title: "サイコロをふってください", text: "幸福収入が不安コストを超えたら、幸福の国へ脱出です。", buttons: [] });
+}
+
+function finishGame(escaped) {
+  const stamps = load("uchu_game_stamps", []);
+  if (!stamps.includes(dateKey)) { stamps.push(dateKey); save("uchu_game_stamps", stamps.slice(-30)); }
+  const best = load("uchu_best_" + dateKey, null);
+
+  if (escaped) { SFX.fanfare(); coinRain(20); }
+  $('game').hidden = true; $('end').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const weeks = S.week + 1;
+  const full = Object.values(S.harm).every(v => v > 0);
+  setNamu('namu-end', escaped ? namuLine("escape") : namuLine("fail"));
+  drawRadar();
+  if (escaped) {
+    $('end-badge').textContent = full ? "満月エンディング" : "幸福の国へ脱出";
+    $('end-title').textContent = full
+      ? "健康・夢・人間関係・お金、4つとも満たして幸福の国へ🌕"
+      : "第" + weeks + "週で、幸福の国へたどり着きました✨";
+    $('end-msg').innerHTML = "幸福収入が不安コストを超えて、不安のラットレースを抜け出しました。<br>手に入れた幸せと、窓口でのひとつひとつの用事が、あなたの毎日を支えています。";
+    if (!best || weeks < best) save("uchu_best_" + dateKey, weeks);
+    $('end-img').src = "img/img_183.jpg";
+  } else {
+    $('end-badge').textContent = "12週間おつかれさまでした";
+    $('end-title').textContent = "幸福の国まで、あと " + (S.cost - S.inc) + " です";
+    $('end-msg').innerHTML = "できなかった日があっても、窓口はいつでも開いています。<br>盤面は毎日かわります。明日の盤面で、もう一度挑戦してみてくださいね。";
+    $('end-img').src = "img/img_30.jpg";
+  }
+  $('e-inc').textContent = "+" + S.inc;
+  $('e-cost').textContent = "−" + S.cost;
+  $('e-assets').textContent = S.assets.length + "つ";
+  $('e-works').textContent = S.works + "回";
+  $('e-zukan').textContent = load("uchu_zukan", []).length + " / " + ALL_CARDS.length;
+  const bestNow = load("uchu_best_" + dateKey, null);
+  $('e-best').textContent = bestNow ? "第" + bestNow + "週" : "まだ";
+  $('password').textContent = todayPass;
+  $('words').textContent = "今日のことば：" + todayWord;
+
+  const type = $('radar-type').textContent;
+  const share = escaped
+    ? "宇宙銀行の幸福フローゲームで、第" + weeks + "週に「幸福の国」へ脱出しました✨ わたしは「" + type + "」。今日の合言葉は「" + todayPass + "」"
+    : "宇宙銀行の幸福フローゲーム、今日は幸福の国まであと" + (S.cost - S.inc) + "。わたしは「" + type + "」でした🌙";
+  $('btn-share').href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(share) + "&url=" + encodeURIComponent(location.origin + location.pathname);
+}
+
+function drawRadar() {
+  const keys = ["H", "A", "R", "M"];
+  const cx = 120, cy = 108, R = 76;
+  const max = Math.max(20, ...keys.map(k => S.harm[k]));
+  const ang = i => -Math.PI / 2 + i * Math.PI / 2;
+  const pt = (i, r) => [cx + Math.cos(ang(i)) * r, cy + Math.sin(ang(i)) * r];
+  let g = '';
+  [0.33, 0.66, 1].forEach(f => {
+    g += '<polygon points="' + keys.map((k, i) => pt(i, R * f).join(',')).join(' ') + '" fill="none" stroke="#e2d3b0" stroke-width="1"/>';
+  });
+  keys.forEach((k, i) => {
+    const [x, y] = pt(i, R);
+    g += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x + '" y2="' + y + '" stroke="#e2d3b0" stroke-width="1"/>';
+    const [lx, ly] = pt(i, R + 18);
+    g += '<text x="' + lx + '" y="' + (ly + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#744210">' + HARM[k].name + ' ' + S.harm[k] + '</text>';
+  });
+  const poly = keys.map((k, i) => pt(i, Math.max(4, S.harm[k] / max * R)).join(',')).join(' ');
+  g += '<polygon points="' + poly + '" fill="rgba(223,183,108,0.45)" stroke="#b38938" stroke-width="2"/>';
+  $('radar').innerHTML = g;
+
+  const top = keys.slice().sort((a, b) => S.harm[b] - S.harm[a])[0];
+  const full = keys.every(k => S.harm[k] > 0);
+  const TYPES_TXT = {
+    H: ["からだが満ちた「健康の月」タイプ", "体を大切にする選択が、あなたの幸福の土台になっています。"],
+    A: ["夢が輝く「一番星」タイプ", "好きなことや夢に向かう気持ちが、あなたの毎日を照らしています。"],
+    R: ["つながりが満ちる「天の川」タイプ", "家族や仲間とのつながりが、あなたのいちばんの財産です。"],
+    M: ["お金と仲良しの「黄金の通帳」タイプ", "お金と向き合う小さな用事が、あなたの安心を育てています。"]
+  };
+  if (full && Math.min(...keys.map(k => S.harm[k])) >= max * 0.5) {
+    $('radar-type').textContent = "4つが満ちた「満月」タイプ";
+    $('radar-desc').textContent = "健康・夢・人間関係・お金のバランスがとれています。ブータンのような、幸福度の高い暮らしです。";
+  } else {
+    $('radar-type').textContent = TYPES_TXT[top][0];
+    const low = keys.slice().sort((a, b) => S.harm[a] - S.harm[b])[0];
+    $('radar-desc').textContent = TYPES_TXT[top][1] + "次は「" + HARM[low].long + "」の幸せも手に入れると、月がもっと満ちていきます。";
+  }
+}
+
+function showNotebook() {
+  const nb = $('notebook');
+  if (nb.style.display === 'block') { nb.style.display = 'none'; return; }
+  const note = load("uchu_notebook", []);
+  nb.innerHTML = '';
+  if (!note.length) { nb.textContent = "まだ記帳はありません。窓口ワークで書いたことが、ここにたまっていきます（この端末だけに保存されます）。"; }
+  note.forEach(n => {
+    const p = document.createElement('p');
+    p.innerHTML = '<small></small><br>';
+    p.querySelector('small').textContent = n.d + "　" + n.w;
+    p.appendChild(document.createTextNode(n.t));
+    nb.appendChild(p);
+  });
+  nb.style.display = 'block';
+}
+
+/* ===== スタート画面 ===== */
+function renderStart() {
+  setNamu('namu-start', namuLine("start"));
+  const zk = load("uchu_zukan", []);
+  $('zukan-note').textContent = "集めた幸せ " + zk.length + " / " + ALL_CARDS.length + " 種類（レアカード " + RARE.length + " 種をふくむ）";
+  const th = todayTheme;
+  const work = WORKS.find(w => w.key === th.work);
+  $('today-box').innerHTML = '<div class="label">今日の窓口</div>' + th.name + "は「" + th.theme + "」。<br>今日は <b>" + work.title.replace(/　/, " ") + "</b> の効果が2倍になります。<br>17時の新しい動画を流しながら、どうぞ。";
+  const stamps = load("uchu_game_stamps", []);
+  const box = $('stamps'); box.innerHTML = '';
+  const recent = stamps.slice(-7);
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement('span');
+    if (i < recent.length) { s.className = 'on'; s.textContent = '888'; } else s.textContent = (i + 1);
+    box.appendChild(s);
+  }
+  const n = stamps.length;
+  $('stamp-note').textContent = n >= 3
+    ? "スタンプ" + n + "個。3個以上なので、スタート時の幸福キャッシュ +10 のボーナスつきです。"
+    : "1日1回あそぶと、スタンプがたまります。3個たまると、スタート時に幸福キャッシュ +10。";
+}
+
+function startGame() {
+  audio(); SFX.shararan();
+  S = newState();
+  $('start').hidden = true; $('end').hidden = true; $('game').hidden = false;
+  $('notebook').style.display = 'none';
+  buildBoard(); render();
+  $('btn-roll').disabled = false;
+  showEvent({ tag: "第1週", title: "サイコロをふって、スタートしましょう", text: (S.bonus ? "スタンプボーナスで幸福キャッシュ +" + S.bonus + "！ " : "") + "今日の盤面は、今日あそぶ人みんな同じです。", namu: namuLine("start"), buttons: [] });
+}
+
+$('btn-start').onclick = startGame;
+$('btn-roll').onclick = roll;
+$('btn-retry').onclick = startGame;
+$('btn-note').onclick = showNotebook;
+$('btn-sound').onclick = () => { soundOn = !soundOn; $('btn-sound').textContent = soundOn ? "音 ON" : "音 OFF"; if (soundOn) SFX.coin(); };
+renderStart();
+</script>
+
+</body></html>

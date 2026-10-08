@@ -1,0 +1,490 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>宇宙銀行｜残高照会窓口</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-color: #0b111e;
+      --card-bg: #131b2e;
+      --gold: #dfb76c;
+      --gold-light: #f3e5ab;
+      --text-main: #f0f4f8;
+      --text-sub: #a0aec0;
+      --accent: #2d3748;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 16px;
+      background-image: radial-gradient(circle at 50% 20%, #1e293b 0%, #0b111e 80%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      border: 1px solid rgba(223, 183, 108, 0.3);
+      border-radius: 16px;
+      padding: 28px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(223, 183, 108, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 14px;
+      background: rgba(11, 17, 30, 0.8);
+      border: 1px solid rgba(223, 183, 108, 0.4);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1.05rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 8px rgba(223, 183, 108, 0.3);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #dfb76c, #b38938);
+      border: none;
+      border-radius: 10px;
+      color: #0b111e;
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* ローディング演出 */
+    .loading {
+      display: none;
+      padding: 30px 0;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(223, 183, 108, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 結果レシート画面 */
+    .result-card {
+      display: none;
+      text-align: left;
+      background: #fdfbf7;
+      color: #2d3748;
+      border-radius: 10px;
+      padding: 24px 18px;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: radial-gradient(circle, transparent, transparent 50%, #fdfbf7 50%, #fdfbf7 100%);
+      background-size: 12px 12px;
+    }
+
+    .receipt-header {
+      text-align: center;
+      border-bottom: 1px dashed #cbd5e0;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .receipt-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: #744210;
+    }
+
+    .receipt-date {
+      font-size: 0.85rem;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    .balance-box {
+      text-align: center;
+      background: #fffaf0;
+      border: 1px solid #feebc8;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .balance-label {
+      font-size: 0.9rem;
+      color: #744210;
+    }
+
+    .balance-today {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #2b6cb0;
+      margin-top: 2px;
+    }
+
+    .balance-note {
+      font-size: 0.85rem;
+      color: #744210;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .balance-value {
+      white-space: nowrap;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #b7791f;
+      margin-top: 4px;
+    }
+
+    .details-list {
+      font-size: 0.95rem;
+      border-bottom: 1px dashed #cbd5e0;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .detail-name {
+      color: #4a5568;
+    }
+
+    .detail-val {
+      font-weight: bold;
+      color: #2b6cb0;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+
+    .receipt-msg {
+      font-size: 0.95rem;
+      color: #4a5568;
+      line-height: 1.8;
+      text-align: center;
+      background: #edf2f7;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .action-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comment-cta {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #744210;
+      text-align: center;
+      background: #fffaf0;
+      border: 1px dashed #dfb76c;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .comment-cta b { font-size: 1.1rem; }
+
+    .btn-link {
+      display: block;
+      padding: 15px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      line-height: 1.5;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+
+    .btn-youtube {
+      background: #c53030;
+      color: #fff;
+    }
+
+    .btn-book {
+      background: #2b6cb0;
+      color: #fff;
+    }
+
+    .btn-share {
+      background: #1a202c;
+      color: #fff;
+    }
+
+    .btn-retry {
+      background: transparent;
+      border: 1px solid #cbd5e0;
+      color: #718096;
+      margin-top: 6px;
+    }
+  </style>
+<div class="container">
+  <!-- 入力フォーム画面 -->
+  <div id="input-screen">
+    <h1>宇宙銀行｜残高照会窓口</h1>
+    <p class="subtitle">
+      目に見える通帳を見るのが怖い夜も、大丈夫。<br>
+      あなたが今日までに積み上げた「見えない豊かさ」を照会します。
+    </p>
+
+    <div class="form-group">
+      <label for="user-num">直感で浮かんだ、好きな3桁の数字</label>
+      <input type="text" id="user-num" inputmode="numeric" maxlength="3" placeholder="例：888" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="user-state">今のあなたの状態は？</label>
+      <select id="user-state">
+        <option value="1">今日も一日、本当によく頑張った</option>
+        <option value="2">ちょっとお金や将来のことが不安</option>
+        <option value="3">家事や仕事でクタクタに疲れた</option>
+        <option value="4">とにかく今夜は安心して眠りたい</option>
+      </select>
+    </div>
+
+    <button class="btn-submit" onclick="checkBalance()">残高を照会する</button>
+  </div>
+
+  <!-- ローディング中 -->
+  <div id="loading-screen" class="loading">
+    <div class="spinner"></div>
+    <p style="color: var(--gold); font-size: 0.9rem;">宇宙銀行の金庫へアクセス中…</p>
+    <p style="color: var(--text-sub); font-size: 0.75rem; margin-top: 6px;">あなたが積み上げた優しさを計算しています</p>
+  </div>
+
+  <!-- 結果レシート画面 -->
+  <div id="result-screen" class="result-card">
+    <div class="receipt-header">
+      <div class="receipt-title">宇宙銀行 豊かさ受領明細票</div>
+      <div class="receipt-date" id="receipt-date"></div>
+      <div class="receipt-date" id="receipt-no"></div>
+    </div>
+
+    <div class="balance-box">
+      <div class="balance-label">本日の入金</div>
+      <div class="balance-today" id="today-amount"></div>
+      <div class="balance-label" style="margin-top:10px;">これまでの確定保有残高</div>
+      <div class="balance-value" id="balance-amount"></div>
+      <div class="balance-note" id="balance-note"></div>
+    </div>
+
+    <div class="details-list" id="details-container">
+      <!-- JavaScriptで動的生成 -->
+    </div>
+
+    <div class="receipt-msg" id="receipt-message">
+      <!-- JavaScriptで動的生成 -->
+    </div>
+
+    <div class="comment-cta">
+      受け取った豊かさは、YouTubeのコメント欄に<br>
+      <b>「888 受け取ります」</b>と書いて受け取ってくださいね
+    </div>
+
+    <div class="action-links">
+      <a href="https://youtu.be/Mc6bef3Rxa8" target="_blank" rel="noopener" class="btn-link btn-youtube">▶︎ 432Hz 睡眠用BGMで安心を受け取って眠る</a>
+      <a href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener" class="btn-link btn-book">📖 ワーク帳『残高を見るのが怖いあなたへ』を見る</a>
+      <a href="#" target="_blank" rel="noopener" class="btn-link btn-share" id="btn-share">この明細をXでシェアする</a>
+      <button class="btn-link btn-retry" onclick="resetForm()">もう一度照会する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 「今のあなたの状態」ごとに、明細とメッセージを変える
+  const byState = {
+    "1": {
+      details: [
+        { name: "今日1日を無事に生き抜いた基本給", val: 100 },
+        { name: "家族や大切な人を支えた配当金", val: 55 },
+        { name: "誰にも見られない場所で頑張ったボーナス", val: 120 },
+        { name: "あなたの存在そのものへの感謝報酬", val: 88 }
+      ],
+      msg: "今日も本当によく頑張りましたね。あなたが積み上げた一日は、ひとつ残らず宇宙銀行に記帳されています。今夜は胸を張って、ゆっくりおやすみください🌙"
+    },
+    "2": {
+      details: [
+        { name: "朝起きて今日を始めた基本配当", val: 70 },
+        { name: "通帳を見るのが怖い気持ちを受け止めた手当", val: 100 },
+        { name: "言えない不安をぐっと飲み込んだ忍耐手当", val: 88 },
+        { name: "自分を責めずに深呼吸した特別利息", val: 150 }
+      ],
+      msg: "焦らなくて大丈夫。不安を感じるのは、自分と大切な人を守ろうとしている証拠です。今夜の不安はここに預けて、深呼吸してから眠りましょうね。"
+    },
+    "3": {
+      details: [
+        { name: "今日も一日おつかれさま手当", val: 88 },
+        { name: "家事やお仕事を投げ出さなかった配当", val: 62 },
+        { name: "クタクタの体を運んで帰ってきた皆勤手当", val: 90 },
+        { name: "今夜しっかり休むための準備金", val: 200 }
+      ],
+      msg: "クタクタになるまで頑張ったあなたへ。休むことは、豊かさを受け取るための大切な準備です。今夜は何もしなくて大丈夫。あたたかいお布団で体を休めてくださいね。"
+    },
+    "4": {
+      details: [
+        { name: "今日1日を無事に終えた基本給", val: 100 },
+        { name: "誰かに優しさを分け与えた積立金", val: 95 },
+        { name: "不安を手放そうとした勇気の利息", val: 120 },
+        { name: "今夜安心して眠るための準備金", val: 200 }
+      ],
+      msg: "あなたはもう、十分すぎるほどの豊かさを積み上げています。今夜はお金や将来の不安をすべてここに預けて、安心して眠ってくださいね🌙"
+    }
+  };
+
+  function cleanNumber() {
+    const raw = document.getElementById('user-num').value.replace(/[^0-9０-９]/g, '')
+      .replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+    if (raw.length === 0) return String(Math.floor(Math.random() * 900) + 100);
+    return raw.slice(0, 3).padStart(3, '0');
+  }
+
+  function checkBalance() {
+    const num = cleanNumber();
+    const state = document.getElementById('user-state').value;
+
+    document.getElementById('input-screen').style.display = 'none';
+    document.getElementById('loading-screen').style.display = 'block';
+
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      renderResult(num, state);
+      document.getElementById('result-screen').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1800);
+  }
+
+  function renderResult(num, state) {
+    const now = new Date();
+    document.getElementById('receipt-date').innerText =
+      now.getFullYear() + "年" + (now.getMonth() + 1) + "月" + now.getDate() + "日 " +
+      String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + " 照会";
+    document.getElementById('receipt-no').innerText = "受付番号 No." + num;
+
+    const plan = byState[state] || byState["4"];
+    const lucky = 8 + (parseInt(num, 10) % 81);
+    const items = plan.details.concat([{ name: "受付番号 " + num + " の幸運利息", val: lucky }]);
+    const todayTotal = items.reduce((a, b) => a + b.val, 0);
+
+    // 残高は、この端末で毎晩1回ずつ積み上がる（同じ日の2回目は加算しない）
+    const todayKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+    let balance = 0, last = "", days = 0;
+    try {
+      balance = parseInt(localStorage.getItem("uchu_balance") || "0", 10) || 0;
+      last = localStorage.getItem("uchu_last") || "";
+      days = parseInt(localStorage.getItem("uchu_days") || "0", 10) || 0;
+    } catch (e) {}
+    let note;
+    if (last !== todayKey) {
+      balance += todayTotal;
+      days += 1;
+      try {
+        localStorage.setItem("uchu_balance", String(balance));
+        localStorage.setItem("uchu_last", todayKey);
+        localStorage.setItem("uchu_days", String(days));
+      } catch (e) {}
+      note = days === 1
+        ? "はじめての記帳です。毎晩照会すると、ここに少しずつ積み上がっていきます。"
+        : days + "晩目の記帳です。今夜の分も、ちゃんと残高に加わりました。";
+    } else {
+      note = "今夜の分は、もう記帳済みです。また明日の夜にお越しください🌙";
+    }
+    if (balance >= 888 && balance - todayTotal < 888 && last !== todayKey) {
+      note = "残高が 888 を超えました✨ 宇宙銀行の扉が、また一枚ひらきました。";
+    }
+
+    document.getElementById('today-amount').innerText = "+ " + todayTotal.toLocaleString() + " エナジー";
+    document.getElementById('balance-amount').innerHTML =
+      balance.toLocaleString() + ' <span style="font-size:0.95rem;">エナジー</span>';
+    document.getElementById('balance-note').innerText = note;
+    document.getElementById('receipt-message').innerText = plan.msg;
+    document.getElementById('details-container').innerHTML = items.map(it => '<div class="detail-item"><span class="detail-name">' + it.name + '</span><span class="detail-val">+' + it.val + '</span></div>').join('');
+
+    const shareText = "宇宙銀行の残高照会窓口で、今夜の豊かさを記帳しました✨ 確定保有残高 " + balance.toLocaleString() + " エナジー";
+    document.getElementById('btn-share').href =
+      "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText) +
+      "&url=" + encodeURIComponent(location.origin + location.pathname);
+  }
+
+  function resetForm() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('input-screen').style.display = 'block';
+  }
+</script>
+
+</body></html>
