@@ -28,9 +28,9 @@ page(f'''<h2>はじめに　氷山の一角</h2>
 <p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>''')
 page(f'''<h2>この手帳の使い方</h2>
 <div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。</p></div>
-<div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、「今日ひとつだけ」ができたら□にチェック。ひとことメモも残します。</p></div>
-<div class="step"><b>3　週末</b><p>今週うけとったものと、自分へのひとことを書きます。</p></div>
-<div class="step"><b>4　月の終わり</b><p>新しい言葉を言えた日に○をつけ、今月の記録を書きます。</p></div>
+<div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、こころの月（満ちてる・ふつう・ざわざわ）と眠りの☆に○をつけます。「今日ひとつだけ」ができたら□にチェック。</p></div>
+<div class="step"><b>3　週末</b><p>「今週の窓口」に、受け取ったこと・あずけること・来週ためしてみたいことを書きます。</p></div>
+<div class="step"><b>4　月の終わり</b><p>口ぐせの重さに○をつけ、新しい言葉を言えた日と今月の記録を書きます。</p></div>
 <div class="note">書けない日があっても大丈夫。日付は入っていないので、空いたら次のページからまた始めましょう。</div>
 {qrbox('スマホで読みとると「心のブロック診断」が開きます。口ぐせを選ぶと新しい言葉が出て、TODOをGoogleカレンダーに入れたり、LINEに送ったりもできます。')}
 <div class="step"><b>新しい言葉の言い方</b><p>朝と寝る前に、声に出して3回。心がざわついても、言いなれるほど、なじんでいきます。</p></div>''')
@@ -46,22 +46,28 @@ while len(order)<60:
     if j<len(bycat[c]): order.append(bycat[c][j])
     k+=1
 ln=lambda n:''.join('<div class="ln"></div>' for _ in range(n))
-def day(d,sun=False): return f'<div class="day"><div class="dd{" sun" if sun else ""}">{d}<span>／</span></div><div class="dc"><div class="dl"></div><div class="dl"></div><div class="chk">□ 今日ひとつだけ　</div></div></div>'
+MOON='<span class="mo"><i class="m f"></i>満ちてる<i class="m h"></i>ふつう<i class="m n"></i>ざわざわ</span>'
+STAR='<span class="st">眠り ☆ ☆ ☆</span>'
+def day(d,sun=False): return f'<div class="day"><div class="dd{" sun" if sun else ""}">{d}<span>／</span></div><div class="dc"><div class="dl"></div><div class="dl"></div><div class="feel">こころの月 {MOON}{STAR}</div><div class="chk">□ 今日ひとつだけ　</div></div></div>'
 w=0
 for m in range(12):
     cal='<div class="cal">'+''.join(f'<div class="h{" sun" if d=="日" else ""}">{d}</div>' for d in "月火水木金土日")+''.join('<div></div>' for _ in range(35))+'</div>'
     page(f'''<div class="ttl"><span>　　　月</span><small>MONTHLY</small></div>
 <div class="box"><b>今月の口ぐせ</b><div class="ln"></div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
     page(f'''<div class="ttl"><span>今月の記録</span><small>月末に</small></div>
+<div class="box"><b>口ぐせの重さ（○をつける）</b><div class="scale"><span>月のはじめ</span><span class="sc">1　2　3　4　5</span></div><div class="scale"><span>月の終わり</span><span class="sc">1　2　3　4　5</span></div><small class="tiny">1＝軽い　5＝重い。数字が下がっていなくても大丈夫。気づけたことが一歩です。</small></div>
 <div class="box"><b>新しい言葉を言えた日に○</b><div class="nums">{" ".join(str(i) for i in range(1,16))}<br>{" ".join(str(i) for i in range(16,32))}</div></div>
-<div class="box"><b>今月うけとったもの</b>{ln(4)}</div><div class="box"><b>気づいたこと・メモ</b>{ln(7)}</div>''','R')
+<div class="box"><b>今月うけとったもの</b>{ln(3)}</div><div class="box"><b>気づいたこと・メモ</b>{ln(4)}</div>''','R')
     for _ in range(5):
         it=order[w];w+=1
         page(f'''<div class="ttl"><span>　　月　　日〜</span><small>WEEKLY</small></div>
 <div class="box"><b>✦ 今週の新しい言葉</b><div class="ln"></div><div class="hint">迷ったら：「{it[3]}」</div></div>
 <div class="days">{day("月")}{day("火")}{day("水")}{day("木")}</div>''','L')
         page(f'''<div class="days">{day("金")}{day("土")}{day("日",True)}</div>
-<div class="box"><b>今週うけとったもの</b>{ln(2)}</div><div class="box"><b>今週のわたしへ ひとこと</b>{ln(2)}</div>''','R')
+<div class="win"><div class="wt">今週の窓口</div>
+<div class="wc"><b>✦ 受け取ったこと</b><small>うれしかった・助かった</small>{ln(2)}</div>
+<div class="wc"><b>☁ あずけること</b><small>ざわざわしたことは、ここに置いていく</small>{ln(2)}</div>
+<div class="wc"><b>→ 来週ためしてみたいこと</b>{ln(1)}</div></div>''','R')
 # word collection
 P.append(f'<section class="pg"><h2>ことば集　口ぐせ → 新しい言葉</h2><p>今の口ぐせに近いものを探して、右の言葉を月間・週間ページに書きましょう。</p>{qrbox("同じ120の言葉を、アプリでテーマ別に選べます。")}</section>')
 rows=[]
@@ -116,6 +122,16 @@ p{{margin:0}}
 .dd span{{font-size:7pt;color:#777;margin-top:auto}}
 .dc{{padding:1mm 2.5mm;display:flex;flex-direction:column}}
 .dl{{border-bottom:.5pt dashed #bbb;flex:1}}
+.feel{{font-size:7.5pt;display:flex;gap:3mm;align-items:center;padding-top:.8mm;color:#444}}
+.mo{{display:inline-flex;align-items:center;gap:1mm}}
+.m{{display:inline-block;width:2.6mm;height:2.6mm;border-radius:50%;border:.4pt solid #333;margin-left:1.2mm}}
+.m.f{{background:#555}} .m.h{{background:linear-gradient(90deg,#555 50%,#fff 50%)}}
+.st{{margin-left:auto;letter-spacing:.05em}}
+.win{{border:1pt solid #222;border-radius:3mm;padding:2mm 3mm;display:flex;flex-direction:column;gap:1.5mm}}
+.wt{{font-family:M;font-size:11pt;text-align:center;letter-spacing:.3em}}
+.wc b{{font-size:8.5pt}} .wc small{{font-size:7pt;color:#666;margin-left:2mm}}
+.scale{{display:flex;justify-content:space-between;font-size:8.5pt;padding:.8mm 0}} .sc{{letter-spacing:.1em}}
+.tiny{{font-size:7pt;color:#666}}
 .chk{{font-size:8pt;padding-top:1mm;border-bottom:.5pt dashed #bbb;height:7mm}}
 .cat{{font-family:M;font-size:12pt;border-bottom:1pt solid #222;margin:4mm 0 1mm;break-after:avoid}}
 .wr{{display:grid;grid-template-columns:1fr 1fr;gap:3mm;padding:1.2mm 0;border-bottom:.4pt dotted #aaa;break-inside:avoid;font-size:8.5pt}}
