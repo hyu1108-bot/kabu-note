@@ -27,7 +27,7 @@ page(f'''<h2>はじめに　氷山の一角</h2>
 {iceberg('見えている口ぐせ<br><b>「節約しなきゃ」</b>','水面の下の思いこみ<br><b>いつも足りない</b>')}
 <p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>''')
 page(f'''<h2>この手帳の使い方</h2>
-<div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。口ぐせがすぐに出てこないときは、アプリで選んでから書けば大丈夫です。</p></div>
+<div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月のテーマ（お金・夢と仕事・人とのつながり・からだ）に○をつけ、よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。口ぐせがすぐに出てこないときは、アプリで選んでから書けば大丈夫です。</p></div>
 <div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、こころの月（満ちてる・ふつう・ざわざわ）と眠りの☆に○をつけます。「今日ひとつだけ」ができたら□にチェック。</p></div>
 <div class="step"><b>3　週末</b><p>「今週の窓口」に、受け取ったことと、あずけたいことを書きます。</p></div>
 <div class="step"><b>4　月の終わり</b><p>新しい言葉を言えた日に○をつけ、今月の記録を書きます。</p></div>
@@ -53,6 +53,7 @@ w=0
 for m in range(12):
     cal='<div class="cal">'+''.join(f'<div class="h{" sun" if d=="日" else ""}">{d}</div>' for d in "月火水木金土日")+''.join('<div></div>' for _ in range(35))+'</div>'
     page(f'''<div class="ttl"><span>　　　月</span><small>MONTHLY</small></div>
+<div class="box"><b>今月のテーマ（○をつける）</b><div class="themes"><span>🪙 お金</span><span>🌱 夢・仕事</span><span>🤝 人とのつながり</span><span>🌿 からだ</span></div></div>
 <div class="box"><b>今月の口ぐせ</b><div class="ln"></div><div class="hint">思いつかないときは、アプリ「心のブロック診断」で選んでみてください（使い方のページのQRコードから）</div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
     page(f'''<div class="ttl"><span>今月の記録</span><small>月末に</small></div>
 <div class="box"><b>新しい言葉を言えた日に○</b><div class="nums">{" ".join(str(i) for i in range(1,16))}<br>{" ".join(str(i) for i in range(16,32))}</div></div>
@@ -110,6 +111,7 @@ p{{margin:0}}
 .ttl small{{font-family:G;font-size:7pt;letter-spacing:.2em}}
 .box{{border:.6pt solid #888;border-radius:2mm;padding:1.5mm 3mm}}
 .box b{{font-size:8pt;letter-spacing:.05em}}
+.themes{{display:flex;justify-content:space-around;font-size:9.5pt;padding:1mm 0}}
 .hint{{font-size:7.5pt;color:#555;margin-top:1mm}}
 .nums{{font-size:9pt;letter-spacing:.12em;line-height:2}}
 .cal{{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:6mm repeat(5,1fr);flex:1;border-top:.6pt solid #888;border-left:.6pt solid #888}}
