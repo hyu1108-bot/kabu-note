@@ -6,7 +6,7 @@ cats=[]
 for it in items:
     if it[0] not in cats: cats.append(it[0])
 F=os.environ.get('FONT_DIR',os.path.abspath('fonts'))
-KIN='file://'+os.path.join(os.path.dirname(os.path.abspath(__file__)),'kinas.png')
+KIN='file://'+os.path.join(os.path.dirname(os.path.abspath(__file__)),'kinas_fill_gray.png')
 def kinas(msg,size=22,side='left'): return f'<div class="kn {side}"><img src="{KIN}" style="width:{size}mm"><div class="kb">{msg}</div></div>'
 import qrcode,qrcode.image.svg,io
 URL='https://kokoro-block.netlify.app/'
