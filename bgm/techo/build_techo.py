@@ -5,7 +5,12 @@ items=json.loads(arr)
 cats=[]
 for it in items:
     if it[0] not in cats: cats.append(it[0])
-F=os.path.abspath('fonts')
+F=os.environ.get('FONT_DIR',os.path.abspath('fonts'))
+import qrcode,qrcode.image.svg,io
+URL='https://kokoro-block.netlify.app/'
+_b=io.BytesIO();qrcode.make(URL,image_factory=qrcode.image.svg.SvgPathImage,box_size=10,border=1).save(_b)
+QR=_b.getvalue().decode().split('?>',1)[-1]
+def qrbox(msg): return f'<div class="qr"><div class="qri">{QR}</div><div><b>アプリでも選べます</b><p>{msg}</p><p class="url">{URL}</p></div></div>'
 def iceberg(top,under,w=100):
     return f'''<div class="ice"><svg viewBox="0 0 360 400"><rect width="360" height="120" fill="#fff"/><rect y="120" width="360" height="280" fill="#e9e9e9"/>
 <polygon points="132,120 160,80 174,58 192,74 206,96 228,120" fill="#fff" stroke="#333" stroke-width="2"/>
@@ -21,12 +26,13 @@ page(f'''<h2>はじめに　氷山の一角</h2>
 <p>「節約しなきゃ」「借金を返すぞ」「人生をやり直したい」。<br>ふだん心の中でつぶやいている口ぐせは、氷山の一角です。</p>
 {iceberg('見えている口ぐせ<br><b>「節約しなきゃ」</b>','水面の下の思いこみ<br><b>いつも足りない</b>')}
 <p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>''')
-page('''<h2>この手帳の使い方</h2>
+page(f'''<h2>この手帳の使い方</h2>
 <div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。</p></div>
 <div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、「今日ひとつだけ」ができたら□にチェック。ひとことメモも残します。</p></div>
 <div class="step"><b>3　週末</b><p>今週うけとったものと、自分へのひとことを書きます。</p></div>
 <div class="step"><b>4　月の終わり</b><p>新しい言葉を言えた日に○をつけ、今月の記録を書きます。</p></div>
 <div class="note">書けない日があっても大丈夫。日付は入っていないので、空いたら次のページからまた始めましょう。</div>
+{qrbox('スマホで読みとると「心のブロック診断」が開きます。口ぐせを選ぶと新しい言葉が出て、毎朝のカレンダー通知にも入れられます。')}
 <div class="step"><b>新しい言葉の言い方</b><p>朝と寝る前に、声に出して3回。心がざわついても、言いなれるほど、なじんでいきます。</p></div>''')
 page(f'''<h2>今年のわたしの口ぐせ</h2><p>思いつくままに書き出してみましょう。お金・仕事・家族・恋愛・からだ、なんでも。</p>
 {''.join('<div class="ln"></div>' for _ in range(10))}
@@ -57,7 +63,7 @@ for m in range(12):
         page(f'''<div class="days">{day("金")}{day("土")}{day("日",True)}</div>
 <div class="box"><b>今週うけとったもの</b>{ln(2)}</div><div class="box"><b>今週のわたしへ ひとこと</b>{ln(2)}</div>''','R')
 # word collection
-P.append('<section class="pg"><h2>ことば集　口ぐせ → 新しい言葉</h2><p>今の口ぐせに近いものを探して、右の言葉を月間・週間ページに書きましょう。</p></section>')
+P.append(f'<section class="pg"><h2>ことば集　口ぐせ → 新しい言葉</h2><p>今の口ぐせに近いものを探して、右の言葉を月間・週間ページに書きましょう。</p>{qrbox("同じ120の言葉を、アプリでテーマ別に選べます。")}</section>')
 rows=[]
 for c in cats:
     rows.append(f'<div class="cat">{c}</div>')
@@ -113,8 +119,10 @@ p{{margin:0}}
 .chk{{font-size:8pt;padding-top:1mm;border-bottom:.5pt dashed #bbb;height:7mm}}
 .cat{{font-family:M;font-size:12pt;border-bottom:1pt solid #222;margin:4mm 0 1mm;break-after:avoid}}
 .wr{{display:grid;grid-template-columns:1fr 1fr;gap:3mm;padding:1.2mm 0;border-bottom:.4pt dotted #aaa;break-inside:avoid;font-size:8.5pt}}
+\n.qr{{display:flex;gap:3mm;align-items:center;border:.6pt solid #888;border-radius:2mm;padding:2mm 3mm}}
+.qri{{width:22mm;flex:none}} .qri svg{{width:22mm;height:22mm}} .qr b{{font-size:9pt}} .qr p{{font-size:8pt}} .url{{font-size:7pt;color:#555}}
 .wv span{{display:block;font-size:7pt;color:#666}}
 .ww{{font-family:M;font-size:9.5pt}}
 '''
-open('techo.html','w').write(f'<!doctype html><meta charset="utf-8"><style>{css}</style>'+''.join(P))
+open(os.environ.get('OUT','techo.html'),'w').write(f'<!doctype html><meta charset="utf-8"><style>{css}</style>'+''.join(P))
 print(len(P),'blocks')
