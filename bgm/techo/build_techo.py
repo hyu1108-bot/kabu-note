@@ -20,7 +20,7 @@ def iceberg(top,under,w=100):
 P=[]
 def page(h,cls=''): P.append(f'<section class="pg {cls}">{h}</section>')
 # 1 title
-page('''<div class="cover"><p class="small">宇宙銀行の</p><h1>心のブロックを<br>書きかえる手帳</h1><p class="sub">口ぐせの奥にある思いこみに気づいて<br>新しい言葉で1週間を過ごす</p><p class="small">日付なし・いつからでも始められます</p><p class="au">ヒュー</p></div>''')
+page('''<div class="cover"><p class="small">宇宙銀行の日付なし手帳</p><h1>お金のブロックを<br>書きかえる手帳</h1><p class="sub">口ぐせの奥にある思いこみに気づいて<br>新しい言葉で1週間ずつ<br>仕事・人間関係・こころまで</p><p class="small">日付なし・いつからでも始められます</p><p class="au">ヒュー</p></div>''')
 page('<div class="center small">この手帳は、自分の気持ちに気づくためのものです。<br>結果や効果を約束するものではありません。<br><br>借金や支払いが苦しいとき、眠れない・気持ちが沈む日が続くときは、<br>ひとりで抱えずに専門の窓口へ相談してください。<br>お金・借金の相談：「法テラス」で検索<br>こころの相談：「まもろうよ こころ」で検索（厚生労働省）</div>')
 page(f'''<h2>はじめに　氷山の一角</h2>
 <p>「節約しなきゃ」「借金を返すぞ」「人生をやり直したい」。<br>ふだん心の中でつぶやいている口ぐせは、氷山の一角です。</p>
