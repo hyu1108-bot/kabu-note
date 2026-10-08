@@ -27,7 +27,7 @@ page(f'''<h2>はじめに　氷山の一角</h2>
 {iceberg('見えている口ぐせ<br><b>「節約しなきゃ」</b>','水面の下の思いこみ<br><b>いつも足りない</b>')}
 <p>水面の下には、もっと大きな思いこみがかくれています。そこに気づいて、新しい言葉に書きかえる。この手帳は、それを1週間ずつ、くり返していくためのものです。</p>''')
 page(f'''<h2>この手帳の使い方</h2>
-<div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。</p></div>
+<div class="step"><b>1　月のはじめ（月間ページ）</b><p>今月よく出る口ぐせを書き、巻末の「ことば集」から新しい言葉を選んで書きます。口ぐせがすぐに出てこないときは、アプリで選んでから書けば大丈夫です。</p></div>
 <div class="step"><b>2　毎日（週間ページ）</b><p>予定を書き、こころの月（満ちてる・ふつう・ざわざわ）と眠りの☆に○をつけます。「今日ひとつだけ」ができたら□にチェック。</p></div>
 <div class="step"><b>3　週末</b><p>「今週の窓口」に、受け取ったことと、あずけたいことを書きます。</p></div>
 <div class="step"><b>4　月の終わり</b><p>新しい言葉を言えた日に○をつけ、今月の記録を書きます。</p></div>
@@ -53,7 +53,7 @@ w=0
 for m in range(12):
     cal='<div class="cal">'+''.join(f'<div class="h{" sun" if d=="日" else ""}">{d}</div>' for d in "月火水木金土日")+''.join('<div></div>' for _ in range(35))+'</div>'
     page(f'''<div class="ttl"><span>　　　月</span><small>MONTHLY</small></div>
-<div class="box"><b>今月の口ぐせ</b><div class="ln"></div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
+<div class="box"><b>今月の口ぐせ</b><div class="ln"></div><div class="hint">思いつかないときは、アプリ「心のブロック診断」で選んでみてください（使い方のページのQRコードから）</div></div><div class="box"><b>✦ 今月の新しい言葉</b><div class="ln"></div></div>{cal}''','L')
     page(f'''<div class="ttl"><span>今月の記録</span><small>月末に</small></div>
 <div class="box"><b>新しい言葉を言えた日に○</b><div class="nums">{" ".join(str(i) for i in range(1,16))}<br>{" ".join(str(i) for i in range(16,32))}</div></div>
 <div class="box"><b>今月うけとったもの</b>{ln(4)}</div><div class="box"><b>気づいたこと・メモ</b>{ln(7)}</div>''','R')
