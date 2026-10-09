@@ -45,7 +45,7 @@
 - Xの行き先テスト（本／チャンネル／おみくじを2週ずつ、リンクのクリック数で比較）の候補の一つ
 
 ## 心のブロック診断（Webアプリ）＋手帳（2026-10-08〜09作成）
-- 公開URL：https://kokoro-block.netlify.app/ （Netlify、プロジェクト名 kokoro-block）。元ファイル：`bgm/techo/netlify/index.html`（確認用は `bgm/techo/app_index.html`）。更新はNetlifyの「choose a file」から上書き
+- **公開URL（2026-10-09 Cloudflareへ移転）：https://uchuginko.atelier-kiki-love.workers.dev/kokoro/**。4アプリを1サイトに（https://uchuginko.atelier-kiki-love.workers.dev/ 入口・/kokoro/・/omikuji/・/zandaka/・/flow/）。元フォルダ `bgm/site/`、上げるのは `bgm/uchuginko_site.zip`（Workers名 uchuginko、「新規展開」からzipをドロップ）。旧Netlify（kokoro-block・おみくじ）は案内ページ `bgm/redirect/` で自動転送（手帳のQRは旧URLのまま）。旧URL：https://kokoro-block.netlify.app/ （Netlify、プロジェクト名 kokoro-block）。元ファイル：`bgm/techo/netlify/index.html`（確認用は `bgm/techo/app_index.html`）。更新はNetlifyの「choose a file」から上書き
 - 中身：口ぐせ120個（12テーマを4グループ＝お金／夢・仕事／人とのつながり／こころ・からだで色分け。HARMの法則）。選ぶと氷山の図（見えている口ぐせ→水面下の思いこみ）→新しい言葉1つ→今日ひとつだけ
 - アファメーションには「身を削る」など否定・つらい言葉を入れない。健康は効果を約束しない
 - 7日間チャレンジ：言葉を選んで開始→次に開くと上に「今週の言葉 ○日目/7」と「言えた」「今日ひとつだけ」のチェック。8日目にふりかえり。相談窓口はリンクなしで名前だけ（法テラス／まもろうよ こころ）

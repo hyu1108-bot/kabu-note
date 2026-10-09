@@ -7,7 +7,7 @@
 <meta property="og:title" content="心のブロック診断｜宇宙銀行">
 <meta property="og:description" content="口ぐせの奥にある思いこみに気づいて、新しい言葉へ。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://kokoro-block.netlify.app/">
+<meta property="og:url" content="https://uchuginko.atelier-kiki-love.workers.dev/kokoro/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
 <title>心のブロック診断</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
@@ -327,8 +327,8 @@ function show(n){
   const t=new Date(),u=new Date(Date.now()+864e5),p=n=>String(n).padStart(2,"0"),f=d=>`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
   document.getElementById("cal").href="https://calendar.google.com/calendar/render?action=TEMPLATE"+
    "&text="+encodeURIComponent("今日ひとつだけ："+a)+"&dates="+f(t)+"/"+f(u)+
-   "&details="+encodeURIComponent("✦ 今日の新しい言葉\n「"+w+"」\n朝と寝る前に、声に出して3回\n\n心の声：「"+v+"」\n奥にある思い："+h+"\n\n心のブロック診断 https://kokoro-block.netlify.app/");
-  document.getElementById("share").onclick=e=>{const txt="✦ "+w+"\n今日ひとつだけ："+a+"\n（心の声：「"+v+"」）\nhttps://kokoro-block.netlify.app/";
+   "&details="+encodeURIComponent("✦ 今日の新しい言葉\n「"+w+"」\n朝と寝る前に、声に出して3回\n\n心の声：「"+v+"」\n奥にある思い："+h+"\n\n心のブロック診断 https://uchuginko.atelier-kiki-love.workers.dev/kokoro/");
+  document.getElementById("share").onclick=e=>{const txt="✦ "+w+"\n今日ひとつだけ："+a+"\n（心の声：「"+v+"」）\nhttps://uchuginko.atelier-kiki-love.workers.dev/kokoro/";
     if(/iPhone|iPad|Android/i.test(navigator.userAgent)){location.href="https://line.me/R/share?text="+encodeURIComponent(txt)}
     else{navigator.clipboard.writeText(txt).then(()=>e.target.textContent="コピーしました。パソコンではLINEのKeepメモに貼りつけてください（スマホならLINEが直接開きます）",()=>{})}};
   document.getElementById("back").onclick=()=>{res.hidden=true;pick.hidden=false;drawChal();scrollTo(0,0)};
