@@ -9,7 +9,7 @@ F=os.environ.get('FONT_DIR',os.path.abspath('fonts'))
 KIN='file://'+os.path.join(os.path.dirname(os.path.abspath(__file__)),'kinas_fill_gray.png')
 def kinas(msg,size=22,side='left'): return f'<div class="kn {side}"><img src="{KIN}" style="width:{size}mm"><div class="kb">{msg}</div></div>'
 import qrcode,qrcode.image.svg,io
-URL='https://kokoro-block.netlify.app/'
+URL='https://uchuginko.atelier-kiki-love.workers.dev/kokoro/'
 _b=io.BytesIO();qrcode.make(URL,image_factory=qrcode.image.svg.SvgPathImage,box_size=10,border=1).save(_b)
 QR=_b.getvalue().decode().split('?>',1)[-1]
 def qrbox(msg): return f'<div class="qr"><div class="qri">{QR}</div><div><b>アプリでも選べます</b><p>{msg}</p><p class="url">{URL}</p></div></div>'
