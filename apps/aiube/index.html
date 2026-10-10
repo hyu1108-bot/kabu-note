@@ -41,6 +41,7 @@ canvas{background:#fff;border-radius:18px;border:3px solid #eedfc0;touch-action:
 .opts button{background:var(--u);font-size:26px}
 .msg{font-size:30px;font-weight:bold;min-height:40px}
 .home{position:fixed;top:10px;left:10px;width:auto;font-size:16px;padding:8px 14px;background:#b5aa98;box-shadow:none;z-index:5}
+rt{font-size:.45em;font-weight:normal}
 </style>
 </head>
 <body>
@@ -74,7 +75,7 @@ canvas{background:#fff;border-radius:18px;border:3px solid #eedfc0;touch-action:
 <section class="screen" id="oyama">
   <h2>とんがり おやま</h2>
   <svg class="face" viewBox="0 0 200 200" id="oyFace"></svg>
-  <p class="mid">べろを とがらせて<br>おやまの かたちに キープ！</p>
+  
   <div class="timer" id="oyTime">5</div>
   <div class="mid" id="oyRep"></div>
   <button id="oyStart">スタート</button>
@@ -248,20 +249,26 @@ document.querySelectorAll("#aiReps button").forEach(b=>b.onclick=()=>{
 });
 
 /* ---------- とんがりおやま ---------- */
-const OY_SEC=5,OY_REPS=5;
-const TONGUE_UP='<ellipse cx="100" cy="140" rx="30" ry="22" fill="#7a1f1f"/><path d="M80 158 Q100 108 120 158 Z" fill="#ff6f8f"/>';
-START.oyama=()=>{show("oyama");face($("oyFace"),TONGUE_UP,"var(--be)");$("oyTime").textContent=OY_SEC;$("oyRep").textContent=`${OY_REPS}かい やるよ`;$("oyStart").style.display="block"};
+const OY_SEC=3;
+const OM='<ellipse cx="100" cy="140" rx="30" ry="20" fill="#7a1f1f"/>';
+const OYS={
+ up:{k:"とんがり おやま",tip:"べろを とがらせて うえへ",m:OM+'<path d="M82 156 Q100 104 118 156 Z" fill="#ff6f8f"/>'},
+ be:{k:"あっかんべー",tip:"べろを したへ べーっと",m:OM+'<path d="M84 136 Q84 186 100 186 Q116 186 116 136 Z" fill="#ff6f8f"/>'},
+ l:{k:"ひだり",tip:"べろを ひだりへ",m:OM+'<path d="M96 132 Q40 128 38 142 Q40 156 96 150 Z" fill="#ff6f8f"/>'},
+ r:{k:"みぎ",tip:"べろを みぎへ",m:OM+'<path d="M104 132 Q160 128 162 142 Q160 156 104 150 Z" fill="#ff6f8f"/>'},
+ pan:{k:"ふんわり ほっとけーき",tip:"べろを ひらべったく ふんわり",m:'<ellipse cx="100" cy="140" rx="36" ry="20" fill="#7a1f1f"/><ellipse cx="100" cy="146" rx="32" ry="12" fill="#ff6f8f"/>'}
+};
+const OY_SEQ=[];for(let i=0;i<3;i++)OY_SEQ.push("up","be","l","r");OY_SEQ.push("pan");
+START.oyama=()=>{show("oyama");face($("oyFace"),OYS.up.m,"var(--be)");$("oyTime").textContent="";$("oyRep").textContent="とんがりおやま → あっかんべー → ひだり → みぎ を 3かい、さいごに ふんわり ほっとけーき";$("oyStart").style.display="block"};
 $("oyStart").onclick=()=>{
-  $("oyStart").style.display="none";let rep=1;
+  $("oyStart").style.display="none";let i=0;
   const run=()=>{
-    let s=OY_SEC;$("oyRep").textContent=`${rep}かいめ / ${OY_REPS}かい`;$("oyTime").textContent=s;say("とんがり おやま！");
-    every(()=>{
-      s--;$("oyTime").textContent=Math.max(s,0);
-      if(s<=0){clearAll();
-        if(rep>=OY_REPS){complete("oyama","べろが つよく なったね！");return}
-        rep++;$("oyTime").textContent="😊";say("やすんで");later(run,3000);
-      }
-    },1000);
+    if(i>=OY_SEQ.length){complete("oyama","べろが じょうずに うごいたね！");return}
+    const st=OYS[OY_SEQ[i]];
+    face($("oyFace"),st.m,"var(--be)");
+    $("oyRep").innerHTML=`<b style="font-size:34px">${st.k}</b><br>${st.tip}<br>${i<12?Math.floor(i/4)+1+"かいめ / 3かい":"さいご！"}`;
+    let s=OY_SEC;$("oyTime").textContent=s;say(st.k);
+    every(()=>{s--;$("oyTime").textContent=Math.max(s,0);if(s<=0){clearAll();i++;later(run,400)}},1000);
   };
   run();
 };
@@ -365,6 +372,23 @@ function stShow(){const pg=stS.p[stI];$("stTitle").textContent=stS.t;$("stRep").
 $("stHear").onclick=()=>say(stS.p[stI][1],.8);
 $("stNext").onclick=()=>{stI++;if(stI>=stS.p.length){complete("book",`「${stS.t}」 よめたね！`);return}stShow()};
 
+/* ---------- カタカナに ふりがな ---------- */
+function rubyfy(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>{
+    const p=n.parentNode;if(!p||p.closest("ruby,script,style,title,svg"))return NodeFilter.FILTER_REJECT;
+    return /[ァ-ヶ]/.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+  const list=[];while(w.nextNode())list.push(w.currentNode);
+  list.forEach(n=>{
+    const f=document.createDocumentFragment();
+    n.nodeValue.split(/([ァ-ヶー]*[ァ-ヶ][ァ-ヶー]*)/).forEach((t,j)=>{
+      if(j%2){const r=document.createElement("ruby");r.textContent=t;const rt=document.createElement("rt");rt.textContent=t.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));r.appendChild(rt);f.appendChild(r)}
+      else if(t)f.appendChild(document.createTextNode(t));
+    });
+    n.parentNode.replaceChild(f,n);
+  });
+}
+new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList:true,subtree:true,characterData:true});
+rubyfy(document.body);
 renderHome();
 </script>
 </body>
