@@ -1,0 +1,51 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>音のテスト</title>
+<style>
+body{margin:0;background:#0d1430;color:#eef0f8;font-family:"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.7;padding:20px 16px 48px}
+.w{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{color:#fff1c2;font-size:22px;margin:0}h2{color:#e6c46a;font-size:17px;margin:0 0 6px}
+.box{background:#151f45;border:1px solid #2a3768;border-radius:14px;padding:16px}
+button{font:inherit;font-size:16px;padding:12px 14px;border-radius:999px;border:1px solid #e6c46a;background:#e6c46a;color:#1a1630;font-weight:700;margin:4px 4px 4px 0}
+button.g{background:transparent;color:#e6c46a}
+.word{font-size:19px;color:#fff1c2;margin:8px 0}
+small,.st{color:#a9b0cf;font-size:13px}.st{display:block;margin-top:6px}
+audio{width:100%;margin-top:8px}
+</style></head><body><div class="w">
+<h1>音のテスト（3つ）</h1>
+<p class="st">スマホで1つずつ押して、どうだったか教えてください。音量を上げて、マナーモードを外してください。</p>
+
+<div class="box"><h2>① キラーンの音</h2>
+<button id="k">✨ キラーン</button><span class="st" id="ks"></span></div>
+
+<div class="box"><h2>② キーナスの声で読み上げ</h2>
+<div class="word">お金は、めぐって私のもとへ帰ってくる</div>
+<button data-p="1.6" data-r="0.95">声A（高め）</button><button data-p="1.2" data-r="0.9">声B（少し高め）</button><button data-p="0.8" data-r="0.85">声C（低め・ゆっくり）</button>
+<button class="g" id="kv">キラーン＋声A</button>
+<span class="st" id="vs"></span></div>
+
+<div class="box"><h2>③ 自分の声を録音して聞く</h2>
+<button id="rec">🎙 録音する</button><button class="g" id="stp" disabled>■ 止める</button>
+<audio id="pl" controls hidden></audio><span class="st" id="rs">録音はこのスマホの中だけ。どこにも送られません。</span></div>
+
+<p class="st" id="env"></p>
+</div><script>
+let ac;function ctx(){ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}
+function kiran(){const c=ctx(),t=c.currentTime;[1568,2093,2637,3136,4186].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f;const s=t+i*0.07;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(0.18,s+0.01);g.gain.exponentialRampToValueAtTime(0.0001,s+1.2);o.connect(g).connect(c.destination);o.start(s);o.stop(s+1.3)})}
+k.onclick=()=>{kiran();ks.textContent="鳴りましたか？"};
+const W=document.querySelector(".word").textContent;
+function say(p,r){if(!("speechSynthesis" in window)){vs.textContent="このブラウザは読み上げに対応していません";return}
+speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(W);u.lang="ja-JP";u.pitch=p;u.rate=r;
+const v=speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.startsWith("ja"));if(v.length)u.voice=v[0];
+u.onend=()=>vs.textContent="読み上げ完了（声："+(u.voice?u.voice.name:"標準")+"／日本語の声 "+v.length+"種類）";
+u.onerror=e=>vs.textContent="読み上げできませんでした："+e.error;speechSynthesis.speak(u)}
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>say(+b.dataset.p,+b.dataset.r));
+kv.onclick=()=>{kiran();setTimeout(()=>say(1.6,0.95),700)};
+let mr,ch=[];
+rec.onclick=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({audio:true});ch=[];mr=new MediaRecorder(s);
+mr.ondataavailable=e=>e.data.size&&ch.push(e.data);
+mr.onstop=()=>{s.getTracks().forEach(t=>t.stop());const b=new Blob(ch,{type:mr.mimeType});pl.src=URL.createObjectURL(b);pl.hidden=false;rs.textContent="録音できました（"+(mr.mimeType||"形式不明")+"）。▶で聞いてください";rec.disabled=false;stp.disabled=true};
+mr.start();rec.disabled=true;stp.disabled=false;rs.textContent="録音中…新しい言葉を声に出してみてください"}
+catch(e){rs.textContent="録音できませんでした："+e.name+"（LINEやYouTubeの中で開いている場合は、SafariかChromeで開き直してください）"}};
+stp.onclick=()=>mr&&mr.state==="recording"&&mr.stop();
+env.textContent="確認用："+navigator.userAgent;
+</script></body></html>
