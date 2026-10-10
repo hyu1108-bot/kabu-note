@@ -8,7 +8,7 @@
 <style>
 :root{--bg:#fff8e7;--ink:#3a2e1f;--a:#ff7a59;--i:#ffc23d;--u:#4cb8ff;--be:#ff5fa2;--ok:#3cc47c;--card:#fff}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Rounded Mplus 1c",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;user-select:none;-webkit-user-select:none}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Rounded Mplus 1c",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:56px 16px 16px;user-select:none;-webkit-user-select:none}
 h1{font-size:28px;margin:6px 0}
 h2{font-size:26px}
 .screen{display:none;width:100%;max-width:480px;flex-direction:column;align-items:center;gap:14px}
@@ -42,6 +42,9 @@ canvas{background:#fff;border-radius:18px;border:3px solid #eedfc0;touch-action:
 .msg{font-size:30px;font-weight:bold;min-height:40px}
 .home{position:fixed;top:10px;left:10px;width:auto;font-size:16px;padding:8px 14px;background:#b5aa98;box-shadow:none;z-index:5}
 rt{font-size:.45em;font-weight:normal}
+.w{display:inline-block;padding:2px 6px;border-radius:10px;color:#b9ad9a;cursor:pointer}
+.w.past{color:var(--ink)}
+.w.now{color:var(--ink);background:#ffe58a;transform:scale(1.15)}
 </style>
 </head>
 <body>
@@ -129,7 +132,7 @@ rt{font-size:.45em;font-weight:normal}
   <div class="mid" id="stRep"></div>
   <div class="bar"><i id="stProg"></i></div>
   <div class="big" id="stPic" style="font-size:90px"></div>
-  <p id="stText" style="font-size:30px;line-height:1.9;background:#fff;border-radius:18px;padding:18px;width:100%;border:3px solid #eedfc0;min-height:150px"></p>
+  <p id="stText" style="font-size:38px;line-height:1.9;background:#fff;border-radius:18px;padding:18px;width:100%;border:3px solid #eedfc0;min-height:150px"></p>
   <button id="stHear" style="background:var(--u)">🔊 よんで もらう</button>
   <button id="stNext">よめた！</button>
 </section>
@@ -372,9 +375,16 @@ START.book=()=>{
   const d=new Date().getDay();
   STORIES.forEach((s,i)=>{const b=document.createElement("button");b.innerHTML=`<span class="ic">${s.p[0][0]}</span>${s.t}<span class="ck">${i===d?"🆕":""}</span>`;b.onclick=()=>{stS=s;stI=0;show("story");stShow()};m.appendChild(b)});
 };
-function stShow(){const pg=stS.p[stI];$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";$("stPic").textContent=pg[0];$("stText").textContent=pg[1];$("stNext").textContent=stI===stS.p.length-1?"おしまい！":"よめた！"}
+let stW=0;
+function stShow(){const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";$("stPic").textContent=pg[0];
+  const t=$("stText");t.innerHTML="";
+  pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.textContent=w;sp.onclick=()=>{stW=j;stMark();say(w,.7)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
+  stMark();}
+function stMark(){const ws=[...$("stText").querySelectorAll(".w")];ws.forEach((w,j)=>{w.classList.toggle("now",j===stW);w.classList.toggle("past",j<stW)});
+  $("stNext").textContent=stW<ws.length-1?"よめた！ ▶":(stI===stS.p.length-1?"おしまい！":"つぎの ページ ▶")}
 $("stHear").onclick=()=>say(stS.p[stI][1],.8);
-$("stNext").onclick=()=>{stI++;if(stI>=stS.p.length){complete("book",`「${stS.t}」 よめたね！`);return}stShow()};
+$("stNext").onclick=()=>{const n=$("stText").querySelectorAll(".w").length;if(stW<n-1){stW++;stMark();return}
+  stI++;if(stI>=stS.p.length){complete("book",`「${stS.t}」 よめたね！`);return}stShow()};
 
 /* ---------- カタカナに ふりがな ---------- */
 function rubyfy(root){
