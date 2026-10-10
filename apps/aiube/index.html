@@ -310,8 +310,6 @@ const MJ_N=5;let mjList=[],mjI=0,drawing=false;
 const cv=$("mjCanvas"),cx=cv.getContext("2d");
 function mjDraw(){
   cx.clearRect(0,0,600,600);
-  cx.strokeStyle="#eedfc0";cx.lineWidth=3;cx.setLineDash([12,12]);
-  cx.beginPath();cx.moveTo(300,0);cx.lineTo(300,600);cx.moveTo(0,300);cx.lineTo(600,300);cx.stroke();cx.setLineDash([]);
   cx.fillStyle="#e6e0d6";cx.font='bold 460px "Hiragino Maru Gothic ProN",sans-serif';cx.textAlign="center";cx.textBaseline="middle";
   cx.fillText(mjList[mjI],300,320);
   $("mjRep").textContent=`「${mjList[mjI]}」をなぞろう  ${mjI+1} / ${MJ_N}`;
