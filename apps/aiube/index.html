@@ -339,7 +339,7 @@ function clockSVG(h,m){tkNow=[h,m];
   s+=`<line x1="100" y1="100" x2="${100+68*Math.sin(ma*Math.PI/180)}" y2="${100-68*Math.cos(ma*Math.PI/180)}" stroke="#3a2e1f" stroke-width="5" stroke-linecap="round"/>`;
   return s+'<circle cx="100" cy="100" r="6" fill="#3a2e1f"/>';
 }
-function label(h,m){return m===0?`${h}じ`:m===30?`${h}じはん`:`${h}じ${m}ふん`}
+function label(h,m){return m===0?`${h}じ`:m===30?`${h}じ30ぷん`:`${h}じ${m}ふん`}
 function tkQ(){
   const h=1+Math.floor(Math.random()*12),m=[0,30,0,30,15,45][Math.floor(Math.random()*6)];
   $("tkClock").innerHTML=clockSVG(h,m);$("tkMsg").textContent="";
