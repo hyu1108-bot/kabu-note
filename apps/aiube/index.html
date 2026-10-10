@@ -87,9 +87,10 @@ rt{font-size:.45em;font-weight:normal}
 
 <!-- メニュー -->
 <section class="screen on" id="home">
-  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v6</small></h1>
+  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v7</small></h1>
   <p class="mid" id="date"></p>
   <div class="menu" id="menu"></div>
+  <button id="gameBtn" style="background:#ff9f1c"></button>
   <p class="mid">ぜんぶ できたら シールが もらえるよ</p>
   <div class="cal" id="cal"></div>
   <p class="mid" id="total"></p>
@@ -181,11 +182,35 @@ rt{font-size:.45em;font-weight:normal}
   <div class="menu" id="stMenu"></div>
 </section>
 
+<!-- ごほうびゲーム -->
+<section class="screen" id="gameSel">
+  <h2>🎮 ごほうび ゲーム</h2>
+  <p class="mid">どれで あそぶ？</p>
+  <div class="menu">
+    <button id="gTrain"><span class="ic">🚃</span>でんしゃを うごかそう</button>
+    <button id="gPost"><span class="ic">🛵</span>ゆうびんやさんで はいたつ</button>
+    <button id="gTruck"><span class="ic">🚚</span>たっきゅうびんで はいたつ</button>
+  </div>
+</section>
+<section class="screen" id="train">
+  <h2 id="trTitle">でんしゃ しゅっぱつ！</h2>
+  <div class="mid" id="trInfo"></div>
+  <div class="scene bg-sky" id="trScene" style="height:240px"><div class="g g-rail"></div><div id="trBg" style="position:absolute;inset:0"></div><span id="trCar" style="left:50%;top:76%;font-size:110px">🚃</span><span id="trPpl" style="left:50%;top:40%;font-size:34px"></span></div>
+  <button id="trBtn">しゅっぱつ しんこう！</button>
+</section>
+<section class="screen" id="deliv">
+  <h2 id="dvTitle" style="font-size:22px"></h2>
+  <div class="q" style="background:#fff;border:3px solid #eedfc0;border-radius:18px;padding:12px;width:100%;text-align:center"><div style="font-size:24px" id="dvOrder"></div></div>
+  <div id="dvMap" style="position:relative;width:100%;height:330px;border-radius:20px;overflow:hidden;background:#9fdc7c;border:3px solid #eedfc0"></div>
+  <div class="mid" id="dvMsg" style="min-height:34px;font-size:24px;font-weight:bold"></div>
+</section>
+
 <!-- できた -->
 <section class="screen" id="done">
   <div class="star" id="dnIcon">⭐</div>
   <h1 id="dnTitle">よくできました！</h1>
   <p class="mid" id="dnMsg"></p>
+  <button id="dnGame" style="background:#ff9f1c;display:none">🎮 ごほうび ゲームで あそぶ！</button>
   <button id="dnBack">つぎへ</button>
 </section>
 
@@ -204,7 +229,7 @@ const STICKERS=["🚄","🚃","🚅","🚆","🚉","📮","✉️","🛵","🚚"
 let timers=[];
 function later(f,ms){timers.push(setTimeout(f,ms))}
 function every(f,ms){timers.push(setInterval(f,ms))}
-function clearAll(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];try{speechSynthesis.cancel()}catch(e){}}
+function clearAll(){try{cancelAnimationFrame(trRaf)}catch(e){}timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];try{speechSynthesis.cancel()}catch(e){}}
 function say(t,rate,pitch){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";u.rate=rate||.9;u.pitch=pitch||1.3;speechSynthesis.speak(u)}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem("st-app")||"{}")}catch(e){return{}}}
 function save(d){try{localStorage.setItem("st-app",JSON.stringify(d))}catch(e){}}
@@ -238,6 +263,10 @@ function renderHome(){
   }
   const n=Object.values(data).filter(v=>v.s).length;
   $("total").textContent=n?`シール ${n}こ あつめたよ！`:"";
+  const left=ACTS.filter(a=>!t.done.includes(a.id)).length;
+  $("gameBtn").textContent=left?`🔒 ごほうび ゲーム（あと ${left}こ）`:"🎮 ごほうび ゲームで あそぶ！";
+  $("gameBtn").style.background=left?"#c9bfae":"#ff9f1c";
+  $("gameBtn").onclick=()=>{if(left)say(`あと ${left}こ がんばろう`);else show("gameSel")};
   show("home");
 }
 $("homeBtn").onclick=renderHome;
@@ -249,7 +278,7 @@ function complete(id,msg){
   let all=false;
   if(!t.s&&ACTS.every(a=>t.done.includes(a.id))){t.s=STICKERS[Math.floor(Math.random()*STICKERS.length)];all=true}
   data[k]=t;save(data);
-  show("done");
+  show("done");$("dnGame").style.display=all?"block":"none";
   if(all){$("dnIcon").textContent=t.s;$("dnTitle").textContent="ぜんぶ できた！";$("dnMsg").textContent="シールを ゲット！";say("ぜんぶ できたね！すごい！")}
   else{$("dnIcon").textContent="⭐";$("dnTitle").textContent="よくできました！";$("dnMsg").textContent=msg||"";say("よくできました！")}
   $("dnIcon").style.animation="none";$("dnIcon").offsetWidth;$("dnIcon").style.animation="";
@@ -490,6 +519,65 @@ $("recBtn").onclick=async()=>{
   }catch(e){alert("マイクが つかえません。ブラウザの せっていで マイクを「きょか」に してください。")}
 };
 $("playBtn").onclick=()=>{if(recURL)recPlay()};
+
+/* ---------- ごほうびゲーム：でんしゃ ---------- */
+$("dnGame").onclick=()=>show("gameSel");
+const STATIONS=["たろう えき","ゆうびん えき","しんかんせん えき","ごみしゅうしゅう えき","おばあちゃん えき"];
+const SCENERY=["🏠","🌳","🏢","🌲","🏡","🏭","🌳","🏫","🏪","🌸"];
+let trSt=0,trPpl=0,trMoving=false,trX=0,trRaf=null;
+function trBgDraw(){const bg=$("trBg");bg.innerHTML="";for(let i=0;i<14;i++){const e=document.createElement("span");e.textContent=SCENERY[i%SCENERY.length];e.dataset.x=i*90;e.style.cssText=`top:${50+(i%3)*6}%;font-size:${40+(i%3)*10}px`;bg.appendChild(e)}trPos()}
+function trPos(){[...$("trBg").children].forEach(e=>{let x=(+e.dataset.x-trX)%1260;if(x<-60)x+=1260;e.style.left=x+"px"})}
+$("gTrain").onclick=()=>{show("train");trSt=0;trPpl=0;trX=0;trBgDraw();$("trPpl").textContent="";$("trTitle").textContent="でんしゃ しゅっぱつ！";$("trInfo").textContent=`つぎは ${STATIONS[0]}`;$("trBtn").textContent="しゅっぱつ しんこう！";$("trBtn").disabled=false;trStep="go"};
+let trStep="go";
+$("trBtn").onclick=()=>{
+  if(trStep==="go"){
+    trStep="moving";$("trBtn").disabled=true;say("しゅっぱつ しんこう！ がたん ごとん");
+    let t0=null,speed=0;const st=$("trBg").querySelector(".stn");if(st)st.remove();
+    const run=ts=>{if(!t0)t0=ts;const el=ts-t0;speed=el<2600?Math.min(6,speed+.12):Math.max(0,speed-.15);trX+=speed;trPos();
+      $("trCar").style.transform=`translate(-50%,${-50+Math.sin(ts/90)*2}%)`;
+      if(el>2600&&speed<=0){const sn=document.createElement("span");sn.className="stn a-pop";sn.textContent="🚉";sn.style.cssText="left:78%;top:44%;font-size:70px";$("trBg").appendChild(sn);
+        $("trTitle").textContent=`${STATIONS[trSt]} に つきました！`;$("trInfo").textContent="🧑 おきゃくさんが まっているよ";say(`${STATIONS[trSt]}、${STATIONS[trSt]}。`);
+        $("trBtn").textContent="🚪 ドアを あける";$("trBtn").disabled=false;trStep="door";return}
+      trRaf=requestAnimationFrame(run)};trRaf=requestAnimationFrame(run);
+  }else if(trStep==="door"){
+    const n=rnd(1,3);trPpl+=n;say(`ドアが ひらきます。おきゃくさんが ${n}にん のりました`);
+    $("trPpl").textContent="🧑".repeat(Math.min(trPpl,8));$("trPpl").className="a-pop";
+    trSt++;
+    if(trSt>=STATIONS.length){$("trTitle").textContent="しゅうてん です！";$("trInfo").textContent=`おきゃくさん ${trPpl}にんを はこんだよ！ うんてんし さん、おつかれさま！`;$("trBtn").textContent="もういちど";trStep="again";later(()=>say("しゅうてんです。おつかれさまでした！"),2200)}
+    else{$("trInfo").textContent=`つぎは ${STATIONS[trSt]}（おきゃくさん ${trPpl}にん）`;$("trBtn").textContent="しゅっぱつ しんこう！";trStep="go"}
+  }else{$("gTrain").onclick()}
+};
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+
+/* ---------- ごほうびゲーム：はいたつ ---------- */
+const HOUSES=[{e:"🏠",n:"あかい やねの いえ"},{e:"🏡",n:"にわの ある いえ"},{e:"🏢",n:"マンション"},{e:"🏫",n:"がっこう"},{e:"🏪",n:"おみせ"},{e:"🏥",n:"びょういん"}];
+const DV_N=5;let dvV,dvI,dvTarget,dvBusy;
+function dvStart(kind){
+  dvV=kind==="post"?{car:"🛵",item:"✉️",name:"ゆうびんやさん",thing:"てがみ"}:{car:"🚚",item:"📦",name:"たっきゅうびん",thing:"にもつ"};
+  show("deliv");dvI=0;$("dvTitle").textContent=`${dvV.car} ${dvV.name}`;
+  const map=$("dvMap");map.innerHTML='<div style="position:absolute;left:0;right:0;top:46%;height:56px;background:#7a7a7a"></div><div style="position:absolute;left:47%;top:0;bottom:0;width:56px;background:#7a7a7a"></div>';
+  const pos=[[16,18],[84,18],[16,82],[84,82],[50,10],[50,92]];
+  HOUSES.forEach((h,i)=>{const b=document.createElement("span");b.textContent=h.e;b.dataset.i=i;b.style.cssText=`position:absolute;left:${pos[i][0]}%;top:${pos[i][1]}%;transform:translate(-50%,-50%);font-size:58px;cursor:pointer`;
+    const num=document.createElement("b");num.textContent=i+1;num.style.cssText="position:absolute;right:-6px;top:-6px;background:#ff5b5b;color:#fff;border-radius:50%;width:26px;height:26px;font-size:17px;display:flex;align-items:center;justify-content:center";b.appendChild(num);
+    b.onclick=()=>dvGo(i,pos[i]);map.appendChild(b)});
+  const c=document.createElement("span");c.id="dvCar";c.textContent=dvV.car;c.style.cssText="position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);font-size:52px;transition:left 1.2s ease,top 1.2s ease;z-index:2";map.appendChild(c);
+  dvNext();
+}
+function dvNext(){dvBusy=false;dvTarget=rnd(0,HOUSES.length-1);const h=HOUSES[dvTarget];
+  $("dvOrder").innerHTML=`${dvV.item} <b>${dvTarget+1}ばん</b>の「${h.n}」${h.e} に ${dvV.thing}を とどけよう！<br><small>${dvI+1} / ${DV_N}</small>`;
+  $("dvMsg").textContent="";say(`${dvTarget+1}ばん、${h.n}に とどけてね`);
+  const c=$("dvCar");c.style.left="50%";c.style.top="51%"}
+function dvGo(i,p){
+  if(dvBusy)return;
+  if(i!==dvTarget){$("dvMsg").textContent="🤔 ちがう おうち かも？";say("ちがう おうち かも？ ばんごうを みてね");return}
+  dvBusy=true;const c=$("dvCar");c.style.left=p[0]+"%";c.style.top=(p[1]<50?p[1]+14:p[1]-14)+"%";
+  later(()=>{say("ピンポーン！ おとどけもの です");$("dvMsg").textContent="🔔 ピンポーン！";},1300);
+  later(()=>{$("dvMsg").textContent="😊「ありがとう！」";say("ありがとう！");
+    const it=document.createElement("span");it.textContent=dvV.item;it.className="a-pop";it.style.cssText=`position:absolute;left:${p[0]}%;top:${p[1]}%;font-size:30px;z-index:3`;$("dvMap").appendChild(it);
+    dvI++;later(()=>{if(dvI>=DV_N){$("dvOrder").innerHTML=`🎉 ${DV_N}こ ぜんぶ とどけたよ！<br>${dvV.name}、おつかれさま！`;$("dvMsg").innerHTML='<button id="dvAgain">もういちど</button>';$("dvAgain").onclick=()=>dvStart(dvV.car==="🛵"?"post":"truck");say("ぜんぶ とどけたね！すごい！")}else dvNext()},1800)},2600);
+}
+$("gPost").onclick=()=>dvStart("post");
+$("gTruck").onclick=()=>dvStart("truck");
 let stS=null,stI=0;
 START.book=()=>{
   show("storyList");const m=$("stMenu");m.innerHTML="";
@@ -531,6 +619,6 @@ new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList
 rubyfy(document.body);
 renderHome();
 </script>
-<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 6 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
+<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 7 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
 </body>
 </html>
