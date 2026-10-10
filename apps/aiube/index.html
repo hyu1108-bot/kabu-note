@@ -45,6 +45,36 @@ rt{font-size:.45em;font-weight:normal}
 .w{display:inline-block;padding:2px 6px;border-radius:10px;color:#b9ad9a;cursor:pointer}
 .w.past{color:var(--ink)}
 .w.now{color:var(--ink);background:#ffe58a;transform:scale(1.15)}
+.scene{position:relative;width:100%;height:210px;border-radius:20px;overflow:hidden;border:3px solid #eedfc0}
+.scene span{position:absolute;transform:translate(-50%,-50%);line-height:1}
+.scene .g{position:absolute;left:0;right:0;bottom:0}
+.bg-sky{background:linear-gradient(#8fd3ff,#d9f1ff)}
+.bg-night{background:linear-gradient(#0d1a45,#2b3f86)}
+.bg-dawn{background:linear-gradient(#ffb36b,#ffe6b3)}
+.bg-room{background:linear-gradient(#fff1d6,#ffe2b8)}
+.bg-rain{background:linear-gradient(#8a98ad,#c9d3e0)}
+.g-rail{height:46px;background:repeating-linear-gradient(90deg,#8b5a2b 0 8px,transparent 8px 26px),linear-gradient(transparent 14px,#777 14px 18px,transparent 18px 30px,#777 30px 34px,transparent 34px),#7cc46a}
+.g-road{height:50px;background:linear-gradient(transparent 22px,#fff 22px 26px,transparent 26px),#6b6b6b;background-size:auto}
+.g-road:after{content:"";position:absolute;left:0;right:0;top:22px;height:4px;background:repeating-linear-gradient(90deg,#fff 0 24px,#6b6b6b 24px 48px)}
+.g-home{height:46px;background:#c98d5b}
+.g-grass{height:40px;background:#7cc46a}
+.g-plat{height:56px;background:linear-gradient(#bdbdbd 0 18px,#ffd400 18px 22px,#bdbdbd 22px 30px,#777 30px 34px,#8b5a2b 34px 38px,#777 38px 42px,#999 42px)}
+.a-go{animation:go 4s linear infinite}
+@keyframes go{from{left:115%}to{left:-15%}}
+.a-fast{animation:go 2s linear infinite}
+.a-stop{animation:stopin 2.2s ease-out forwards}
+@keyframes stopin{from{left:120%}to{}}
+.a-bob{animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,-62%)}}
+.a-spin{animation:spin 2s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.a-tw{animation:tw 1.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25;transform:translate(-50%,-50%) scale(.7)}}
+.a-drop{animation:drop 1.4s ease-in infinite}
+@keyframes drop{0%{transform:translate(-50%,-50%);opacity:1}100%{transform:translate(-50%,40px);opacity:.3}}
+.a-pop{animation:pop2 .9s ease-out both}
+@keyframes pop2{0%{transform:translate(-50%,-50%) scale(0)}70%{transform:translate(-50%,-50%) scale(1.25)}100%{transform:translate(-50%,-50%) scale(1)}}
+.a-flow{animation:go 6s linear infinite}
 </style>
 </head>
 <body>
@@ -108,6 +138,7 @@ rt{font-size:.45em;font-weight:normal}
 <!-- もじかき -->
 <section class="screen" id="moji">
   <h2>もじを かこう</h2>
+  <div class="row" id="mjLv"><button data-l="h" class="gray">ひらがな</button><button data-l="k" class="gray">カタカナ</button><button data-l="j" class="gray">かんじ</button></div>
   <div class="mid" id="mjRep"></div>
   <canvas id="mjCanvas" width="600" height="600"></canvas>
   <div class="row">
@@ -131,7 +162,7 @@ rt{font-size:.45em;font-weight:normal}
   <h2 id="stTitle"></h2>
   <div class="mid" id="stRep"></div>
   <div class="bar"><i id="stProg"></i></div>
-  <div class="big" id="stPic" style="font-size:90px"></div>
+  <div class="scene" id="stPic"></div>
   <p id="stText" style="font-size:38px;line-height:1.9;background:#fff;border-radius:18px;padding:18px;width:100%;border:3px solid #eedfc0;min-height:150px"></p>
   <button id="stHear" style="background:var(--u)">🔊 よんで もらう</button>
   <button id="stNext">よめた！</button>
@@ -316,15 +347,22 @@ function mjDraw(){
   cx.clearRect(0,0,600,600);
   cx.fillStyle="#e6e0d6";cx.font='bold 460px "Hiragino Maru Gothic ProN",sans-serif';cx.textAlign="center";cx.textBaseline="middle";
   cx.fillText(mjList[mjI],300,320);
-  $("mjRep").textContent=`「${mjList[mjI]}」をなぞろう  ${mjI+1} / ${MJ_N}`;
+  $("mjRep").textContent=`「${mjList[mjI]}」${mjRead[mjList[mjI]]?"（"+mjRead[mjList[mjI]]+"）":""}を なぞろう  ${mjI+1} / ${MJ_N}`;
 }
-START.moji=()=>{show("moji");mjList=shuffle(KANA).slice(0,MJ_N);mjI=0;mjDraw();say(mjList[0])};
+const KATA="アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン".split("");
+const KANJI=[["一","いち"],["二","に"],["三","さん"],["四","よん"],["五","ご"],["六","ろく"],["七","なな"],["八","はち"],["九","きゅう"],["十","じゅう"],["百","ひゃく"],["千","せん"],["円","えん"],["日","ひ"],["月","つき"],["火","ひ"],["水","みず"],["木","き"],["金","きん"],["土","つち"],["山","やま"],["川","かわ"],["田","た"],["林","はやし"],["森","もり"],["竹","たけ"],["石","いし"],["花","はな"],["草","くさ"],["虫","むし"],["犬","いぬ"],["貝","かい"],["空","そら"],["雨","あめ"],["天","てん"],["気","き"],["夕","ゆう"],["人","ひと"],["子","こ"],["女","おんな"],["男","おとこ"],["王","おう"],["名","な"],["口","くち"],["目","め"],["耳","みみ"],["手","て"],["足","あし"],["力","ちから"],["大","おおきい"],["小","ちいさい"],["中","なか"],["上","うえ"],["下","した"],["左","ひだり"],["右","みぎ"],["入","はいる"],["出","でる"],["立","たつ"],["休","やすむ"],["見","みる"],["早","はやい"],["正","ただしい"],["生","いきる"],["先","せん"],["年","ねん"],["学","がく"],["校","こう"],["本","ほん"],["文","ぶん"],["字","じ"],["音","おと"],["白","しろ"],["赤","あか"],["青","あお"],["町","まち"],["村","むら"],["車","くるま"],["糸","いと"],["玉","たま"]];
+let mjRead={},mjLevel="h";
+function mjStart(l){mjLevel=l;document.querySelectorAll("#mjLv button").forEach(b=>b.style.background=b.dataset.l===l?"var(--a)":"");
+  if(l==="j"){const k=shuffle(KANJI).slice(0,MJ_N);mjList=k.map(x=>x[0]);mjRead=Object.fromEntries(k)}else{mjList=shuffle(l==="k"?KATA:KANA).slice(0,MJ_N);mjRead={}}
+  mjI=0;mjDraw();say(mjRead[mjList[0]]||mjList[0])}
+document.querySelectorAll("#mjLv button").forEach(b=>b.onclick=()=>mjStart(b.dataset.l));
+START.moji=()=>{show("moji");mjStart(mjLevel)};
 function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*600/r.width,(e.clientY-r.top)*600/r.height]}
 cv.addEventListener("pointerdown",e=>{drawing=true;cv.setPointerCapture(e.pointerId);const[x,y]=pos(e);cx.strokeStyle="#ff7a59";cx.lineWidth=26;cx.lineCap=cx.lineJoin="round";cx.beginPath();cx.moveTo(x,y);cx.lineTo(x,y);cx.stroke()});
 cv.addEventListener("pointermove",e=>{if(!drawing)return;const[x,y]=pos(e);cx.lineTo(x,y);cx.stroke()});
 cv.addEventListener("pointerup",()=>drawing=false);
 $("mjClear").onclick=mjDraw;
-$("mjNext").onclick=()=>{mjI++;if(mjI>=MJ_N){complete("moji","じょうずに かけたね！");return}mjDraw();say(mjList[mjI])};
+$("mjNext").onclick=()=>{mjI++;if(mjI>=MJ_N){complete("moji","じょうずに かけたね！");return}mjDraw();say(mjRead[mjList[mjI]]||mjList[mjI])};
 
 /* ---------- とけい ---------- */
 const TK_N=5;let tkI=0,tkScore=0;
@@ -369,6 +407,51 @@ const STORIES=[
  {t:"よるの しんかんせん",p:[["🌙","よるに なりました。"],["🚄","しんかんせんは、ひかりを つけて はしります。"],["🏙️","まちの あかりが、きらきら ながれて いきます。"],["🛤️","とうちゃくの えきに つくと、しんかんせんも ひと やすみ。"],["😴","たろうも ふとんで、おやすみなさい。"]]},
  {t:"まちの はたらく くるま",p:[["🚃","でんしゃは、たくさんの ひとを はこびます。"],["🛵","ゆうびんやさんは、てがみを とどけます。"],["🚚","ごみしゅうしゅうしゃは、まちを きれいに します。"],["🚄","しんかんせんは、とおくの まちへ びゅーん。"],["🌟","たろうも おおきく なったら、なにに なろうかな。"]]}
 ];
+
+// ばめん： "はいけい,じめん|えもじ,x%,y%,おおきさ,うごき|..."
+const SCENES=[
+ ["sky,plat|🚉,78,40,70|👨,30,62,56|👦,48,68,44,bob|🎒,60,72,26",
+  "sky,plat|🚄,50,62,110,stop|👦,14,58,40,bob|✨,80,25,30,tw",
+  "sky,rail|🪟,50,40,120|👦,50,44,52,bob|🚄,50,86,50,fast",
+  "sky,grass|🗻,60,52,120|☁️,22,22,40,flow|🚄,50,84,60,fast|🌸,12,70,28",
+  "sky,rail|👦,30,46,70,bob|😊,62,40,46,pop|⭐,82,20,30,tw|🚄,50,86,46,fast"],
+ ["sky,road|📮,40,52,100|✉️,64,36,34,bob|✉️,74,52,28,bob|🏠,85,58,50",
+  "sky,road|🛵,50,74,80,stop|📮,20,52,60|👮,50,44,34",
+  "sky,grass|✉️,50,46,90,bob|❓,74,26,40,tw|🗺️,22,30,40",
+  "sky,grass|🏠,50,46,110|✉️,62,64,36,drop|🛵,15,82,40",
+  "sky,road|👦,30,48,70|👋,48,38,40,bob|🛵,60,76,50,go|💌,80,26,30,tw"],
+ ["dawn,road|🌅,50,30,80|🚚,50,74,80,stop|🏘️,15,50,44",
+  "sky,road|🚚,46,70,100|🌀,30,62,40,spin|💨,82,70,34,tw",
+  "sky,road|🗑️,22,62,50|🛍️,50,40,40,bob|🛍️,64,50,36,bob|🚚,82,70,60",
+  "sky,grass|🏘️,40,46,90|✨,70,24,34,tw|✨,20,24,26,tw|🌷,80,72,34",
+  "sky,road|👦,26,46,70|🙌,46,32,44,bob|🚚,70,72,70,go|💖,82,22,30,tw"],
+ ["room,home|📦,40,60,90|✂️,70,40,40,bob|👦,78,64,50",
+  "room,home|🚃,50,58,110,bob|👦,50,40,40|💨,15,66,36,tw",
+  "room,home|🚃,40,62,90|🧸,40,50,40,bob|🎫,74,34,36,tw",
+  "room,home|🔔,50,30,56,bob|🍳,22,60,44|🚃,70,66,70,go",
+  "room,home|🍙,50,46,90,pop|👩,22,58,56|👦,78,58,50,bob"],
+ ["room,home|✏️,30,42,60,bob|📝,56,56,80|👦,82,56,50",
+  "room,home|📝,50,52,110|🚄,50,52,50|🖍️,82,34,40,bob",
+  "sky,road|📮,50,50,100|✉️,50,22,36,drop|👦,18,60,44",
+  "sky,road|🛵,50,74,80,go|✉️,58,52,30|🏡,85,50,44",
+  "room,home|👵,40,50,80,bob|☎️,70,46,44,tw|💕,80,22,30,tw"],
+ ["night,rail|🌙,80,22,50|⭐,20,18,22,tw|⭐,45,30,18,tw|🚄,50,80,70,go",
+  "night,rail|🚄,50,78,90,fast|💡,22,40,30,tw|💡,60,30,30,tw",
+  "night,grass|🏙️,50,52,120|✨,20,22,24,tw|✨,80,26,24,tw|🚄,50,84,44,fast",
+  "night,plat|🚉,78,40,60|🚄,46,62,100,stop|😴,22,26,30,tw",
+  "night,home|🛏️,50,62,100|😴,46,40,46,bob|🌙,82,22,44|💤,64,24,30,tw"],
+ ["sky,rail|🚃,50,78,90,go|👥,50,40,46|🏙️,85,50,44",
+  "sky,road|🛵,50,74,80,go|✉️,30,40,36,bob|📮,82,50,44",
+  "sky,road|🚚,50,72,90,go|🗑️,18,58,40|✨,78,28,30,tw",
+  "sky,grass|🗻,30,50,90|🚄,50,82,60,fast|☁️,72,22,40,flow",
+  "sky,grass|👦,50,52,90,bob|⭐,20,22,34,tw|⭐,80,22,34,tw|🚄,20,84,30|🚚,50,86,30|🛵,80,86,30"]
+];
+function drawScene(el,code){
+  const [head,...items]=code.split("|");const [bg,gr]=head.split(",");
+  el.className="scene bg-"+bg;el.innerHTML=gr?`<div class="g g-${gr}"></div>`:"";
+  items.forEach(it=>{const [e,x,y,sz,an]=it.split(",");const sp=document.createElement("span");sp.textContent=e;
+    sp.style.cssText=`left:${x}%;top:${y}%;font-size:${sz}px`;if(an)sp.className="a-"+an;el.appendChild(sp)});
+}
 let stS=null,stI=0;
 START.book=()=>{
   show("storyList");const m=$("stMenu");m.innerHTML="";
@@ -376,7 +459,7 @@ START.book=()=>{
   STORIES.forEach((s,i)=>{const b=document.createElement("button");b.innerHTML=`<span class="ic">${s.p[0][0]}</span>${s.t}<span class="ck">${i===d?"🆕":""}</span>`;b.onclick=()=>{stS=s;stI=0;show("story");stShow()};m.appendChild(b)});
 };
 let stW=0;
-function stShow(){const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";$("stPic").textContent=pg[0];
+function stShow(){const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";drawScene($("stPic"),SCENES[STORIES.indexOf(stS)][stI]);
   const t=$("stText");t.innerHTML="";
   pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.textContent=w;sp.onclick=()=>{stW=j;stMark();say(w,.7)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
   stMark();}
