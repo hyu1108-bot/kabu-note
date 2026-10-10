@@ -165,6 +165,7 @@ rt{font-size:.45em;font-weight:normal}
   <div class="scene" id="stPic"></div>
   <p id="stText" style="font-size:38px;line-height:1.9;background:#fff;border-radius:18px;padding:18px;width:100%;border:3px solid #eedfc0;min-height:150px"></p>
   <button id="stHear" style="background:var(--u)">🔊 ページを ぜんぶ きく</button>
+  <div class="row"><button id="recBtn" style="background:#ff5b5b">🎤 ろくおん</button><button id="playBtn" style="background:#9b6bff" disabled>▶ じぶんの こえ</button></div>
   <button id="stAuto" class="gray"></button>
   <button id="stNext">よめた！</button>
 </section>
@@ -453,6 +454,22 @@ function drawScene(el,code){
   items.forEach(it=>{const [e,x,y,sz,an]=it.split(",");const sp=document.createElement("span");sp.textContent=e;
     sp.style.cssText=`left:${x}%;top:${y}%;font-size:${sz}px`;if(an)sp.className="a-"+an;el.appendChild(sp)});
 }
+
+/* ---------- ろくおん ---------- */
+let rec=null,recChunks=[],recURL=null,recStream=null;
+function recReset(){if(rec&&rec.state==="recording")rec.stop();if(recURL)URL.revokeObjectURL(recURL);recURL=null;$("playBtn").disabled=true;$("recBtn").textContent="🎤 ろくおん"}
+$("recBtn").onclick=async()=>{
+  if(rec&&rec.state==="recording"){rec.stop();return}
+  try{speechSynthesis.cancel()}catch(e){}
+  try{
+    recStream=recStream||await navigator.mediaDevices.getUserMedia({audio:true});
+    recChunks=[];rec=new MediaRecorder(recStream);
+    rec.ondataavailable=e=>recChunks.push(e.data);
+    rec.onstop=()=>{if(recURL)URL.revokeObjectURL(recURL);recURL=URL.createObjectURL(new Blob(recChunks,{type:rec.mimeType}));$("playBtn").disabled=false;$("recBtn").textContent="🎤 もういちど";new Audio(recURL).play()};
+    rec.start();$("recBtn").textContent="⏹ おわり";
+  }catch(e){alert("マイクが つかえません。ブラウザの せっていで マイクを「きょか」に してください。")}
+};
+$("playBtn").onclick=()=>{if(recURL){try{speechSynthesis.cancel()}catch(e){}new Audio(recURL).play()}};
 let stS=null,stI=0;
 START.book=()=>{
   show("storyList");const m=$("stMenu");m.innerHTML="";
@@ -460,7 +477,7 @@ START.book=()=>{
   STORIES.forEach((s,i)=>{const b=document.createElement("button");b.innerHTML=`<span class="ic">${s.p[0][0]}</span>${s.t}<span class="ck">${i===d?"🆕":""}</span>`;b.onclick=()=>{stS=s;stI=0;show("story");stShow()};m.appendChild(b)});
 };
 let stW=0;
-function stShow(){const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";drawScene($("stPic"),SCENES[STORIES.indexOf(stS)][stI]);
+function stShow(){recReset();const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";drawScene($("stPic"),SCENES[STORIES.indexOf(stS)][stI]);
   const t=$("stText");t.innerHTML="";
   pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.dataset.t=w;sp.textContent=w;sp.onclick=()=>{stW=j;stMark();if(!stAuto)kid(w)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
   stMark();}
