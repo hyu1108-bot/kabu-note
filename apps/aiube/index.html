@@ -87,7 +87,7 @@ rt{font-size:.45em;font-weight:normal}
 
 <!-- メニュー -->
 <section class="screen on" id="home">
-  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v5</small></h1>
+  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v6</small></h1>
   <p class="mid" id="date"></p>
   <div class="menu" id="menu"></div>
   <p class="mid">ぜんぶ できたら シールが もらえるよ</p>
@@ -475,20 +475,21 @@ function drawScene(el,code){
 }
 
 /* ---------- ろくおん ---------- */
-let rec=null,recChunks=[],recURL=null,recStream=null;
-function recReset(){if(rec&&rec.state==="recording")rec.stop();if(recURL)URL.revokeObjectURL(recURL);recURL=null;$("playBtn").disabled=true;$("recBtn").textContent="🎤 ろくおん"}
+let rec=null,recChunks=[],recURL=null,recStream=null;const recAudio=new Audio();
+function recPlay(){try{speechSynthesis.cancel()}catch(e){}recAudio.pause();recAudio.src=recURL;recAudio.currentTime=0;recAudio.play()}
+function recReset(){recAudio.pause();if(rec&&rec.state==="recording")rec.stop();if(recURL)URL.revokeObjectURL(recURL);recURL=null;$("playBtn").disabled=true;$("recBtn").textContent="🎤 ろくおん"}
 $("recBtn").onclick=async()=>{
   if(rec&&rec.state==="recording"){rec.stop();return}
   try{speechSynthesis.cancel()}catch(e){}
   try{
-    recStream=recStream||await navigator.mediaDevices.getUserMedia({audio:true});
+    recStream=recStream||await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}});
     recChunks=[];rec=new MediaRecorder(recStream);
     rec.ondataavailable=e=>recChunks.push(e.data);
-    rec.onstop=()=>{if(recURL)URL.revokeObjectURL(recURL);recURL=URL.createObjectURL(new Blob(recChunks,{type:rec.mimeType}));$("playBtn").disabled=false;$("recBtn").textContent="🎤 もういちど";new Audio(recURL).play()};
-    rec.start();$("recBtn").textContent="⏹ おわり";
+    rec.onstop=()=>{if(recURL)URL.revokeObjectURL(recURL);recURL=URL.createObjectURL(new Blob(recChunks,{type:rec.mimeType}));$("playBtn").disabled=false;$("recBtn").textContent="🎤 もういちど";recPlay()};
+    recAudio.pause();rec.start();$("recBtn").textContent="⏹ おわり";
   }catch(e){alert("マイクが つかえません。ブラウザの せっていで マイクを「きょか」に してください。")}
 };
-$("playBtn").onclick=()=>{if(recURL){try{speechSynthesis.cancel()}catch(e){}new Audio(recURL).play()}};
+$("playBtn").onclick=()=>{if(recURL)recPlay()};
 let stS=null,stI=0;
 START.book=()=>{
   show("storyList");const m=$("stMenu");m.innerHTML="";
@@ -530,6 +531,6 @@ new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList
 rubyfy(document.body);
 renderHome();
 </script>
-<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 5 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
+<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 6 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
 </body>
 </html>
