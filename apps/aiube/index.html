@@ -3,147 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>あいうべ たいそう</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="れんしゅう"><meta name="theme-color" content="#ff7a59">
+<title>きょうの れんしゅう</title>
 <style>
-:root{--bg:#fff8e7;--ink:#3a2e1f;--a:#ff7a59;--i:#ffc23d;--u:#4cb8ff;--be:#ff5fa2;--ok:#3cc47c}
+:root{--bg:#fff8e7;--ink:#3a2e1f;--a:#ff7a59;--i:#ffc23d;--u:#4cb8ff;--be:#ff5fa2;--ok:#3cc47c;--card:#fff}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Rounded Mplus 1c",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;user-select:none}
-h1{font-size:28px;margin:8px 0 4px}
-.sub{font-size:18px;margin-bottom:12px}
-.screen{display:none;width:100%;max-width:480px;flex-direction:column;align-items:center;gap:16px}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Rounded Mplus 1c",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;user-select:none;-webkit-user-select:none}
+h1{font-size:28px;margin:6px 0}
+h2{font-size:26px}
+.screen{display:none;width:100%;max-width:480px;flex-direction:column;align-items:center;gap:14px}
 .screen.on{display:flex}
-button{font:inherit;border:none;border-radius:24px;padding:18px 28px;font-size:28px;font-weight:bold;color:#fff;background:var(--ok);box-shadow:0 6px 0 rgba(0,0,0,.2);cursor:pointer;width:100%}
+button{font:inherit;border:none;border-radius:22px;padding:16px 24px;font-size:26px;font-weight:bold;color:#fff;background:var(--ok);box-shadow:0 6px 0 rgba(0,0,0,.2);cursor:pointer;width:100%}
 button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.2)}
-button.sub2{background:#bbb;font-size:20px;padding:12px}
-.choice{display:flex;gap:10px;width:100%}
-.choice button{font-size:22px;padding:14px 6px;background:#c9b48f}
-.choice button.sel{background:var(--a)}
-svg.face{width:240px;height:240px}
-.big{font-size:96px;font-weight:bold;line-height:1}
-.count{font-size:24px}
-.bar{width:100%;height:20px;background:#eee;border-radius:10px;overflow:hidden}
+.gray{background:#b5aa98;font-size:20px;padding:12px}
+.row{display:flex;gap:10px;width:100%}
+.row button{font-size:22px;padding:14px 6px}
+.menu{display:flex;flex-direction:column;gap:10px;width:100%}
+.menu button{display:flex;align-items:center;gap:12px;background:var(--card);color:var(--ink);font-size:22px;text-align:left;padding:14px 16px;border:3px solid #eedfc0}
+.menu button .ic{font-size:34px}
+.menu button .ck{margin-left:auto;font-size:30px}
+.menu button.done{background:#e3f8ea;border-color:var(--ok)}
+svg.face{width:220px;height:220px}
+.big{font-size:88px;font-weight:bold;line-height:1.1;text-align:center}
+.mid{font-size:22px;text-align:center}
+.bar{width:100%;height:18px;background:#eee;border-radius:9px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
-.tip{font-size:20px;text-align:center;min-height:2.6em}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%}
-.cal div{aspect-ratio:1;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-direction:column;border:2px solid #eedfc0}
-.cal div b{font-size:22px}
+.cal div{aspect-ratio:1;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-direction:column;border:2px solid #eedfc0}
+.cal div b{font-size:22px;min-height:26px}
 .cal .today{border-color:var(--a)}
 .star{font-size:120px;animation:pop .8s ease}
 @keyframes pop{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.timer{font-size:100px;font-weight:bold;color:var(--a)}
+.word{font-size:110px;font-weight:bold;letter-spacing:.1em}
+canvas{background:#fff;border-radius:18px;border:3px solid #eedfc0;touch-action:none;width:100%;max-width:340px;aspect-ratio:1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opts button{background:var(--u);font-size:26px}
+.msg{font-size:30px;font-weight:bold;min-height:40px}
+.home{position:fixed;top:10px;left:10px;width:auto;font-size:16px;padding:8px 14px;background:#b5aa98;box-shadow:none;z-index:5}
 </style>
 </head>
 <body>
-<h1>あいうべ たいそう</h1>
 
-<!-- スタート -->
+<!-- メニュー -->
 <section class="screen on" id="home">
-  <p class="sub">おくちを おおきく うごかそう！</p>
-  <svg class="face" viewBox="0 0 200 200" id="homeFace"></svg>
-  <p class="count">なんかい やる？</p>
-  <div class="choice" id="reps">
-    <button data-n="5">5かい</button>
-    <button data-n="10" class="sel">10かい</button>
-    <button data-n="30">30かい</button>
-  </div>
-  <button id="start">はじめる！</button>
-  <p class="count">シールちょう</p>
+  <h1>きょうの れんしゅう</h1>
+  <p class="mid" id="date"></p>
+  <div class="menu" id="menu"></div>
+  <p class="mid">ぜんぶ できたら シールが もらえるよ</p>
   <div class="cal" id="cal"></div>
-  <p class="count" id="total"></p>
+  <p class="mid" id="total"></p>
 </section>
 
-<!-- たいそう中 -->
-<section class="screen" id="play">
-  <div class="count" id="rep">1かいめ / 10かい</div>
-  <div class="bar"><i id="prog"></i></div>
-  <svg class="face" viewBox="0 0 200 200" id="face"></svg>
-  <div class="big" id="kana">あ</div>
-  <p class="tip" id="tip"></p>
-  <button class="sub2" id="stop">やめる</button>
+<button class="home" id="homeBtn" style="display:none">◀ もどる</button>
+
+<!-- あいうべ -->
+<section class="screen" id="aiube">
+  <h2>あいうべ たいそう</h2>
+  <div class="row" id="aiReps">
+    <button data-n="5" class="gray">5かい</button><button data-n="10" class="gray">10かい</button><button data-n="30" class="gray">30かい</button>
+  </div>
+  <div class="mid" id="aiRep"></div>
+  <div class="bar"><i id="aiProg"></i></div>
+  <svg class="face" viewBox="0 0 200 200" id="aiFace"></svg>
+  <div class="big" id="aiKana"></div>
+  <p class="mid" id="aiTip"></p>
 </section>
 
-<!-- おわり -->
+<!-- とんがりおやま -->
+<section class="screen" id="oyama">
+  <h2>とんがり おやま</h2>
+  <svg class="face" viewBox="0 0 200 200" id="oyFace"></svg>
+  <p class="mid">べろを とがらせて<br>おやまの かたちに キープ！</p>
+  <div class="timer" id="oyTime">5</div>
+  <div class="mid" id="oyRep"></div>
+  <button id="oyStart">スタート</button>
+</section>
+
+<!-- はつご -->
+<section class="screen" id="hatsugo">
+  <h2>いって みよう</h2>
+  <div class="mid" id="hgRep"></div>
+  <div class="bar"><i id="hgProg"></i></div>
+  <div class="word" id="hgWord"></div>
+  <button id="hgHear" style="background:var(--u)">🔊 きく</button>
+  <button id="hgNext">いえた！</button>
+</section>
+
+<!-- タイマー系（ニップルトレーナー・どくしょ） -->
+<section class="screen" id="timerAct">
+  <h2 id="taTitle"></h2>
+  <div class="big" id="taIcon"></div>
+  <p class="mid" id="taTip"></p>
+  <div class="row" id="taMins"></div>
+  <div class="timer" id="taTime"></div>
+  <button id="taStart">スタート</button>
+  <button id="taDone" class="gray">もう できた！</button>
+</section>
+
+<!-- もじかき -->
+<section class="screen" id="moji">
+  <h2>もじを かこう</h2>
+  <div class="mid" id="mjRep"></div>
+  <canvas id="mjCanvas" width="600" height="600"></canvas>
+  <div class="row">
+    <button id="mjClear" class="gray">けす</button>
+    <button id="mjNext">かけた！</button>
+  </div>
+</section>
+
+<!-- とけい -->
+<section class="screen" id="tokei">
+  <h2>なんじ かな？</h2>
+  <div class="mid" id="tkRep"></div>
+  <svg viewBox="0 0 200 200" width="230" height="230" id="tkClock"></svg>
+  <div class="msg" id="tkMsg"></div>
+  <div class="opts" id="tkOpts"></div>
+</section>
+
+<!-- できた -->
 <section class="screen" id="done">
-  <div class="star" id="sticker">⭐</div>
-  <h1>よくできました！</h1>
-  <p class="sub" id="doneMsg"></p>
-  <button id="back">シールを みる</button>
+  <div class="star" id="dnIcon">⭐</div>
+  <h1 id="dnTitle">よくできました！</h1>
+  <p class="mid" id="dnMsg"></p>
+  <button id="dnBack">つぎへ</button>
 </section>
 
 <script>
-const STEPS=[
- {k:"あ",c:"var(--a)",tip:"おくちを たてに<br>おおきく ひらいて「あー」",m:'<ellipse cx="100" cy="140" rx="26" ry="34" fill="#7a1f1f"/><ellipse cx="100" cy="160" rx="16" ry="10" fill="#ff8a8a"/>'},
- {k:"い",c:"var(--i)",tip:"くちを よこに<br>ぐーっと ひろげて「いー」",m:'<rect x="58" y="128" width="84" height="20" rx="10" fill="#7a1f1f"/><rect x="62" y="130" width="76" height="8" rx="4" fill="#fff"/>'},
- {k:"う",c:"var(--u)",tip:"くちを まえに<br>つよく とがらせて「うー」",m:'<circle cx="100" cy="140" r="13" fill="#7a1f1f" stroke="#e05a5a" stroke-width="8"/>'},
- {k:"べ",c:"var(--be)",tip:"したを したに<br>べーっと のばして「べー」",m:'<ellipse cx="100" cy="132" rx="26" ry="12" fill="#7a1f1f"/><path d="M84 132 Q84 182 100 182 Q116 182 116 132 Z" fill="#ff6f8f"/><line x1="100" y1="140" x2="100" y2="170" stroke="#d94a6a" stroke-width="3"/>'}
-];
-const STICKERS=["⭐","🌟","🚀","🦖","🚃","🍙","🐱","🌈","🎈","🏆","🐶","🍓"];
-const HOLD=2000; // 1つの音を2びょう
 const $=id=>document.getElementById(id);
-let reps=10, timer=null, running=false;
-
-function face(el,step,color){
-  el.innerHTML=`<circle cx="100" cy="100" r="92" fill="#ffe0bd" stroke="${color||'#e8b98a'}" stroke-width="8"/>
-  <circle cx="70" cy="80" r="9" fill="#3a2e1f"/><circle cx="130" cy="80" r="9" fill="#3a2e1f"/>
-  <circle cx="55" cy="112" r="10" fill="#ffb0a0" opacity=".7"/><circle cx="145" cy="112" r="10" fill="#ffb0a0" opacity=".7"/>
-  ${step?step.m:'<path d="M70 130 Q100 158 130 130" stroke="#7a1f1f" stroke-width="8" fill="none" stroke-linecap="round"/>'}`;
-}
-function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";u.rate=.9;u.pitch=1.3;speechSynthesis.speak(u)}catch(e){}}
-function load(){try{return JSON.parse(localStorage.getItem("aiube")||"{}")}catch(e){return{}}}
-function save(d){try{localStorage.setItem("aiube",JSON.stringify(d))}catch(e){}}
+const ACTS=[
+ {id:"aiube",ic:"👄",name:"あいうべ たいそう"},
+ {id:"oyama",ic:"⛰️",name:"とんがり おやま"},
+ {id:"hatsugo",ic:"🗣️",name:"あら いり うる…"},
+ {id:"nipple",ic:"🍼",name:"ニップルトレーナー"},
+ {id:"book",ic:"📖",name:"どくしょ"},
+ {id:"moji",ic:"✏️",name:"もじかき"},
+ {id:"tokei",ic:"🕐",name:"とけいを よむ"}
+];
+const STICKERS=["⭐","🌟","🚀","🦖","🚃","🍙","🐱","🌈","🎈","🏆","🐶","🍓","🦁","🚒","🐳"];
+let timers=[];
+function later(f,ms){timers.push(setTimeout(f,ms))}
+function every(f,ms){timers.push(setInterval(f,ms))}
+function clearAll(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];try{speechSynthesis.cancel()}catch(e){}}
+function say(t,rate){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";u.rate=rate||.9;u.pitch=1.3;speechSynthesis.speak(u)}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem("st-app")||"{}")}catch(e){return{}}}
+function save(d){try{localStorage.setItem("st-app",JSON.stringify(d))}catch(e){}}
 function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id))}
+function today(){const d=load(),k=key(new Date());return d[k]||{done:[]}}
+function show(id){clearAll();document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));$("homeBtn").style.display=id==="home"?"none":"block";window.scrollTo(0,0)}
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1])}
 
-function renderCal(){
-  const data=load(),cal=$("cal");cal.innerHTML="";
+/* ---------- メニュー ---------- */
+function renderHome(){
+  const t=today();
   const now=new Date();
+  $("date").textContent=`${now.getMonth()+1}がつ ${now.getDate()}にち`;
+  const m=$("menu");m.innerHTML="";
+  ACTS.forEach(a=>{
+    const b=document.createElement("button");
+    const ok=t.done.includes(a.id);
+    if(ok)b.classList.add("done");
+    b.innerHTML=`<span class="ic">${a.ic}</span>${a.name}<span class="ck">${ok?"✅":""}</span>`;
+    b.onclick=()=>START[a.id]();
+    m.appendChild(b);
+  });
+  const data=load(),cal=$("cal");cal.innerHTML="";
   for(let i=13;i>=0;i--){
     const d=new Date(now);d.setDate(now.getDate()-i);
     const v=data[key(d)];
     const el=document.createElement("div");
     if(i===0)el.classList.add("today");
-    el.innerHTML=`<b>${v?v.s:""}</b>${d.getMonth()+1}/${d.getDate()}`;
+    el.innerHTML=`<b>${v&&v.s?v.s:""}</b>${d.getMonth()+1}/${d.getDate()}`;
     cal.appendChild(el);
   }
-  const n=Object.keys(data).length;
-  $("total").textContent=n?`これまでに ${n}こ あつめたよ！`:"さいごまで やると シールが もらえるよ";
+  const n=Object.values(data).filter(v=>v.s).length;
+  $("total").textContent=n?`シール ${n}こ あつめたよ！`:"";
+  show("home");
+}
+$("homeBtn").onclick=renderHome;
+
+function complete(id,msg){
+  const data=load(),k=key(new Date());
+  const t=data[k]||{done:[]};
+  if(!t.done.includes(id))t.done.push(id);
+  let all=false;
+  if(!t.s&&ACTS.every(a=>t.done.includes(a.id))){t.s=STICKERS[Math.floor(Math.random()*STICKERS.length)];all=true}
+  data[k]=t;save(data);
+  show("done");
+  if(all){$("dnIcon").textContent=t.s;$("dnTitle").textContent="ぜんぶ できた！";$("dnMsg").textContent="シールを ゲット！";say("ぜんぶ できたね！すごい！")}
+  else{$("dnIcon").textContent="⭐";$("dnTitle").textContent="よくできました！";$("dnMsg").textContent=msg||"";say("よくできました！")}
+  $("dnIcon").style.animation="none";$("dnIcon").offsetWidth;$("dnIcon").style.animation="";
+}
+$("dnBack").onclick=renderHome;
+
+/* ---------- かお ---------- */
+function face(el,mouth,color){
+  el.innerHTML=`<circle cx="100" cy="100" r="92" fill="#ffe0bd" stroke="${color||'#e8b98a'}" stroke-width="8"/>
+  <circle cx="70" cy="80" r="9" fill="#3a2e1f"/><circle cx="130" cy="80" r="9" fill="#3a2e1f"/>
+  <circle cx="55" cy="112" r="10" fill="#ffb0a0" opacity=".7"/><circle cx="145" cy="112" r="10" fill="#ffb0a0" opacity=".7"/>
+  ${mouth||'<path d="M70 130 Q100 158 130 130" stroke="#7a1f1f" stroke-width="8" fill="none" stroke-linecap="round"/>'}`;
 }
 
-document.querySelectorAll("#reps button").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll("#reps button").forEach(x=>x.classList.remove("sel"));
-  b.classList.add("sel");reps=+b.dataset.n;
+/* ---------- あいうべ ---------- */
+const AI=[
+ {k:"あ",c:"var(--a)",tip:"おくちを たてに おおきく",m:'<ellipse cx="100" cy="140" rx="26" ry="34" fill="#7a1f1f"/><ellipse cx="100" cy="160" rx="16" ry="10" fill="#ff8a8a"/>'},
+ {k:"い",c:"var(--i)",tip:"くちを よこに ぐーっと",m:'<rect x="58" y="128" width="84" height="20" rx="10" fill="#7a1f1f"/><rect x="62" y="130" width="76" height="8" rx="4" fill="#fff"/>'},
+ {k:"う",c:"var(--u)",tip:"くちを まえに とがらせて",m:'<circle cx="100" cy="140" r="13" fill="#7a1f1f" stroke="#e05a5a" stroke-width="8"/>'},
+ {k:"べ",c:"var(--be)",tip:"べろを したに べーっと",m:'<ellipse cx="100" cy="132" rx="26" ry="12" fill="#7a1f1f"/><path d="M84 132 Q84 182 100 182 Q116 182 116 132 Z" fill="#ff6f8f"/><line x1="100" y1="140" x2="100" y2="170" stroke="#d94a6a" stroke-width="3"/>'}
+];
+const START={};
+START.aiube=()=>{
+  show("aiube");
+  $("aiReps").style.display="flex";$("aiRep").textContent="なんかい やる？";$("aiKana").textContent="";$("aiTip").textContent="";$("aiProg").style.width="0";
+  face($("aiFace"));
+};
+document.querySelectorAll("#aiReps button").forEach(b=>b.onclick=()=>{
+  const reps=+b.dataset.n,total=reps*4;let i=0;
+  $("aiReps").style.display="none";
+  const tick=()=>{
+    if(i>=total){complete("aiube",`あいうべ ${reps}かい できたよ！`);return}
+    const s=AI[i%4];
+    face($("aiFace"),s.m,s.c);
+    $("aiKana").textContent=s.k;$("aiKana").style.color=s.c;$("aiTip").textContent=s.tip;
+    $("aiRep").textContent=`${Math.floor(i/4)+1}かいめ / ${reps}かい`;
+    $("aiProg").style.width=(i/total*100)+"%";
+    say(s.k+"ー");i++;later(tick,2000);
+  };
+  say("はじめるよ");later(tick,1200);
 });
 
-$("start").onclick=()=>{
-  show("play");running=true;
-  let i=0;const total=reps*4;
-  const tick=()=>{
-    if(!running)return;
-    if(i>=total){finish();return}
-    const s=STEPS[i%4];
-    face($("face"),s,s.c);
-    $("kana").textContent=s.k;$("kana").style.color=s.c;
-    $("tip").innerHTML=s.tip;
-    $("rep").textContent=`${Math.floor(i/4)+1}かいめ / ${reps}かい`;
-    $("prog").style.width=(i/total*100)+"%";
-    say(s.k+"ー");
-    i++;timer=setTimeout(tick,HOLD);
+/* ---------- とんがりおやま ---------- */
+const OY_SEC=5,OY_REPS=5;
+const TONGUE_UP='<ellipse cx="100" cy="140" rx="30" ry="22" fill="#7a1f1f"/><path d="M80 158 Q100 108 120 158 Z" fill="#ff6f8f"/>';
+START.oyama=()=>{show("oyama");face($("oyFace"),TONGUE_UP,"var(--be)");$("oyTime").textContent=OY_SEC;$("oyRep").textContent=`${OY_REPS}かい やるよ`;$("oyStart").style.display="block"};
+$("oyStart").onclick=()=>{
+  $("oyStart").style.display="none";let rep=1;
+  const run=()=>{
+    let s=OY_SEC;$("oyRep").textContent=`${rep}かいめ / ${OY_REPS}かい`;$("oyTime").textContent=s;say("とんがり おやま！");
+    every(()=>{
+      s--;$("oyTime").textContent=Math.max(s,0);
+      if(s<=0){clearAll();
+        if(rep>=OY_REPS){complete("oyama","べろが つよく なったね！");return}
+        rep++;$("oyTime").textContent="😊";say("やすんで");later(run,3000);
+      }
+    },1000);
   };
-  say("はじめるよ");timer=setTimeout(tick,1200);
+  run();
 };
-$("stop").onclick=()=>{running=false;clearTimeout(timer);show("home");renderCal()};
 
-function finish(){
-  running=false;$("prog").style.width="100%";
-  const data=load(),k=key(new Date());
-  const s=data[k]?data[k].s:STICKERS[Math.floor(Math.random()*STICKERS.length)];
-  data[k]={s,n:(data[k]?data[k].n:0)+reps};save(data);
-  $("sticker").textContent=s;
-  $("doneMsg").textContent=`きょうは ${data[k].n}かい できたよ！`;
-  show("done");say("よくできました！");
+/* ---------- はつご ---------- */
+const WORDS=["あら","いり","うる","えれ","おろ","だら","でれ","どろ"];
+let hgI=0;
+function hgShow(){$("hgWord").textContent=WORDS[hgI];$("hgRep").textContent=`${hgI+1} / ${WORDS.length}`;$("hgProg").style.width=(hgI/WORDS.length*100)+"%";say(WORDS[hgI],.7)}
+START.hatsugo=()=>{show("hatsugo");hgI=0;hgShow()};
+$("hgHear").onclick=()=>say(WORDS[hgI],.7);
+$("hgNext").onclick=()=>{hgI++;if(hgI>=WORDS.length){complete("hatsugo","ぜんぶ いえたね！");return}hgShow()};
+
+/* ---------- タイマー系 ---------- */
+const TA={
+ nipple:{title:"ニップルトレーナー",ic:"🍼",tip:"おくちで しっかり かもう",mins:[1,3,5]},
+ book:{title:"どくしょ",ic:"📖",tip:"こえに だして よんで みよう",mins:[5,10,15]}
+};
+let taId=null,taMin=0;
+function taOpen(id){
+  show("timerAct");taId=id;const c=TA[id];
+  $("taTitle").textContent=c.title;$("taIcon").textContent=c.ic;$("taTip").textContent=c.tip;
+  const r=$("taMins");r.innerHTML="";r.style.display="flex";
+  c.mins.forEach((m,i)=>{const b=document.createElement("button");b.textContent=m+"ふん";b.className="gray";b.onclick=()=>taSet(m);r.appendChild(b)});
+  taSet(c.mins[0]);$("taStart").style.display="block";
 }
-$("back").onclick=()=>{show("home");renderCal()};
+function taSet(m){taMin=m;$("taTime").textContent=m+":00"}
+START.nipple=()=>taOpen("nipple");
+START.book=()=>taOpen("book");
+$("taStart").onclick=()=>{
+  $("taStart").style.display="none";$("taMins").style.display="none";
+  let s=taMin*60;say("スタート");
+  every(()=>{s--;$("taTime").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+    if(s<=0)complete(taId,TA[taId].title+" できたよ！")},1000);
+};
+$("taDone").onclick=()=>complete(taId,TA[taId].title+" できたよ！");
 
-face($("homeFace"),null);renderCal();
+/* ---------- もじかき ---------- */
+const KANA="あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん".split("");
+const MJ_N=5;let mjList=[],mjI=0,drawing=false;
+const cv=$("mjCanvas"),cx=cv.getContext("2d");
+function mjDraw(){
+  cx.clearRect(0,0,600,600);
+  cx.strokeStyle="#eedfc0";cx.lineWidth=3;cx.setLineDash([12,12]);
+  cx.beginPath();cx.moveTo(300,0);cx.lineTo(300,600);cx.moveTo(0,300);cx.lineTo(600,300);cx.stroke();cx.setLineDash([]);
+  cx.fillStyle="#e6e0d6";cx.font='bold 460px "Hiragino Maru Gothic ProN",sans-serif';cx.textAlign="center";cx.textBaseline="middle";
+  cx.fillText(mjList[mjI],300,320);
+  $("mjRep").textContent=`「${mjList[mjI]}」をなぞろう  ${mjI+1} / ${MJ_N}`;
+}
+START.moji=()=>{show("moji");mjList=shuffle(KANA).slice(0,MJ_N);mjI=0;mjDraw();say(mjList[0])};
+function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*600/r.width,(e.clientY-r.top)*600/r.height]}
+cv.addEventListener("pointerdown",e=>{drawing=true;cv.setPointerCapture(e.pointerId);const[x,y]=pos(e);cx.strokeStyle="#ff7a59";cx.lineWidth=26;cx.lineCap=cx.lineJoin="round";cx.beginPath();cx.moveTo(x,y);cx.lineTo(x,y);cx.stroke()});
+cv.addEventListener("pointermove",e=>{if(!drawing)return;const[x,y]=pos(e);cx.lineTo(x,y);cx.stroke()});
+cv.addEventListener("pointerup",()=>drawing=false);
+$("mjClear").onclick=mjDraw;
+$("mjNext").onclick=()=>{mjI++;if(mjI>=MJ_N){complete("moji","じょうずに かけたね！");return}mjDraw();say(mjList[mjI])};
+
+/* ---------- とけい ---------- */
+const TK_N=5;let tkI=0,tkScore=0;
+function clockSVG(h,m){
+  let s='<circle cx="100" cy="100" r="94" fill="#fff" stroke="#4cb8ff" stroke-width="8"/>';
+  for(let i=1;i<=12;i++){const a=i*30*Math.PI/180;s+=`<text x="${100+74*Math.sin(a)}" y="${100-74*Math.cos(a)+8}" text-anchor="middle" font-size="22" font-weight="bold" fill="#3a2e1f">${i}</text>`}
+  for(let i=0;i<60;i++){const a=i*6*Math.PI/180,r1=i%5?88:84;s+=`<line x1="${100+r1*Math.sin(a)}" y1="${100-r1*Math.cos(a)}" x2="${100+90*Math.sin(a)}" y2="${100-90*Math.cos(a)}" stroke="#999" stroke-width="${i%5?1:3}"/>`}
+  const ha=((h%12)+m/60)*30,ma=m*6;
+  s+=`<line x1="100" y1="100" x2="${100+45*Math.sin(ha*Math.PI/180)}" y2="${100-45*Math.cos(ha*Math.PI/180)}" stroke="#ff5fa2" stroke-width="9" stroke-linecap="round"/>`;
+  s+=`<line x1="100" y1="100" x2="${100+68*Math.sin(ma*Math.PI/180)}" y2="${100-68*Math.cos(ma*Math.PI/180)}" stroke="#3a2e1f" stroke-width="5" stroke-linecap="round"/>`;
+  return s+'<circle cx="100" cy="100" r="6" fill="#3a2e1f"/>';
+}
+function label(h,m){return m===0?`${h}じ`:m===30?`${h}じはん`:`${h}じ${m}ふん`}
+function tkQ(){
+  const h=1+Math.floor(Math.random()*12),m=[0,30,0,30,15,45][Math.floor(Math.random()*6)];
+  $("tkClock").innerHTML=clockSVG(h,m);$("tkMsg").textContent="";
+  $("tkRep").textContent=`${tkI+1} / ${TK_N}もんめ`;
+  const set=new Set([label(h,m)]);
+  while(set.size<4){const hh=1+Math.floor(Math.random()*12),mm=[0,30,15,45][Math.floor(Math.random()*4)];set.add(label(hh,mm))}
+  const o=$("tkOpts");o.innerHTML="";
+  shuffle([...set]).forEach(t=>{const b=document.createElement("button");b.textContent=t;
+    b.onclick=()=>{
+      if(t===label(h,m)){tkScore++;$("tkMsg").textContent="⭕ せいかい！";say("せいかい！"+t);o.querySelectorAll("button").forEach(x=>x.disabled=true);
+        later(()=>{tkI++;if(tkI>=TK_N){complete("tokei",`とけい ${TK_N}もん できたよ！`);return}tkQ()},1600)}
+      else{$("tkMsg").textContent="🤔 もういちど";b.style.background="#ccc";b.disabled=true}
+    };o.appendChild(b)});
+}
+START.tokei=()=>{show("tokei");tkI=0;tkScore=0;tkQ()};
+
+renderHome();
 </script>
 </body>
 </html>
