@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="億クイズ"><meta name="theme-color" content="#3d6bff">
+<title>億・兆クイズ</title>
+<style>
+:root{--bg:#f3f7ff;--ink:#1f2a44;--main:#3d6bff;--ok:#2fbf71;--ng:#ff5b5b;--card:#fff;--line:#d5def5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px;user-select:none;-webkit-user-select:none}
+.screen{display:none;width:100%;max-width:520px;flex-direction:column;align-items:center;gap:14px}
+.screen.on{display:flex}
+h1{font-size:28px}
+h2{font-size:22px}
+.mid{font-size:18px;text-align:center;line-height:1.6}
+button{font:inherit;border:none;border-radius:16px;padding:14px 18px;font-size:20px;font-weight:bold;color:#fff;background:var(--main);box-shadow:0 4px 0 rgba(0,0,0,.18);cursor:pointer;width:100%}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+button:disabled{opacity:.55}
+.gray{background:#8a94ab}
+.menu{display:flex;flex-direction:column;gap:10px;width:100%}
+.menu button{background:var(--card);color:var(--ink);border:3px solid var(--line);text-align:left;display:flex;gap:12px;align-items:center}
+.menu button .ic{font-size:28px}
+.menu button small{display:block;font-size:14px;font-weight:normal;color:#5c6680}
+.menu button .best{margin-left:auto;font-size:16px;color:var(--main)}
+.q{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:18px;width:100%;text-align:center}
+.q .t{font-size:18px;margin-bottom:10px;line-height:1.6}
+.q .n{font-size:30px;font-weight:bold;word-break:break-all;letter-spacing:.04em}
+.opts{display:grid;grid-template-columns:1fr;gap:10px;width:100%}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts button{background:var(--card);color:var(--ink);border:3px solid var(--line);font-size:22px;word-break:break-all}
+.opts button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opts button.ng{background:var(--ng);color:#fff;border-color:var(--ng)}
+.bar{width:100%;height:14px;background:#e3e9f8;border-radius:7px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--main);transition:width .3s}
+.exp{width:100%;background:#fff8dc;border:2px solid #f1d98a;border-radius:14px;padding:12px;font-size:17px;line-height:1.7;display:none}
+.table{width:100%;overflow-x:auto}
+table{border-collapse:collapse;margin:0 auto;font-size:15px}
+td,th{border:1px solid #c5cfe8;padding:4px 3px;text-align:center;min-width:22px;background:#fff}
+th{background:#eef2ff;font-weight:normal;font-size:12px}
+th.g{background:#dfe7ff;font-weight:bold;font-size:14px}
+td.on{background:#ffe58a;font-weight:bold}
+.big{font-size:64px}
+.top{display:flex;justify-content:space-between;width:100%;font-size:16px}
+.back{width:auto;padding:8px 14px;font-size:15px;background:#8a94ab;box-shadow:none}
+</style>
+</head>
+<body>
+
+<section class="screen on" id="home">
+  <h1>億・兆 クイズ</h1>
+  <p class="mid">４年生の「大きな数」<br>1回10問。全部正解をめざそう！</p>
+  <div class="menu" id="menu"></div>
+  <p class="mid" id="hist"></p>
+</section>
+
+<section class="screen" id="quiz">
+  <div class="top"><button class="back" id="quit">◀ やめる</button><span id="qNo"></span><span id="score"></span></div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="q"><div class="t" id="qText"></div><div class="n" id="qNum"></div></div>
+  <div class="opts" id="opts"></div>
+  <button class="gray" id="hintBtn">💡 位取り表を見る</button>
+  <div class="exp" id="exp"></div>
+  <button id="next" style="display:none">つぎへ ▶</button>
+</section>
+
+<section class="screen" id="result">
+  <div class="big" id="rIcon"></div>
+  <h1 id="rTitle"></h1>
+  <p class="mid" id="rMsg"></p>
+  <div class="exp" id="rMiss" style="display:block"></div>
+  <button id="again">もう一度</button>
+  <button class="gray" id="toHome">メニューへ</button>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+const KD="〇一二三四五六七八九";
+const UNITS=["","万","億","兆"];
+const PLACE=["一","十","百","千","万","十万","百万","千万","億","十億","百億","千億","兆","十兆","百兆","千兆"];
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+
+/* 数字の文字列 → 漢字（三億五百万） */
+function toKanji(d){
+  d=d.replace(/^0+/,"")||"0";if(d==="0")return"〇";
+  const g=[];for(let i=d.length;i>0;i-=4)g.unshift(d.slice(Math.max(0,i-4),i));
+  let out="";
+  g.forEach((x,i)=>{const u=UNITS[g.length-1-i];x=x.padStart(4,"0");let s="";
+    ["千","百","十",""].forEach((p,j)=>{const n=+x[j];if(!n)return;s+=(n===1&&p?"":KD[n])+p});
+    if(s)out+=s+u});
+  return out;
+}
+/* 数字 → 漢字まじり（3億500万） */
+function toMix(d){
+  d=d.replace(/^0+/,"")||"0";const g=[];for(let i=d.length;i>0;i-=4)g.unshift(d.slice(Math.max(0,i-4),i));
+  let out="";g.forEach((x,i)=>{const n=+x;if(n)out+=n+UNITS[g.length-1-i]});return out||"0";
+}
+/* ランダムな大きい数（0がほどよく入る） */
+function randNum(minLen,maxLen){
+  const len=rnd(minLen,maxLen);let s=""+rnd(1,9);
+  for(let i=1;i<len;i++)s+=Math.random()<.45?"0":rnd(1,9);
+  return s;
+}
+const fmt=d=>d; // 数字はそのまま（区切りなし）
+
+function placeTable(d,mark){
+  const len=Math.max(d.length,9),cols=Math.ceil(len/4)*4;
+  const p=d.padStart(cols,"0");
+  let h1="<tr>",h2="<tr>",row="<tr>";
+  for(let g=cols/4-1;g>=0;g--){h1+=`<th class="g" colspan="4">${UNITS[g]||"一"}</th>`;["千","百","十","一"].forEach(x=>h2+=`<th>${x}</th>`)}
+  [...p].forEach((c,i)=>{const pos=cols-1-i;const lead=i<cols-d.length;row+=`<td class="${pos===mark?"on":""}">${lead?"":c}</td>`});
+  return `<div class="table"><table>${h1}</tr>${h2}</tr>${row}</tr></table></div>`;
+}
+
+/* ---------- 問題 ---------- */
+const GEN={
+ read(){ // 数字→漢字
+   const d=randNum(9,13);const a=toKanji(d);
+   const set=new Set([a]);let t=0;
+   while(set.size<4&&t++<50){let x=[...d];const k=rnd(0,2);
+     if(k===0){const i=rnd(1,x.length-1);x[i]=x[i]==="0"?""+rnd(1,9):"0"}
+     else if(k===1){x.splice(rnd(1,x.length-1),0,"0")}
+     else{x.splice(rnd(1,x.length-1),1)}
+     set.add(toKanji(x.join("")))}
+   return{t:"この数の読み方を、漢字で書くと？",n:fmt(d),opts:shuffle([...set]),a,d,exp:`4けたずつ区切ると読みやすいよ。下から「一・万・億・兆」。<br>答え：${a}`};
+ },
+ write(){ // 漢字→数字
+   const d=randNum(9,13);const a=d;
+   const set=new Set([a]);let t=0;
+   while(set.size<4&&t++<50){let x=[...d];const k=rnd(0,2);
+     if(k===0)x.splice(rnd(1,x.length-1),0,"0");else if(k===1)x.splice(rnd(1,x.length-1),1);else{const i=rnd(1,x.length-1);x[i]=x[i]==="0"?""+rnd(1,9):"0"}
+     set.add(x.join(""))}
+   return{t:"この数を、数字で書くと？",n:toKanji(d),opts:shuffle([...set]),a,d,exp:`ない位には「0」を書くよ。<br>答え：${a}`};
+ },
+ place(){ // ○の位の数字
+   const d=randNum(10,14).replace(/0/g,()=>""+rnd(1,9));
+   const pos=rnd(4,d.length-1);const a=d[d.length-1-pos];
+   const set=new Set([a]);while(set.size<4)set.add(""+rnd(0,9));
+   return{t:`この数の<b>${PLACE[pos]}の位</b>の数字は？`,n:fmt(d),opts:shuffle([...set]),a,d,mark:pos,two:true,exp:`位取り表で、${PLACE[pos]}の位を見てみよう。<br>答え：${a}`};
+ },
+ times(){ // 10倍・100倍・10でわる
+   const base=rnd(1,99)+"0".repeat(rnd(6,10));const k=pick(["10倍","100倍","1000倍","10でわる"]);
+   let a;if(k==="10倍")a=base+"0";else if(k==="100倍")a=base+"00";else if(k==="1000倍")a=base+"000";else a=base.slice(0,-1);
+   const cand=[base+"0",base+"00",base+"000",base.slice(0,-1),base.slice(0,-2)].map(toMix);
+   const set=new Set([toMix(a)]);shuffle(cand).forEach(c=>{if(set.size<4)set.add(c)});
+   return{t:`<b>${toMix(base)}</b> を <b>${k}</b> にした数は？`,n:"",opts:shuffle([...set]),a:toMix(a),d:a,exp:`10倍すると、位が1つ上がるよ（数字の右に0が1こつく）。10でわると、位が1つ下がるよ。<br>答え：${toMix(a)}`};
+ },
+ count(){ // ○は○を何こ集めた数
+   const P=[["1億","1000万",10],["1億","100万",100],["1兆","1000億",10],["1兆","1億",10000],["1万","1000",10],["1億","1万",10000]];
+   let q;
+   if(Math.random()<.5){q=pick(P);var big=q[0],unit=q[1],a=""+q[2]}
+   else{const m=rnd(2,9);if(Math.random()<.5){big=m+"億";unit="1000万";a=""+m*10}else{big=m+"兆";unit="1000億";a=""+m*10}}
+   const n=+a;const set=new Set([a]);[n*10,n/10,n*100,n+1,n-1].forEach(x=>{if(set.size<4&&x>=1&&Number.isInteger(x))set.add(""+x)});
+   return{t:`<b>${big}</b> は、<b>${unit}</b> を何こ集めた数？`,n:"",opts:shuffle([...set]),a,d:"",two:true,exp:`1000万を10こ集めると1億、1000億を10こ集めると1兆になるよ。<br>答え：${a}こ`};
+ },
+ comp(){ // 大きいのはどっち
+   const x=randNum(10,13);let y=[...x];const i=rnd(1,y.length-1);y[i]=""+((+y[i]+rnd(1,8))%10);y=y.join("");if(y===x)y=x+"0";
+   if(Math.random()<.3)y=Math.random()<.5?x.slice(0,-1)+"":x+"0";
+   const big=BigInt(x)>BigInt(y)?x:y;
+   const useMix=Math.random()<.5;
+   const show=v=>useMix?toMix(v):v;
+   return{t:"大きいのはどっち？",n:"",opts:[show(x),show(y)],a:show(big),d:big,exp:`けた数が同じなら、上の位からくらべよう。<br>答え：${show(big)}`};
+ }
+};
+const MODES=[
+ {id:"read",ic:"📖",name:"読み方",sub:"数字 → 漢字",gens:["read"]},
+ {id:"write",ic:"✏️",name:"書き方",sub:"漢字 → 数字",gens:["write"]},
+ {id:"place",ic:"🔢",name:"位",sub:"千万の位の数字は？",gens:["place"]},
+ {id:"times",ic:"✖️",name:"10倍・10でわる",sub:"位が上がる・下がる",gens:["times"]},
+ {id:"count",ic:"🧺",name:"何こ集めた数",sub:"1億は1000万が何こ？",gens:["count"]},
+ {id:"comp",ic:"⚖️",name:"大きさくらべ",sub:"大きいのはどっち？",gens:["comp"]},
+ {id:"mix",ic:"🏆",name:"ぜんぶミックス",sub:"テストの練習に",gens:["read","write","place","times","count","comp"]}
+];
+
+/* ---------- 記録 ---------- */
+function load(){try{return JSON.parse(localStorage.getItem("okuquiz")||"{}")}catch(e){return{}}}
+function save(d){try{localStorage.setItem("okuquiz",JSON.stringify(d))}catch(e){}}
+
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
+function home(){
+  const rec=load();const m=$("menu");m.innerHTML="";
+  MODES.forEach(md=>{const b=document.createElement("button");const best=rec[md.id];
+    b.innerHTML=`<span class="ic">${md.ic}</span><span>${md.name}<small>${md.sub}</small></span><span class="best">${best!=null?"さいこう "+best+"/10":""}</span>`;
+    b.onclick=()=>start(md);m.appendChild(b)});
+  const p=rec._plays||0;$("hist").textContent=p?`これまでに ${p}回 チャレンジしたよ`:"";
+  show("home");
+}
+
+/* ---------- クイズ ---------- */
+const N=10;let mode,qi,score,cur,miss;
+function start(md){mode=md;qi=0;score=0;miss=[];show("quiz");ask()}
+function ask(){
+  cur=GEN[pick(mode.gens)]();
+  $("qNo").textContent=`${qi+1} / ${N}問`;$("score").textContent=`⭕ ${score}`;$("prog").style.width=(qi/N*100)+"%";
+  $("qText").innerHTML=cur.t;$("qNum").textContent=cur.n;$("qNum").style.display=cur.n?"block":"none";
+  $("exp").style.display="none";$("next").style.display="none";$("hintBtn").style.display=cur.d?"block":"none";
+  const o=$("opts");o.innerHTML="";o.className="opts"+(cur.two?" two":"");
+  cur.opts.forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>answer(b,t);o.appendChild(b)});
+}
+function answer(b,t){
+  const all=[...$("opts").children];all.forEach(x=>x.disabled=true);
+  const ok=t===cur.a;
+  if(ok){score++;b.classList.add("ok")}else{b.classList.add("ng");all.forEach(x=>{if(x.textContent===cur.a)x.classList.add("ok")});miss.push(cur)}
+  $("score").textContent=`⭕ ${score}`;
+  $("exp").innerHTML=(ok?"⭕ せいかい！<br>":"❌ おしい！<br>")+cur.exp+(cur.d&&!ok?placeTable(cur.d,cur.mark):"");
+  $("exp").style.display="block";$("hintBtn").style.display="none";$("next").style.display="block";
+}
+$("hintBtn").onclick=()=>{$("exp").innerHTML="💡 位取り表"+placeTable(cur.d,cur.mark);$("exp").style.display="block";$("hintBtn").style.display="none"};
+$("next").onclick=()=>{qi++;if(qi>=N)finish();else ask()};
+$("quit").onclick=home;
+function finish(){
+  const rec=load();rec._plays=(rec._plays||0)+1;if(rec[mode.id]==null||score>rec[mode.id])rec[mode.id]=score;save(rec);
+  $("rIcon").textContent=score===N?"🏆":score>=8?"🌟":score>=5?"👍":"💪";
+  $("rTitle").textContent=`${N}問中 ${score}問 せいかい！`;
+  $("rMsg").textContent=score===N?"パーフェクト！すごい！":score>=8?"あと少しで満点！":score>=5?"いい調子！":"位取り表を見ながら、もう一度やってみよう";
+  $("rMiss").innerHTML=miss.length?"<b>まちがえた問題</b><br>"+miss.map(m=>`・${m.t.replace(/<[^>]+>/g,"")} ${m.n} → <b>${m.a}</b>`).join("<br>"):"まちがいなし！";
+  show("result");
+}
+$("again").onclick=()=>start(mode);
+$("toHome").onclick=home;
+home();
+</script>
+</body>
+</html>
