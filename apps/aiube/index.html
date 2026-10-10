@@ -50,7 +50,7 @@ canvas{touch-action:none}
 rt{font-size:.45em;font-weight:normal}
 .w{display:inline-block;padding:2px 6px;border-radius:10px;color:#b9ad9a;cursor:pointer}
 .w.past{color:var(--ink)}
-.w.now{color:var(--ink);background:#ffe58a;transform:scale(1.15)}
+.w.now{color:var(--ink);background:#ffe58a;box-shadow:0 0 0 3px #ffd23d}
 .scene{position:relative;width:100%;height:210px;border-radius:20px;overflow:hidden;border:3px solid #eedfc0}
 .scene span{position:absolute;transform:translate(-50%,-50%);line-height:1}
 .scene .g{position:absolute;left:0;right:0;bottom:0}
@@ -498,7 +498,7 @@ START.book=()=>{
 let stW=0;
 function stShow(){recReset();const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";drawScene($("stPic"),SCENES[STORIES.indexOf(stS)][stI]);
   const t=$("stText");t.innerHTML="";
-  pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.dataset.t=w;sp.textContent=w;sp.onclick=()=>{stW=j;stMark();if(!stAuto)kid(w)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
+  pg[1].replace(/、(?=\S)/g,"、 ").split(/[ 　]+/).filter(Boolean).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.dataset.t=w;sp.textContent=w;sp.onclick=()=>{stW=j;stMark();if(!stAuto)kid(w)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
   stMark();}
 let stAuto=true;try{stAuto=localStorage.getItem("stAuto")!=="0"}catch(e){}
 const kid=(t)=>say(t,.75,1.9);
