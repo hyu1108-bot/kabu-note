@@ -164,7 +164,8 @@ rt{font-size:.45em;font-weight:normal}
   <div class="bar"><i id="stProg"></i></div>
   <div class="scene" id="stPic"></div>
   <p id="stText" style="font-size:38px;line-height:1.9;background:#fff;border-radius:18px;padding:18px;width:100%;border:3px solid #eedfc0;min-height:150px"></p>
-  <button id="stHear" style="background:var(--u)">🔊 よんで もらう</button>
+  <button id="stHear" style="background:var(--u)">🔊 ページを ぜんぶ きく</button>
+  <button id="stAuto" class="gray"></button>
   <button id="stNext">よめた！</button>
 </section>
 <section class="screen" id="storyList">
@@ -196,7 +197,7 @@ let timers=[];
 function later(f,ms){timers.push(setTimeout(f,ms))}
 function every(f,ms){timers.push(setInterval(f,ms))}
 function clearAll(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];try{speechSynthesis.cancel()}catch(e){}}
-function say(t,rate){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";u.rate=rate||.9;u.pitch=1.3;speechSynthesis.speak(u)}catch(e){}}
+function say(t,rate,pitch){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ja-JP";u.rate=rate||.9;u.pitch=pitch||1.3;speechSynthesis.speak(u)}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem("st-app")||"{}")}catch(e){return{}}}
 function save(d){try{localStorage.setItem("st-app",JSON.stringify(d))}catch(e){}}
 function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
@@ -461,11 +462,16 @@ START.book=()=>{
 let stW=0;
 function stShow(){const pg=stS.p[stI];stW=0;$("stTitle").textContent=stS.t;$("stRep").textContent=`${stI+1} / ${stS.p.length}ページ`;$("stProg").style.width=(stI/stS.p.length*100)+"%";drawScene($("stPic"),SCENES[STORIES.indexOf(stS)][stI]);
   const t=$("stText");t.innerHTML="";
-  pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.textContent=w;sp.onclick=()=>{stW=j;stMark();say(w,.7)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
+  pg[1].split(/[ 　]+/).forEach((w,j)=>{const sp=document.createElement("span");sp.className="w";sp.dataset.t=w;sp.textContent=w;sp.onclick=()=>{stW=j;stMark();if(!stAuto)kid(w)};t.appendChild(sp);t.appendChild(document.createTextNode(" "))});
   stMark();}
-function stMark(){const ws=[...$("stText").querySelectorAll(".w")];ws.forEach((w,j)=>{w.classList.toggle("now",j===stW);w.classList.toggle("past",j<stW)});
+let stAuto=true;try{stAuto=localStorage.getItem("stAuto")!=="0"}catch(e){}
+const kid=(t)=>say(t,.75,1.9);
+function stAutoLabel(){$("stAuto").textContent=stAuto?"👂 さきに おてほんを きく：オン":"👂 さきに おてほんを きく：オフ"}
+$("stAuto").onclick=()=>{stAuto=!stAuto;try{localStorage.setItem("stAuto",stAuto?"1":"0")}catch(e){}stAutoLabel();if(stAuto)stSayNow()};
+function stSayNow(){const w=$("stText").querySelectorAll(".w")[stW];if(w)kid(w.dataset.t)}
+function stMark(){stAutoLabel();if(stAuto)setTimeout(stSayNow,250);const ws=[...$("stText").querySelectorAll(".w")];ws.forEach((w,j)=>{w.classList.toggle("now",j===stW);w.classList.toggle("past",j<stW)});
   $("stNext").textContent=stW<ws.length-1?"よめた！ ▶":(stI===stS.p.length-1?"おしまい！":"つぎの ページ ▶")}
-$("stHear").onclick=()=>say(stS.p[stI][1],.8);
+$("stHear").onclick=()=>say(stS.p[stI][1],.8,1.9);
 $("stNext").onclick=()=>{const n=$("stText").querySelectorAll(".w").length;if(stW<n-1){stW++;stMark();return}
   stI++;if(stI>=stS.p.length){complete("book",`「${stS.t}」 よめたね！`);return}stShow()};
 
