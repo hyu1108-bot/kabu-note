@@ -260,7 +260,7 @@ const OYS={
  be:{k:"あっかんべー",tip:"べろを したへ べーっと",m:OM+'<path d="M84 136 Q84 186 100 186 Q116 186 116 136 Z" fill="#ff6f8f"/>'},
  l:{k:"ひだり",tip:"べろを ひだりへ",m:OM+'<path d="M96 132 Q40 128 38 142 Q40 156 96 150 Z" fill="#ff6f8f"/>'},
  r:{k:"みぎ",tip:"べろを みぎへ",m:OM+'<path d="M104 132 Q160 128 162 142 Q160 156 104 150 Z" fill="#ff6f8f"/>'},
- pan:{k:"ふんわり ほっとけーき",tip:"べろを ひらべったく ふんわり",m:'<ellipse cx="100" cy="140" rx="36" ry="20" fill="#7a1f1f"/><ellipse cx="100" cy="146" rx="32" ry="12" fill="#ff6f8f"/>'}
+ pan:{k:"ふんわり ほっとけーき",sec:10,tip:"べろを ひらべったく ふんわり",m:'<ellipse cx="100" cy="140" rx="36" ry="20" fill="#7a1f1f"/><ellipse cx="100" cy="146" rx="32" ry="12" fill="#ff6f8f"/>'}
 };
 const OY_SEQ=[];for(let i=0;i<3;i++)OY_SEQ.push("up","be","l","r");OY_SEQ.push("pan");
 START.oyama=()=>{show("oyama");face($("oyFace"),OYS.up.m,"var(--be)");$("oyTime").textContent="";$("oyRep").textContent="とんがりおやま → あっかんべー → ひだり → みぎ を 3かい、さいごに ふんわり ほっとけーき";$("oyStart").style.display="block"};
@@ -271,7 +271,7 @@ $("oyStart").onclick=()=>{
     const st=OYS[OY_SEQ[i]];
     face($("oyFace"),st.m,"var(--be)");
     $("oyRep").innerHTML=`<b style="font-size:34px">${st.k}</b><br>${st.tip}<br>${i<12?Math.floor(i/4)+1+"かいめ / 3かい":"さいご！"}`;
-    let s=OY_SEC;$("oyTime").textContent=s;say(st.k);
+    let s=st.sec||OY_SEC;$("oyTime").textContent=s;say(st.k);
     every(()=>{s--;$("oyTime").textContent=Math.max(s,0);if(s<=0){clearAll();i++;later(run,400)}},1000);
   };
   run();
