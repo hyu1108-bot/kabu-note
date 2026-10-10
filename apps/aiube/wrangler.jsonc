@@ -1,0 +1,6 @@
+{
+  // Cloudflare Workers「taro」の設定（GitHubから自動で公開するため）
+  "name": "taro",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "." }
+}
