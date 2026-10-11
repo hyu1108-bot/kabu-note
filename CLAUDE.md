@@ -128,6 +128,7 @@
     `ambient, soft gentle harp melody, subtle music box accents, delicate sparkling coin-like chimes throughout, soft crystal wind chimes, warm soft pads, tender, soothing, gentle, warm, hopeful, very slow, sleep, no piano, no guitar, no flute, no drums, instrumental`
   - 曲名は管理用に「日付_プロンプト名_番号」。番号は生成順でなくダウンロード順でよい。ダウンロード後にエクスプローラーで全部選んでF2→`1007_チャリン`と入力すると `1007_チャリン (1)` のように自動で連番になる。ダウンロードは曲ページから（Studio経由は無音になる不具合）。最初の1曲で音が出るか確認
   - **2026-10-11：1007の11曲（`ダウンロード\1007音源` の金運1007ー〜08）をffmpegで1本（37分）にしてIDチェック → 全曲問題なし**。「IDチェック済み」フォルダへ。日曜10/11の動画も金曜1009の音に差し替えて問題なし
+  - **2026-10-11：1011の曲（デスクトップ`音源1011`、53分）をIDチェック → 「金運1011ー (7)」だけ申し立て**（`阿尔法音乐：增强学习记忆力`/Tencent Music、28:34〜28:48）→ NGフォルダへ。残りは「IDチェック済み」へ
   - **使う前に、番号順に1本につないで非公開アップ→著作権欄を確認**。申し立てが付いた曲は捨て、問題なかった曲だけ「IDチェック済み」フォルダへ。ライブ・3時間動画はそこからだけ使う
 
 ## ライブ配信の作り方
