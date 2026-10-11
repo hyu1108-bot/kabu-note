@@ -35,6 +35,8 @@ p{margin:0}
 .res{display:flex;flex-direction:column;gap:20px}
 .step{display:flex;flex-direction:column;gap:4px}
 .voice{align-self:center;margin-top:6px}
+.find{display:flex;flex-direction:column;gap:8px;border:1px solid #e6c46a55;border-radius:14px;padding:14px;margin-bottom:14px}
+.find .btn{align-self:flex-start}
 .tabs-bottom{margin-top:8px}
 .label{font-size:13px;color:var(--gold);letter-spacing:.12em}
 .voice{font-size:20px;font-weight:700}
@@ -279,6 +281,26 @@ const ITEMS=[
  ["こころ・からだ","家族の健康が心配","私が見張っていないと守れない、と思っている","家族も私も、やさしく守られている","家族の元気な姿を思い浮かべる"],
  ["こころ・からだ","病気を抱えているから夢は無理","体の状態が人生を決める、と思っている","私は、今の体のままで夢を描いていい","小さな楽しみを1つ予定に入れる"]
 ];
+
+const EXTRA=[
+ ["言われた言葉","そんなことしてたらだめ","道から外れると、取り返しがつかなくなる、と思っている","少し寄り道しても、私はちゃんと戻ってこられる","今日、ちょっとだけ寄り道を楽しむ"],
+ ["言われた言葉","今、ちがうことして","決めたこと以外に使う時間はむだ、と思っている","今やっていることにも、ちゃんと意味がある","好きなことを5分だけ味わう"],
+ ["言われた言葉","ちゃんとして","きちんとしていないと認めてもらえない、と思っている","きちんとできない日の私も、大切にされていい","70点でよしとすることを1つ決める"],
+ ["言われた言葉","話しかけないで","余裕がないときの私は、人に優しくできない、と思っている","疲れたら休んでから、またやさしく向き合えばいい","「あとでね」とひとこと添える"],
+ ["言われた言葉","どうしてそんなこともわからないの","わかって当然、できないのは恥ずかしい、と思っている","わからないことは聞いていい。私も、相手も","知らなかったことを1つ人に聞いてみる"],
+ ["言われた言葉","早くしなさい","ゆっくりな私は迷惑をかける、と思っている","私には、私にちょうどいい速さがある","ひとつの動作をゆっくり丁寧にする"],
+ ["言われた言葉","わがまま言わないの","ほしいと言うと嫌われる、と思っている","私の「ほしい」は、口にしていい","小さなお願いを1つ言ってみる"],
+ ["言われた言葉","泣かないの","気持ちを見せると弱いと思われる、と思っている","私の気持ちは、どれも大切なサイン","今の気持ちに名前をつけてみる"],
+ ["言われた言葉","お姉ちゃん（お兄ちゃん）なんだから","自分より人を優先しないといけない、と思っている","私も、守られて甘えていい","自分のために1つ先に選ぶ"],
+ ["言われた言葉","みんなと同じにしなさい","ちがうと仲間外れにされる、と思っている","私らしさは、そのままで歓迎される","自分だけの好きを1つ書き出す"],
+ ["言われた言葉","うちはお金がないから","豊かさは自分には縁がない、と思っている","お金は、私のところにもめぐってくる","今日受け取ったものを1つ数える"],
+ ["言われた言葉","調子に乗らないの","喜ぶと何か悪いことが起きる、と思っている","うれしいときは、思いきり喜んでいい","うれしかったことを声に出して言う"],
+ ["言われた言葉","あなたのためを思って言ってるの","人の期待にこたえないと愛されない、と思っている","私は、私の気持ちで選んでいい","今日の小さなことを自分の好みで選ぶ"],
+ ["言われた言葉","がまんしなさい","がまんしないと幸せになれない、と思っている","私は、がまんしなくても満たされていい","がまんしていることを1つゆるめる"],
+ ["言われた言葉","余計なことしないで","自分から動くと迷惑になる、と思っている","私の思いやりは、ちゃんと誰かに届いている","やってよかったことを1つ思い出す"]
+];
+ITEMS.push(...EXTRA);
+const UK="kokoro_mine";let MINE=[];try{MINE=JSON.parse(localStorage.getItem(UK)||"[]")}catch(e){}ITEMS.push(...MINE);
 const pick=document.getElementById("pick"),res=document.getElementById("result");
 const GROUPS=[
  {name:"お金",icon:"🪙",col:"#e6c46a",cats:["借金・支払い","不安・節約","将来・老後","お金そのもの","運・ツキ"]},
@@ -287,9 +309,34 @@ const GROUPS=[
  {name:"こころ・からだ",icon:"🌿",col:"#9cc7f0",cats:["こころ・からだ"]}];
 let cat="借金・支払い";
 function drawPick(){
-  pick.innerHTML=GROUPS.map(g=>`<div class="grp" style="--gc:${g.col}"><div class="gh"><span class="gi">${g.icon}</span>${g.name}</div><div class="chips">${g.cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}</div></div>`).join("")+`<div class="gsel">「${cat}」の口ぐせ</div>`;
+  pick.innerHTML=`<div class="find"><label class="label" for="fq">✍️ 思い浮かんだ言葉から探す</label><textarea id="fq" rows="2" placeholder="例：ちゃんとして／どうしてそんなこともわからないの"></textarea><button class="btn" id="fgo">奥の思いを探す</button><div id="fres"></div></div>`+GROUPS.map(g=>`<div class="grp" style="--gc:${g.col}"><div class="gh"><span class="gi">${g.icon}</span>${g.name}</div><div class="chips">${g.cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}</div></div>`).join("")+`<div class="gsel">「${cat}」の口ぐせ</div>`;
   pick.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawPick();const g=pick.querySelector(".gsel");g.classList.add("flash");g.scrollIntoView({behavior:"smooth",block:"start"})});
+  document.getElementById("fgo").onclick=findWord;
   ITEMS.forEach((it,n)=>{if(it[0]!==cat)return;const b=document.createElement("button");b.className="opt";b.textContent="「"+it[1]+"」";b.onclick=()=>show(n);pick.appendChild(b)})}
+
+function bg(t){t=t.replace(/[「」『』、。！？!?\s・（）()〜ー…]/g,"");const S=new Set(),X=new Set(["ない","ないと","いと","して","しな","なさ","さい","する","てる","って","ても","たい","です","ます","から","のは","がな","いの","けな","いけ"]);for(let i=0;i<t.length-1;i++){const g=t.slice(i,i+2);if(!X.has(g))S.add(g)}if(t.length===1)S.add(t);return S}
+function findWord(){const q=document.getElementById("fq").value.trim(),out=document.getElementById("fres");if(!q){out.innerHTML="";return}
+  const Q=bg(q),sc=ITEMS.map((it,n)=>{const B=bg(it[1]);let c=0;Q.forEach(x=>B.has(x)&&c++);return{n,s:c/Math.max(1,Math.min(Q.size,B.size))}}).filter(x=>x.s>=0.34).sort((a,b)=>b.s-a.s).slice(0,3);
+  out.innerHTML=(sc.length?`<p class="side">近い口ぐせが見つかりました</p>`+sc.map(x=>`<button class="opt" data-n="${x.n}">「${esc(ITEMS[x.n][1])}」</button>`).join(""):`<p class="side">ぴったりの口ぐせは見つかりませんでした。</p>`)+
+   `<button class="btn ghost" id="fask">🔍 キーナスと3つの質問で探す</button>`;
+  out.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>show(+b.dataset.n));
+  document.getElementById("fask").onclick=()=>ask(q)}
+function ask(q){pick.hidden=true;chal.hidden=true;res.hidden=false;
+  res.innerHTML=`<div class="step"><span class="label">浮かんだ言葉</span><div class="word" style="font-size:20px">「${esc(q)}」</div></div>
+  ${kin("3つだけ聞かせてね。<br>思いつかなければ、とばしても大丈夫。")}
+  <div class="step"><label class="label" for="q1">① この言葉を言わなかったら（守らなかったら）、何が起きると思う？</label><textarea id="q1" placeholder="例：だらしない人だと思われる"></textarea></div>
+  <div class="step"><label class="label" for="q2">② 昔、だれかに言われたことはある？</label><textarea id="q2" placeholder="例：母によく言われた"></textarea></div>
+  <div class="step"><label class="label" for="q3">③ 本当は、どうしてほしい？どうなりたい？</label><textarea id="q3" placeholder="例：できない日も、そのままでいいと言ってほしい"></textarea></div>
+  <button class="btn" id="mk">氷山にしてみる</button><button class="btn ghost" id="bk">もどる</button>`;
+  document.getElementById("bk").onclick=()=>{res.hidden=true;pick.hidden=false;drawPick()};
+  document.getElementById("mk").onclick=()=>{const g=id=>document.getElementById(id).value.trim();const a1=g("q1"),a2=g("q2"),a3=g("q3");
+    const h=(a1?`「${a1}」というこわさ`:"言葉の奥にある、小さなこわさ")+(a2?`（${a2}）`:"");
+    let w=a3?a3.replace(/[。．]$/,"").replace(/と(言って|言われ)(ほしい|たい)$/,"").replace(/(して|させて)ほしい$/,"していい").replace(/てほしい$/,"ていい"):"私は、そのままの私で大丈夫";
+    if(a3&&!/^私/.test(w))w="私は、"+w;
+    const it=["自分の言葉",q,h,w,"新しい言葉を、今日1回だけ声に出す"];MINE.push(it);try{localStorage.setItem(UK,JSON.stringify(MINE))}catch(e){}
+    ITEMS.push(it);showMine(ITEMS.length-1)}}
+function showMine(n){show(n);const el=document.getElementById("word");if(!el)return;el.contentEditable="true";const p=el.nextElementSibling;if(p)p.textContent="しっくりこなければ、タップして自分の言葉に書きかえてね";
+  el.onblur=()=>{const t=el.textContent.trim();if(!t||t===ITEMS[n][3])return;ITEMS[n][3]=t;const k=n-(ITEMS.length-MINE.length);if(MINE[k])MINE[k][3]=t;try{localStorage.setItem(UK,JSON.stringify(MINE))}catch(e){}showMine(n)}}
 drawPick();
 function show(n){
   const [,v,h,w,a]=ITEMS[n];
