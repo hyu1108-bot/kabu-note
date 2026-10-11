@@ -74,7 +74,7 @@ $fcFile = Join-Path $env:TEMP "telop_filter.txt"
 [IO.File]::WriteAllText($fcFile, "[0:v]" + ($parts -join ",") + "[v]", $utf8)
 
 "テロップを入れています..."
-ffmpeg -hide_banner -loglevel error -stats -y -i $Seg -filter_complex_script $fcFile -map "[v]" `
+ffmpeg -hide_banner -loglevel error -stats -y -i $Seg -/filter_complex $fcFile -map "[v]" `
   -c:v libx264 -preset veryfast -crf 23 -r 24 -pix_fmt yuv420p $SegT
 
 $list = Join-Path $env:TEMP "telop_list.txt"
