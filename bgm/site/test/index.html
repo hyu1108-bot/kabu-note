@@ -27,6 +27,9 @@ audio{width:100%;margin-top:8px}
 <button id="rec">🎙 録音する</button><button class="g" id="stp" disabled>■ 止める</button>
 <audio id="pl" controls hidden></audio><span class="st" id="rs">録音はこのスマホの中だけ。どこにも送られません。</span></div>
 
+<div class="box"><h2>④ 声えらび（このスマホに入っている日本語の声）</h2>
+<p class="st">男性の声があれば「ふつう」で、なければ「若め」「元気」を試してください。キーナスっぽい組み合わせを教えてください。</p>
+<div id="vl"><span class="st">読み込み中…（出ないときは少し待ってから再読み込み）</span></div></div>
 <p class="st" id="env"></p>
 </div><script>
 let ac;function ctx(){ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}
@@ -48,4 +51,10 @@ mr.start();rec.disabled=true;stp.disabled=false;rs.textContent="録音中…新�
 catch(e){rs.textContent="録音できませんでした："+e.name+"（LINEやYouTubeの中で開いている場合は、SafariかChromeで開き直してください）"}};
 stp.onclick=()=>mr&&mr.state==="recording"&&mr.stop();
 env.textContent="確認用："+navigator.userAgent;
+
+const P=[["ふつう",1.0,0.95],["若め",1.3,1.0],["元気",1.5,1.1],["ゆっくり",1.1,0.8]];
+function listV(){const v=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.replace("_","-").startsWith("ja"));if(!v.length)return;
+vl.innerHTML=v.map((x,i)=>`<div style="margin:10px 0"><b style="color:#fff1c2">${i+1}. ${x.name}</b><br>${P.map((q,j)=>`<button class="g" data-v="${i}" data-q="${j}">${q[0]}</button>`).join("")}</div>`).join("");
+vl.querySelectorAll("button").forEach(b=>b.onclick=()=>{const x=v[+b.dataset.v],q=P[+b.dataset.q];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(W);u.lang="ja-JP";u.voice=x;u.pitch=q[1];u.rate=q[2];speechSynthesis.speak(u)})}
+if("speechSynthesis" in window){listV();speechSynthesis.onvoiceschanged=listV}
 </script></body></html>
