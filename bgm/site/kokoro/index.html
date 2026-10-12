@@ -331,7 +331,7 @@ function bg(t){t=t.replace(/[「」『』、。！？!?\s・（）()〜ー…]/g
 function findWord(){const q=document.getElementById("fq").value.trim(),out=document.getElementById("fres");if(!q){out.innerHTML="";return}
   const Q=bg(q),sc=ITEMS.map((it,n)=>{const B=bg(it[1]);let c=0;Q.forEach(x=>B.has(x)&&c++);return{n,s:c/Math.max(1,Math.min(Q.size,B.size))}}).filter(x=>x.s>=0.34).sort((a,b)=>b.s-a.s).slice(0,3);
   out.innerHTML=(sc.length?`<p class="side">近い口ぐせが見つかりました</p>`+sc.map(x=>`<button class="opt" data-n="${x.n}">「${esc(ITEMS[x.n][1])}」</button>`).join(""):`<p class="side">ぴったりの口ぐせは見つかりませんでした。</p>`)+
-   `<button class="btn ghost" id="fask">🔍 キーナスと3つの質問で探す</button>`;
+   `<p class="side">${sc.length?"どれもしっくりこないときは":"かわりに"}、かんたんな質問に3つ答えると、あなただけの「奥の思い」と「新しい言葉」が出ます。</p><button class="btn ghost" id="fask">💬 質問に答えて、自分の答えを出す</button>`;
   out.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>show(+b.dataset.n));
   document.getElementById("fask").onclick=()=>ask(q)}
 function ask(q){pick.hidden=true;chal.hidden=true;res.hidden=false;
