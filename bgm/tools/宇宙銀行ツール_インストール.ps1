@@ -50,15 +50,13 @@ $T1 = "ようこそ、宇宙銀行へ`n今夜も、朝まで11時間"
 $T2 = "不安は、消さなくていい`n預けるだけで大丈夫"
 if ((Get-Date).DayOfWeek -eq 'Monday') { $T3 = "おみくじ：チャットに`nおみくじ とだけ書いてね" }
 else { $T3 = "今夜は何もしなくて大丈夫です`nゆっくりおやすみください" }
-
+$Size  = 96
 $Seg   = Join-Path $env:TEMP "live_seg.mp4"
-$SegT  = Join-Path $env:TEMP "live_seg_telop.mp4"
 $Audio = (Get-ChildItem "$HOME\Desktop\ライブ音源_3h_*.mp3" | Sort-Object LastWriteTime | Select-Object -Last 1).FullName
 $Out   = "$HOME\Desktop\ライブ素材_テロップ付き_$(Get-Date -Format MMdd).mp4"
 $font  = if (Test-Path "C:\Windows\Fonts\YuGothB.ttc") { "C\:/Windows/Fonts/YuGothB.ttc" } else { "C\:/Windows/Fonts/meiryob.ttc" }
 $utf8  = New-Object Text.UTF8Encoding $false
 "使う音: $Audio"
-
 $times = @(@(2,15), @(14,27), @(26,39))
 $texts = @($T1, $T2, $T3)
 $parts = @()
@@ -68,21 +66,14 @@ for ($i=0; $i -lt 3; $i++) {
   $tfp = ($tf -replace '\\','/') -replace ':','\:'
   $s = $times[$i][0]; $e = $times[$i][1]
   $alpha = "if(lt(t,$s),0,if(lt(t,$s+1),t-$s,if(lt(t,$e-1),1,if(lt(t,$e),$e-t,0))))"
-  $parts += "drawtext=fontfile='$font':textfile='$tfp':fontsize=72:fontcolor=0xF5D78E:line_spacing=28:shadowcolor=black@0.8:shadowx=4:shadowy=4:x=(w-text_w)/2:y=(h-text_h)/2:alpha='$alpha'"
+  $parts += "drawtext=fontfile='$font':textfile='$tfp':fontsize=$($Size):fontcolor=0xF5D78E:line_spacing=$([int]($Size*0.4)):shadowcolor=black@0.8:shadowx=5:shadowy=5:x=(w-text_w)/2:y=(h-text_h)/2:alpha='$alpha'"
 }
 $fcFile = Join-Path $env:TEMP "telop_filter.txt"
-[IO.File]::WriteAllText($fcFile, "[0:v]" + ($parts -join ",") + "[v]", $utf8)
-
-"テロップを入れています..."
-ffmpeg -hide_banner -loglevel error -stats -y -i $Seg -/filter_complex $fcFile -map "[v]" `
-  -c:v libx264 -preset veryfast -crf 23 -r 24 -pix_fmt yuv420p $SegT
-
-$list = Join-Path $env:TEMP "telop_list.txt"
-$lines = @("file '$SegT'") + (1..12 | ForEach-Object { "file '$Seg'" })
-[IO.File]::WriteAllLines($list, $lines, $utf8)
-"3時間にして音をのせます..."
-ffmpeg -hide_banner -loglevel error -stats -y -f concat -safe 0 -i $list -i $Audio `
-  -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -t 10800 $Out
+[IO.File]::WriteAllText($fcFile, "[0:v]" + ($parts -join ",") + ",format=yuv420p[v]", $utf8)
+"テロップを入れて3時間に仕上げます...（30分くらい）"
+ffmpeg -hide_banner -loglevel error -stats -y -stream_loop -1 -i $Seg -i $Audio -/filter_complex $fcFile `
+  -map "[v]" -map 1:a -c:v libx264 -preset veryfast -tune stillimage -crf 23 -r 24 -profile:v high -level 4.1 `
+  -c:a aac -b:a 192k -t 10800 -movflags +faststart $Out
 "できました: $Out"
 Read-Host "Enterで閉じます"
 '@ | Out-File "$T\ライブ3_テロップと仕上げ.ps1" -Encoding utf8
