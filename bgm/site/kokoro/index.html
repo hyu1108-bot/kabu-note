@@ -44,6 +44,16 @@ p{margin:0}
 .word{background:#0f1838;border:1px solid var(--gold);border-radius:16px;padding:32px 20px;text-align:center;font-family:var(--display);font-weight:800;font-size:26px;line-height:1.7;color:var(--gold2);text-wrap:balance}
 .act{border-left:3px solid var(--gold);padding-left:14px}
 .row{display:flex;gap:10px;flex-wrap:wrap}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mbtn{font:inherit;font-weight:700;font-size:16px;color:var(--fg);background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:16px 10px;cursor:pointer;text-align:center}
+.mbtn small{display:block;font-weight:400;font-size:12px;color:var(--mute);margin-top:4px}
+.mbtn[aria-pressed="true"]{border-color:var(--gold);background:#1c2856;color:var(--gold)}
+details.more{border-top:1px solid var(--line);padding-top:12px}
+details.more summary{cursor:pointer;color:var(--gold);font-size:14px;list-style:none;text-align:center}
+details.more summary::after{content:" ▼";font-size:11px}details.more[open] summary::after{content:" ▲"}
+details.more[open]>*:not(summary){margin-top:10px}
+details.next{display:block}
+
 .btn{font:inherit;cursor:pointer;background:var(--gold);color:#1a1630;border:0;border-radius:999px;padding:12px 22px;font-weight:700}
 a.btn{text-decoration:none;display:inline-block}
 .btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
@@ -143,7 +153,7 @@ textarea{font:inherit;width:100%;box-sizing:border-box;min-height:80px;backgroun
   <header>
     <div class="eyebrow">宇宙銀行｜心の窓口</div>
     <h1>心のブロック診断</h1>
-    <p class="lead">テーマを選んで、いま心の中でよく言っている言葉をひとつ選んでください。その奥にある思いと、好転させるひと言が出ます。</p>
+    <p class="lead">よく言っている口ぐせをリストから選ぶか、思い浮かんだ言葉を書いてください。その奥にある思いと、好転させるひと言が出ます。</p>
   <div id="kinHead"></div>
   </header>
 
@@ -307,11 +317,14 @@ const GROUPS=[
  {name:"夢・仕事",icon:"🌱",col:"#8fd3a8",cats:["仕事・働き方","一発逆転・夢","人生・自分"]},
  {name:"人とのつながり",icon:"🤝",col:"#f2a7b8",cats:["受け取り・人間関係","家族・育ち","恋愛・パートナー"]},
  {name:"こころ・からだ",icon:"🌿",col:"#9cc7f0",cats:["こころ・からだ"]}];
-let cat="借金・支払い";
+let cat="借金・支払い",mode=null;
 function drawPick(){
-  pick.innerHTML=`<div class="find"><label class="label" for="fq">✍️ 思い浮かんだ言葉から探す</label><textarea id="fq" rows="2" placeholder="例：ちゃんとして／どうしてそんなこともわからないの"></textarea><button class="btn" id="fgo">奥の思いを探す</button><div id="fres"></div></div>`+GROUPS.map(g=>`<div class="grp" style="--gc:${g.col}"><div class="gh"><span class="gi">${g.icon}</span>${g.name}</div><div class="chips">${g.cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}</div></div>`).join("")+`<div class="gsel">「${cat}」の口ぐせ</div>`;
+  const mb=`<div class="mode"><button class="mbtn" data-m="list" aria-pressed="${mode==="list"}">📋 リストから選ぶ<small>よくある口ぐせ120個</small></button><button class="mbtn" data-m="write" aria-pressed="${mode==="write"}">✍️ 自分の言葉を書く<small>思い浮かんだ言葉から探す</small></button></div>`;
+  pick.innerHTML=mb+(mode==="write"?`<div class="find"><label class="label" for="fq">思い浮かんだ言葉を、そのまま書いてください</label><textarea id="fq" rows="2" placeholder="例：ちゃんとして／どうしてそんなこともわからないの"></textarea><button class="btn" id="fgo">奥の思いを探す</button><div id="fres"></div></div>`:"")+(mode==="list"?GROUPS.map(g=>`<div class="grp" style="--gc:${g.col}"><div class="gh"><span class="gi">${g.icon}</span>${g.name}</div><div class="chips">${g.cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("")}</div></div>`).join("")+`<div class="gsel">「${cat}」の口ぐせ</div>`:"");
+  pick.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=mode===b.dataset.m?null:b.dataset.m;drawPick();if(mode==="write")document.getElementById("fq").focus()});
   pick.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawPick();const g=pick.querySelector(".gsel");g.classList.add("flash");g.scrollIntoView({behavior:"smooth",block:"start"})});
-  document.getElementById("fgo").onclick=findWord;
+  if(mode==="write")document.getElementById("fgo").onclick=findWord;
+  if(mode!=="list")return;
   ITEMS.forEach((it,n)=>{if(it[0]!==cat)return;const b=document.createElement("button");b.className="opt";b.textContent="「"+it[1]+"」";b.onclick=()=>show(n);pick.appendChild(b)})}
 
 function bg(t){t=t.replace(/[「」『』、。！？!?\s・（）()〜ー…]/g,"");const S=new Set(),X=new Set(["ない","ないと","いと","して","しな","なさ","さい","する","てる","って","ても","たい","です","ます","から","のは","がな","いの","けな","いけ"]);for(let i=0;i<t.length-1;i++){const g=t.slice(i,i+2);if(!X.has(g))S.add(g)}if(t.length===1)S.add(t);return S}
@@ -363,13 +376,14 @@ function show(n){
    <div class="step act"><span class="label">今日ひとつだけ</span><p>${a}</p></div>
    <div class="step"><label class="label" for="memo">メモ（なくてもOK）</label><textarea id="memo" placeholder="例：今日はポイントで500円分受け取れた"></textarea></div>
    <button class="btn chal-start" id="startc">✦ この言葉で7日間チャレンジ</button>
-   <div class="row"><button class="btn" id="save">記録に残す</button><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">💬 LINEのKeepメモに送る</button><button class="btn ghost" id="copy">言葉をコピー</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>
-   <p class="note">💬 LINEが開いたら、送り先で「Keepメモ」を選ぶと、自分だけに残せます。</p>
-   <div class="next"><div class="next-label">— この扉の先へ —</div>
+   <div class="row"><button class="btn" id="save">記録に残す</button><button class="btn ghost" id="back">ほかの言葉を選ぶ</button></div>
+   <details class="more"><summary>ほかの残し方</summary><div class="row"><a class="btn ghost" id="cal" target="_blank" rel="noopener">📅 TODOをカレンダーに</a><button class="btn ghost" id="share">💬 LINEのKeepメモに送る</button><button class="btn ghost" id="copy">言葉をコピー</button></div>
+   <p class="note">💬 LINEが開いたら、送り先で「Keepメモ」を選ぶと、自分だけに残せます。</p></details>
+   <details class="more next"><summary>この扉の先へ</summary>
      <a class="next-link" href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ/streams" target="_blank" rel="noopener">🌙 YouTube「宇宙銀行」で、この言葉と一緒に眠る<small>月・土 18時〜朝までライブ配信中。チャットにリアルタイムで書き込めます</small></a>
      <a class="next-link" href="https://www.amazon.co.jp/dp/B0HMFF1SBT" target="_blank" rel="noopener">📔 この言葉を、1週間ずつ手帳に書いていく<small>『お金のブロックを書きかえる手帳』（日付なし）</small></a>
      <a class="next-link" href="https://www.amazon.co.jp/dp/B0HL5NG47P" target="_blank" rel="noopener">📖 不安をほどくワークを続ける<small>ワーク帳『残高を見るのが怖いあなたへ』（紙の本）</small></a>
-</div>
+</details>
    <div class="help"><b>つらさが続くときは、ひとりで抱えずに</b><p>お金の相談は「法テラス」、こころの相談は「まもろうよ こころ」で検索を（どちらも無料）。</p></div>`;
   document.getElementById("copy").onclick=e=>{navigator.clipboard.writeText(w).then(()=>e.target.textContent="コピーしました",()=>getSelection().selectAllChildren(document.getElementById("word")))};
   document.getElementById("voice").onclick=()=>kinVoice(w);
