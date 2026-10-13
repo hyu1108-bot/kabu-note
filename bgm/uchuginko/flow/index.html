@@ -236,7 +236,7 @@
   <!-- スタート -->
   <section class="panel" id="start">
     <h1>宇宙銀行｜幸福フローゲーム</h1>
-    <p class="lead">不安のラットレースを抜け出して<br>「幸福の国」へ向かう、12週間のすごろく</p>
+    <p class="lead">不安のぐるぐるを抜け出して<br>「幸福の国」へ向かう、12週間のすごろく</p>
     <img class="hero-img" src="img/img_183.jpg" alt="水面に輝くダイヤモンド">
     <div class="rules">
       <b>あそびかた</b><br>
@@ -818,7 +818,7 @@ function finishGame(escaped) {
     $('end-title').textContent = full
       ? "健康・夢・人間関係・お金、4つとも満たして幸福の国へ🌕"
       : "第" + weeks + "週で、幸福の国へたどり着きました✨";
-    $('end-msg').innerHTML = "幸福収入が不安コストを超えて、不安のラットレースを抜け出しました。<br>手に入れた幸せと、窓口でのひとつひとつの用事が、あなたの毎日を支えています。";
+    $('end-msg').innerHTML = "幸福収入が不安コストを超えて、不安のぐるぐるを抜け出しました。<br>手に入れた幸せと、窓口でのひとつひとつの用事が、あなたの毎日を支えています。";
     if (!best || weeks < best) save("uchu_best_" + dateKey, weeks);
     $('end-img').src = "img/img_183.jpg";
   } else {
