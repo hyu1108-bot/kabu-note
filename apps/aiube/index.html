@@ -91,7 +91,7 @@ rt{font-size:.45em;font-weight:normal}
 
 <!-- メニュー -->
 <section class="screen on" id="home">
-  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v10</small></h1>
+  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v11</small></h1>
   <p class="mid" id="date"></p>
   <div class="menu" id="menu"></div>
   <button id="gameBtn" style="background:#ff9f1c"></button>
@@ -292,10 +292,15 @@ function renderHome(){
   const left=ACTS.filter(a=>!t.done.includes(a.id)).length;
   $("gameBtn").textContent=left?`🔒 ごほうび ゲーム（あと ${left}こ）`:"🎮 ごほうび ゲームで あそぶ！";
   $("gameBtn").style.background=left?"#c9bfae":"#ff9f1c";
-  $("gameBtn").onclick=()=>{if(left)say(`あと ${left}こ がんばろう`);else show("gameSel")};
+  $("gameBtn").onclick=()=>{if(gbLong){gbLong=false;return}if(left)say(`あと ${left}こ がんばろう`);else show("gameSel")};
   show("home");
 }
 $("homeBtn").onclick=renderHome;
+// おうちのひと用：ロックのボタンを 3びょう ながおしで ゲームを ためせる
+let gbTimer=null,gbLong=false;
+$("gameBtn").addEventListener("pointerdown",()=>{gbTimer=setTimeout(()=>{gbLong=true;say("おうちのひと モード");show("gameSel")},3000)});
+["pointerup","pointerleave","pointercancel"].forEach(ev=>$("gameBtn").addEventListener(ev,()=>clearTimeout(gbTimer)));
+$("gameBtn").addEventListener("contextmenu",e=>e.preventDefault());
 
 function complete(id,msg){
   const data=load(),k=key(new Date());
@@ -746,6 +751,6 @@ new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList
 rubyfy(document.body);
 renderHome();
 </script>
-<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 10 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
+<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 11 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
 </body>
 </html>
