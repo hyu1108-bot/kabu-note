@@ -91,7 +91,7 @@ rt{font-size:.45em;font-weight:normal}
 
 <!-- メニュー -->
 <section class="screen on" id="home">
-  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v11</small></h1>
+  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v13</small></h1>
   <p class="mid" id="date"></p>
   <div class="menu" id="menu"></div>
   <button id="gameBtn" style="background:#ff9f1c"></button>
@@ -636,15 +636,18 @@ const LINES=[
 ];
 const SB_GAP=400; // えきと えきの きょり(m)
 let sb=null;
+const SB_RUN=45,SB_DWELL=15; // えきかんの じかん・とまる じかん（びょう）
+const sbArr=i=>sb.T0+i*(SB_RUN+SB_DWELL), sbDep=i=>sbArr(i)+SB_DWELL;
+const hms=t=>{t=Math.max(0,Math.floor(t));return `${Math.floor(t/3600)}:${String(Math.floor(t/60)%60).padStart(2,"0")}:${String(t%60).padStart(2,"0")}`};
 $("gSub").onclick=()=>{show("subSel");const m=$("subLines");m.innerHTML="";
   LINES.forEach(L=>{const b=document.createElement("button");b.innerHTML=`<span class="ic" style="display:inline-block;width:30px;height:30px;border-radius:50%;background:${L.c}"></span>${L.k}（${L.n}）<small style="margin-left:auto;font-size:14px">${L.st[0]} → ${L.st[L.st.length-1]}</small>`;b.onclick=()=>sbStart(L);m.appendChild(b)})};
 function sbStart(L){
-  show("sub");sb={L,i:0,pos:0,v:0,power:false,brake:false,state:"stop",score:[],t:0,last:0};
-  sbHeadSet();$("sbMsg").textContent=`${L.st[0]}えき。「すすむ」で しゅっぱつ！`;$("sbDoor").style.display="none";
+  show("sub");const T0=10*3600+rnd(0,5)*600;sb={L,i:0,pos:0,v:0,power:false,brake:false,state:"stop",score:[],t:0,last:0,clock:T0,T0,late:[]};
+  sbHeadSet();$("sbMsg").textContent=`${L.st[0]}えき ${hms(sb.T0)} はつ。じかんに なったら「すすむ」！`;$("sbDoor").style.display="none";
   say(`${L.y[0]}から、${L.y[L.y.length-1]}ゆき、しゅっぱつします`);
   sb.last=performance.now();trRaf=requestAnimationFrame(sbLoop);
 }
-function sbHeadSet(){const L=sb.L,nx=sb.i+1;$("sbHead").innerHTML=`<span style="color:${L.c}">●</span> ${L.k}　つぎは <b>${L.st[nx]||"しゅうてん"}</b>`}
+function sbHeadSet(){const L=sb.L,nx=sb.i+1;$("sbHead").innerHTML=`<span style="color:${L.c}">●</span> ${L.k}　つぎは <b>${L.st[nx]||"しゅうてん"}</b>`+(L.st[nx]?`<br><span style="color:#e5333f;font-size:17px">${hms(sbArr(nx))} ちゃく よてい</span>`:"")}
 const hold=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();if(sb)sb[k]=true},off=()=>{if(sb)sb[k]=false};
   b.addEventListener("pointerdown",on);b.addEventListener("pointerup",off);b.addEventListener("pointerleave",off);b.addEventListener("pointercancel",off)};
 hold("sbPower","power");hold("sbBrake","brake");
@@ -653,8 +656,9 @@ $("sbDoor").onclick=()=>{if(!sb)return;$("sbDoor").style.display="none";
   if(sb.i>=L.st.length-1){later(()=>sbEnd(),2500)}
 };
 function sbLoop(now){
-  if(!sb)return;const dt=Math.min(.05,(now-sb.last)/1000);sb.last=now;const L=sb.L;
-  if(sb.state==="run"||sb.state==="stop"&&sb.power&&!sb.brake&&sb.i<L.st.length-1){
+  if(!sb)return;const dt=Math.min(.05,(now-sb.last)/1000);sb.last=now;const L=sb.L;if(sb.state!=="end")sb.clock+=dt;
+  if(sb.state==="stop"&&sb.power&&sb.clock<sbDep(sb.i)-1){if(!sb.wait){sb.wait=true;$("sbMsg").textContent=`まだ はっしゃ じかんじゃ ないよ（${hms(sbDep(sb.i))} はつ）`}}
+  else if(sb.state==="run"||sb.state==="stop"&&sb.power&&!sb.brake&&sb.i<L.st.length-1){sb.wait=false;
     if(sb.state==="stop"){sb.state="run";$("sbMsg").textContent="しゅっぱつ しんこう！";}
     let a=-0.15; if(sb.power&&!sb.brake)a=1.0; if(sb.brake)a=-1.6;
     sb.v=Math.max(0,Math.min(70/3.6,sb.v+a*dt));sb.pos+=sb.v*dt;
@@ -665,50 +669,112 @@ function sbLoop(now){
     if(sb.v===0&&sb.state==="run"&&rem<=40){
       const err=Math.abs(rem);sb.i++;sb.ann=false;sb.state="arrived";
       let r=err<1?"🌟 ぴったり！":err<4?"⭕ じょうず！":err<12?"🙂 おしい！":rem<0?"💦 いきすぎ…":"💦 てまえ すぎ…";
-      sb.score.push(err);$("sbMsg").textContent=`${r}（ずれ ${err.toFixed(1)}m）`;
+      sb.score.push(err);const lt=Math.round(sb.clock-sbArr(sb.i));sb.late.push(lt);
+      const tm=lt<=-6?`⏱ ${-lt}びょう はやい`:lt<=5?"⏰ ていじ（じかん ぴったり）！":`🐢 ${lt}びょう おくれ`;
+      $("sbMsg").innerHTML=`${r}（ずれ ${err.toFixed(1)}m）<br>${tm}`;if(lt<=5&&lt>-6)say("ていじ とうちゃく！");
       sb.pos=target;$("sbDoor").style.display="block";sbHeadSet();
     }
   }
-  if(sb.state==="door"){sb.t+=dt;if(sb.t>2.5&&sb.i<L.st.length-1){sb.state="stop";$("sbMsg").textContent="ドアが しまります。「すすむ」で しゅっぱつ！"}}
+  if(sb.state==="door"){sb.t+=dt;if(sb.t>2.5&&sb.i<L.st.length-1&&sb.clock>=sbDep(sb.i)-3){sb.state="stop";$("sbMsg").textContent="ドアが しまります。「すすむ」で しゅっぱつ！";say("ドアが しまります")}}
   sbDraw();trRaf=requestAnimationFrame(sbLoop);
 }
 function sbDraw(){
-  const c=$("sbCv"),g=c.getContext("2d"),W=720,H=540,L=sb.L,vx=W/2,vy=210;
-  g.fillStyle="#111";g.fillRect(0,0,W,H);
-  // トンネル
-  const grd=g.createRadialGradient(vx,vy,5,vx,vy,420);grd.addColorStop(0,"#000");grd.addColorStop(1,"#3a3a3a");g.fillStyle=grd;g.fillRect(0,0,W,380);
-  const target=(sb.i+(sb.state==="run"||sb.state==="stop"?1:0))*SB_GAP;
-  const rem=target-sb.pos;
-  const proj=z=>{const k=60/(z+60);return k};
-  // レール
-  g.strokeStyle="#777";g.lineWidth=3;[[-.6],[.6]].forEach(([x])=>{g.beginPath();g.moveTo(vx+x*10,vy+8);g.lineTo(vx+x*700,380);g.stroke()});
-  // まくらぎ・ライト
-  for(let k=0;k<26;k++){const z=((k*12-(sb.pos%12))+12)%312;const s=proj(z);const y=vy+170*s+8;
-    g.strokeStyle=`rgba(120,90,60,${.3+s*.7})`;g.lineWidth=2+6*s;g.beginPath();g.moveTo(vx-560*s,y);g.lineTo(vx+560*s,y);g.stroke();}
-  for(let k=0;k<14;k++){const z=((k*25-(sb.pos%25))+25)%350;const s=proj(z);g.fillStyle=`rgba(255,240,180,${.25+s})`;
-    g.beginPath();g.arc(vx-420*s,vy-150*s,2+8*s,0,7);g.arc(vx+420*s,vy-150*s,2+8*s,0,7);g.fill()}
-  // ホーム
-  const pz0=rem-60,pz1=rem+60;
-  if(pz1>0&&pz0<400){const s0=proj(Math.max(0,pz0)),s1=proj(Math.max(0,pz1));
-    g.fillStyle="#cfcfcf";g.beginPath();g.moveTo(vx-560*s0,vy+170*s0);g.lineTo(vx-560*s1,vy+170*s1);g.lineTo(vx-560*s1,vy+100*s1);g.lineTo(vx-560*s0,vy+100*s0);g.fill();
-    g.fillStyle=L.c;g.fillRect(vx-560*s0,vy-150*s0,(560*s0-560*s1)+1,24*s0+2);
-    const ss=proj(Math.max(0,rem-20));g.fillStyle="#fff";g.fillRect(vx-300*ss,vy-120*ss,600*ss,90*ss);g.strokeStyle=L.c;g.lineWidth=6*ss+1;g.strokeRect(vx-300*ss,vy-120*ss,600*ss,90*ss);
-    g.fillStyle="#222";g.font=`bold ${Math.max(8,52*ss)}px sans-serif`;g.textAlign="center";g.textBaseline="middle";g.fillText(L.st[sb.i+(sb.state==="run"||sb.state==="stop"?1:0)]||"",vx,vy-75*ss);
-    const sm=proj(Math.max(0,rem));if(rem>-5){g.strokeStyle="#ff3030";g.lineWidth=3+5*sm;g.beginPath();g.moveTo(vx-560*sm,vy+170*sm+8);g.lineTo(vx+560*sm,vy+170*sm+8);g.stroke()}
+  const c=$("sbCv"),g=c.getContext("2d"),W=720,H=540,L=sb.L;
+  const moving=sb.state==="run"||sb.state==="stop";
+  const nextI=sb.i+(moving?1:0),target=nextI*SB_GAP,rem=target-sb.pos;
+  const vy=200,cvx=70*Math.sin(sb.pos/260);            // カーブ
+  const S=z=>60/(Math.max(0,z)+60);
+  const X=(x,z)=>{const k=S(z);return W/2+x*k+cvx*(1-k)*(1-k)}, Y=(y,z)=>vy+y*S(z);
+  const inSt=rem<70&&rem>-70;                            // えきの なか
+  // トンネル（かべ・てんじょう・ゆか）
+  const zf=900;
+  const quad=(pts,col)=>{g.fillStyle=col;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill()};
+  const wall=inSt?"#d9d4c8":"#6b7078",wallFar="#25282d";
+  let gr=g.createLinearGradient(0,0,W/2,0);gr.addColorStop(0,wall);gr.addColorStop(1,wallFar);
+  quad([[X(-560,0),Y(-170,0)],[X(-560,zf),Y(-170,zf)],[X(-560,zf),Y(170,zf)],[X(-560,0),Y(170,0)]],gr);
+  gr=g.createLinearGradient(W,0,W/2,0);gr.addColorStop(0,wall);gr.addColorStop(1,wallFar);
+  quad([[X(560,0),Y(-170,0)],[X(560,zf),Y(-170,zf)],[X(560,zf),Y(170,zf)],[X(560,0),Y(170,0)]],gr);
+  gr=g.createLinearGradient(0,0,0,vy);gr.addColorStop(0,inSt?"#f4f1ea":"#565b63");gr.addColorStop(1,"#1d1f23");
+  quad([[X(-560,0),Y(-170,0)],[X(560,0),Y(-170,0)],[X(560,zf),Y(-170,zf)],[X(-560,zf),Y(-170,zf)]],gr);
+  gr=g.createLinearGradient(0,H,0,vy);gr.addColorStop(0,"#4a4540");gr.addColorStop(1,"#1d1f23");
+  quad([[X(-560,0),Y(170,0)],[X(560,0),Y(170,0)],[X(560,zf),Y(170,zf)],[X(-560,zf),Y(170,zf)]],gr);
+  g.fillStyle="#000";g.beginPath();g.arc(X(0,zf),Y(0,zf),10,0,7);g.fill();
+  // せんの いろの ライン
+  g.strokeStyle=L.c;g.lineWidth=6;[-560,560].forEach(x=>{g.beginPath();for(let z=0;z<=zf;z+=30){const px=X(x,z),py=Y(-30,z);z?g.lineTo(px,py):g.moveTo(px,py)}g.stroke()});
+  // まくらぎ・レール（2せん）
+  for(let k=0;k<40;k++){const z=((k*8-(sb.pos%8))+8)%320;const t=S(z);g.strokeStyle=`rgba(150,120,90,${.2+t*.8})`;g.lineWidth=1+7*t;
+    g.beginPath();g.moveTo(X(-330,z),Y(170,z));g.lineTo(X(-30,z),Y(170,z));g.moveTo(X(30,z),Y(170,z));g.lineTo(X(330,z),Y(170,z));g.stroke()}
+  g.strokeStyle="#c9ccd1";g.lineWidth=3;[-260,-100,100,260].forEach(x=>{g.beginPath();for(let z=0;z<=zf;z+=20){const px=X(x,z),py=Y(170,z);z?g.lineTo(px,py):g.moveTo(px,py)}g.stroke()});
+  // てんじょうの ライト
+  for(let k=0;k<16;k++){const z=((k*20-(sb.pos%20))+20)%320;const t=S(z);g.fillStyle=`rgba(255,244,200,${.3+t*.7})`;
+    g.fillRect(X(-380,z)-30*t,Y(-165,z),60*t+1,8*t+1);g.fillRect(X(380,z)-30*t,Y(-165,z),60*t+1,8*t+1)}
+  // しんごう・きょりの かんばん
+  for(let k=0;k<4;k++){const z=((k*100-(sb.pos%100))+100)%400;const t=S(z),x=X(-520,z),y=Y(20,z);
+    g.fillStyle="#111";g.fillRect(x-8*t,y-40*t,16*t+1,48*t+1);g.fillStyle=rem<150&&moving?"#ffb400":"#2bff6a";
+    g.beginPath();g.arc(x,y-28*t,5*t+1,0,7);g.fill();
+    const zm=((k*100+50-(sb.pos%100))+100)%400,tm=S(zm);g.fillStyle="#fff";g.fillRect(X(520,zm)-14*tm,Y(0,zm)-10*tm,28*tm+1,20*tm+1);
+    g.fillStyle="#222";g.font=`bold ${Math.max(6,16*tm)}px sans-serif`;g.textAlign="center";g.textBaseline="middle";
+    g.fillText(Math.floor((sb.pos+zm)/100)%10,X(520,zm),Y(0,zm))}
+  // むこうから くる でんしゃ
+  const oz=(sb.oz=(sb.oz??700)-(sb.v+14)*0.04);if(sb.oz<-40)sb.oz=900+Math.random()*900;
+  if(oz>0&&oz<800){const t=S(oz);g.fillStyle="#9aa3ad";g.fillRect(X(30,oz),Y(-130,oz),X(330,oz)-X(30,oz),Y(170,oz)-Y(-130,oz));
+    g.fillStyle=L.c;g.fillRect(X(30,oz),Y(40,oz),X(330,oz)-X(30,oz),18*t+1);
+    g.fillStyle="#1b2a3a";g.fillRect(X(60,oz),Y(-100,oz),X(300,oz)-X(60,oz),Y(10,oz)-Y(-100,oz));
+    g.fillStyle="#fffbd0";g.beginPath();g.arc(X(80,oz),Y(110,oz),10*t+1,0,7);g.arc(X(280,oz),Y(110,oz),10*t+1,0,7);g.fill()}
+  // えきの ホーム
+  const p0=rem-90,p1=rem+70;
+  if(p1>0&&p0<900){const a0=Math.max(0,p0);
+    quad([[X(-560,a0),Y(70,a0)],[X(-560,p1),Y(70,p1)],[X(-340,p1),Y(70,p1)],[X(-340,a0),Y(70,a0)]],"#e8e3d6");
+    quad([[X(-340,a0),Y(70,a0)],[X(-340,p1),Y(70,p1)],[X(-340,p1),Y(170,p1)],[X(-340,a0),Y(170,a0)]],"#8d877a");
+    g.strokeStyle="#ffd400";g.lineWidth=4*S(a0)+1;g.beginPath();g.moveTo(X(-370,a0),Y(70,a0));g.lineTo(X(-370,p1),Y(70,p1));g.stroke();
+    // ホームドア
+    for(let z=Math.ceil(a0/12)*12;z<p1;z+=12){const t=S(z);g.fillStyle="rgba(200,230,255,.55)";g.fillRect(X(-350,z),Y(-10,z),6*t+1,Y(70,z)-Y(-10,z))}
+    // ひと
+    const ppl=["🧑","👩","👴","👧","🧑‍💼","👨"];g.textAlign="center";g.textBaseline="bottom";
+    for(let k=0;k<6;k++){const z=p0+18+k*24;if(z<=0||z>p1)continue;const t=S(z);g.font=`${Math.max(6,90*t)}px sans-serif`;g.fillText(ppl[k],X(-470,z),Y(70,z))}
+    // えきめいの かんばん
+    const zs=Math.max(0,rem-30),t=S(zs);g.fillStyle="#fff";const sx=X(-150,zs),sy=Y(-150,zs),sw=X(150,zs)-sx,sh=70*t+2;
+    g.fillRect(sx,sy,sw,sh);g.fillStyle=L.c;g.fillRect(sx,sy+sh-10*t,sw,10*t+1);
+    g.fillStyle="#222";g.font=`bold ${Math.max(6,40*t)}px sans-serif`;g.textBaseline="middle";g.fillText(L.st[nextI]||"",sx+sw/2,sy+sh*.42);
+    // ていしせん
+    if(moving&&rem>-5){g.strokeStyle="#ff2a2a";g.lineWidth=3+6*S(rem);g.beginPath();g.moveTo(X(-330,rem),Y(170,rem));g.lineTo(X(330,rem),Y(170,rem));g.stroke();
+      g.fillStyle="#ff2a2a";g.font=`bold ${Math.max(6,30*S(rem))}px sans-serif`;g.fillText("ていし",X(0,rem),Y(130,rem))}
   }
-  // うんてんだい
-  g.fillStyle="#2b2f38";g.fillRect(0,380,W,160);g.fillStyle=L.c;g.fillRect(0,380,W,10);
-  const kmh=sb.v*3.6;g.fillStyle="#000";g.beginPath();g.arc(150,470,62,0,7);g.fill();
-  g.strokeStyle="#ffd84a";g.lineWidth=6;g.beginPath();g.arc(150,470,52,Math.PI*.75,Math.PI*(.75+1.5*kmh/80));g.stroke();
-  g.fillStyle="#fff";g.font="bold 34px sans-serif";g.textAlign="center";g.fillText(Math.round(kmh),150,470);g.font="16px sans-serif";g.fillText("km/h",150,500);
-  g.textAlign="left";g.font="bold 24px sans-serif";g.fillStyle="#fff";
-  const d=Math.max(0,rem);g.fillText(sb.state==="run"||sb.state==="stop"?`あと ${Math.round(d)} m`:"とうちゃく",270,440);
-  g.fillStyle="#555";g.fillRect(270,465,400,22);g.fillStyle=L.c;g.fillRect(270,465,400*Math.min(1,1-d/SB_GAP),22);
-  g.fillStyle=sb.power&&!sb.brake?"#3cc47c":"#555";g.fillRect(270,500,120,22);g.fillStyle=sb.brake?"#ff5b5b":"#555";g.fillRect(400,500,120,22);
-  g.fillStyle="#fff";g.font="16px sans-serif";g.fillText("すすむ",300,517);g.fillText("ブレーキ",425,517);
+  // ===== うんてんせき =====
+  // まどわく
+  g.fillStyle="#1a1d22";g.beginPath();g.rect(0,0,W,H);g.roundRect(26,52,W-52,312,26);g.fill("evenodd");
+  g.fillStyle="#2e333b";g.fillRect(0,0,W,46);
+  g.fillStyle="#000";g.fillRect(168,8,384,32);g.fillStyle="#ff9a2a";g.font="bold 18px sans-serif";g.textAlign="center";g.textBaseline="middle";
+  g.fillText(moving?`つぎは ${L.st[nextI]||"しゅうてん"} ${hms(sbArr(nextI))}ちゃく`:`${L.st[sb.i]}  ${sb.i<L.st.length-1?hms(sbDep(sb.i))+"はつ":"しゅうてん"}`,W/2,25);
+  // とけい・のこり じかん
+  g.fillStyle="#000";g.fillRect(560,8,150,32);g.fillStyle="#7dff8a";g.font="bold 20px monospace";g.fillText(hms(sb.clock),635,25);
+  if(moving&&L.st[nextI]){const left=Math.round(sbArr(nextI)-sb.clock);g.fillStyle="#000";g.fillRect(10,8,150,32);g.fillStyle=left<0?"#ff5b5b":left<10?"#ffb400":"#7dff8a";g.font="bold 18px sans-serif";g.fillText(left>=0?`あと ${left}びょう`:`${-left}びょう おくれ`,85,25)}
+  g.fillStyle=L.c;g.fillRect(0,40,W,6);
+  // ダッシュボード
+  gr=g.createLinearGradient(0,370,0,H);gr.addColorStop(0,"#3a404a");gr.addColorStop(1,"#15181c");g.fillStyle=gr;
+  g.beginPath();g.moveTo(0,382);g.quadraticCurveTo(W/2,350,W,382);g.lineTo(W,H);g.lineTo(0,H);g.fill();
+  g.fillStyle=L.c;g.fillRect(0,H-8,W,8);
+  // そくどけい
+  const kmh=sb.v*3.6,gx=130,gy=462,R=62;
+  g.fillStyle="#0b0d10";g.beginPath();g.arc(gx,gy,R+8,0,7);g.fill();g.strokeStyle="#9aa";g.lineWidth=3;g.stroke();
+  for(let k=0;k<=8;k++){const an=Math.PI*(.75+1.5*k/8);g.strokeStyle="#ccd";g.lineWidth=k%2?2:4;g.beginPath();g.moveTo(gx+Math.cos(an)*(R-12),gy+Math.sin(an)*(R-12));g.lineTo(gx+Math.cos(an)*R,gy+Math.sin(an)*R);g.stroke();
+    if(k%2===0){g.fillStyle="#ccd";g.font="12px sans-serif";g.fillText(k*10,gx+Math.cos(an)*(R-24),gy+Math.sin(an)*(R-24))}}
+  const na=Math.PI*(.75+1.5*Math.min(80,kmh)/80);g.strokeStyle="#ff4040";g.lineWidth=4;g.beginPath();g.moveTo(gx,gy);g.lineTo(gx+Math.cos(na)*(R-6),gy+Math.sin(na)*(R-6));g.stroke();
+  g.fillStyle="#fff";g.beginPath();g.arc(gx,gy,5,0,7);g.fill();g.font="bold 22px sans-serif";g.fillText(Math.round(kmh),gx,gy+30);
+  // マスコン（レバー）
+  const mx=600,my=410;g.fillStyle="#0b0d10";g.fillRect(mx-22,my,44,110);
+  g.font="bold 14px sans-serif";g.fillStyle="#3cc47c";g.fillText("すすむ",mx-62,my+14);g.fillStyle="#bbb";g.fillText("N",mx-50,my+55);g.fillStyle="#ff5b5b";g.fillText("ブレーキ",mx-68,my+98);
+  const ly=sb.brake?my+92:sb.power?my+14:my+54;g.fillStyle="#d0d4da";g.fillRect(mx-34,ly-8,68,16);g.fillStyle="#222";g.beginPath();g.arc(mx+40,ly,13,0,7);g.fill();
+  // のこり きょり
+  const d=Math.max(0,rem);g.textAlign="left";g.fillStyle="#fff";g.font="bold 22px sans-serif";
+  g.fillText(moving?`つぎの えきまで ${Math.round(d)} m`:"とうちゃく！",225,420);
+  g.fillStyle="#0b0d10";g.fillRect(225,440,300,24);g.fillStyle=L.c;g.fillRect(227,442,296*Math.min(1,1-d/SB_GAP),20);
+  g.fillStyle="#fff";g.font="14px sans-serif";g.fillText(`${L.k}  ${sb.i+1}/${L.st.length}えき`,225,490);
+  // ランプ
+  [["ドア",!moving],["ATC",true]].forEach(([t,on],k)=>{g.fillStyle=on?(k?"#2bff6a":"#ffb400"):"#333";g.beginPath();g.arc(420+k*60,500,9,0,7);g.fill();g.fillStyle="#ccd";g.font="12px sans-serif";g.textAlign="center";g.fillText(t,420+k*60,524)});
 }
-function sbEnd(){const n=sb.score.length,good=sb.score.filter(e=>e<4).length;
-  $("sbMsg").innerHTML=`しゅうてん です！ ${n}えき中 ${good}えき じょうずに とまれたよ！<br><button id="sbAgain">もういちど</button>`;
+function sbEnd(){sb.state="end";const n=sb.score.length,good=sb.score.filter(e=>e<4).length,ontime=sb.late.filter(t=>t<=5&&t>-6).length;
+  $("sbMsg").innerHTML=`しゅうてん です！<br>🎯 ぴったり とまれた：${good} / ${n}えき<br>⏰ じかんどおり：${ontime} / ${n}えき<br><button id="sbAgain">もういちど</button>`;
   $("sbAgain").onclick=()=>sbStart(sb.L);say("しゅうてんです。うんてんし さん、おつかれさまでした！")}
 let stS=null,stI=0;
 START.book=()=>{
@@ -751,6 +817,6 @@ new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList
 rubyfy(document.body);
 renderHome();
 </script>
-<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 11 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
+<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 13 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
 </body>
 </html>
