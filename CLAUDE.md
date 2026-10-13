@@ -159,6 +159,11 @@
 - 日曜コピー案：「もう残高を見るのが怖くなくなる」
 - 金曜コピー案：「運がないと思っていた人ほど、再生してください」
 
+### 2026-10-13 「眠るときに、いちばん心地いい音」
+- いちばん多かったのは「「チャリン」と鳴る、お金のような音」（票数は未記録）
+- → SUNOのプロンプトで「チャリン」を強めた版を試す：`ambient, soft gentle harp melody, gentle sparkling coin chimes as a main feature, clear high golden chime tones, subtle music box accents, soft crystal wind chimes, warm soft pads, tender, soothing, gentle, warm, hopeful, very slow, sleep, no piano, no guitar, no flute, no drums, instrumental`（うるさく感じたら元のプロンプトに戻す）
+- 視聴者は「眠るときに流す」人が多い（本人の実感）。アンケートは聴くだけの人も押せるよう「聴くだけの方も、タップひとつで大丈夫です」を添える
+
 ## 出版
 - Kindle本『残高を見るのが怖いあなたへ　お金の不安をほどく12週間の宇宙銀行ワーク帳』（著者：ヒュー）：2026-09-27 Kindle版の出版完了。**ペーパーバックも発売済み（¥1,408）**。Kindle版：https://www.amazon.co.jp/dp/B0H5SV8JMM ／ ペーパーバック：https://www.amazon.co.jp/dp/B0HL5NG47P 。2つのページはまだ1つにまとまっていない（紐づけ待ち。1週間たってもまとまらなければKDPに問い合わせ）。視聴者は紙に書き込める世代なので、概要欄・Xでは両方のURLを載せる
   - 構成：はじめに（3つの約束：金額は書かない／できない週があっていい／結果は約束しない）→ 第1章 お金の不安の正体 → 第2章 6つの窓口ワーク → 第3章 12週間の記帳 → 不安な夜に読むことば集
