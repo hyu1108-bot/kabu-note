@@ -81,13 +81,17 @@ rt{font-size:.45em;font-weight:normal}
 .a-pop{animation:pop2 .9s ease-out both}
 @keyframes pop2{0%{transform:translate(-50%,-50%) scale(0)}70%{transform:translate(-50%,-50%) scale(1.25)}100%{transform:translate(-50%,-50%) scale(1)}}
 .a-flow{animation:go 6s linear infinite}
+.mirror{position:relative;width:100%;max-width:360px;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#222;border:4px solid #ffc23d;display:none}
+.mirror video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.mirror .lbl{position:absolute;left:8px;top:6px;color:#fff;font-size:14px;text-shadow:0 1px 3px #000}
+.mirBtn{background:#ffc23d;color:#3a2e1f;font-size:18px;padding:10px}
 </style>
 </head>
 <body>
 
 <!-- メニュー -->
 <section class="screen on" id="home">
-  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v8</small></h1>
+  <h1>たろうの れんしゅう <small style="font-size:14px;color:#c0a">v9</small></h1>
   <p class="mid" id="date"></p>
   <div class="menu" id="menu"></div>
   <button id="gameBtn" style="background:#ff9f1c"></button>
@@ -101,12 +105,13 @@ rt{font-size:.45em;font-weight:normal}
 <!-- あいうべ -->
 <section class="screen" id="aiube">
   <h2>あいうべ たいそう</h2>
+  <div class="mirror" data-mir><span class="lbl">🪞 かがみ</span></div><button class="mirBtn" data-mirbtn></button>
   <div class="row" id="aiReps">
     <button data-n="5" class="gray">5かい</button><button data-n="10" class="gray">10かい</button><button data-n="30" class="gray">30かい</button>
   </div>
   <div class="mid" id="aiRep"></div>
   <div class="bar"><i id="aiProg"></i></div>
-  <svg class="face" viewBox="0 0 200 200" id="aiFace"></svg>
+  <svg class="face" viewBox="0 0 200 200" id="aiFace" style="width:150px;height:150px"></svg>
   <div class="big" id="aiKana"></div>
   <p class="mid" id="aiTip"></p>
 </section>
@@ -124,6 +129,7 @@ rt{font-size:.45em;font-weight:normal}
 <!-- はつご -->
 <section class="screen" id="hatsugo">
   <h2>いって みよう</h2>
+  <div class="mirror" data-mir><span class="lbl">🪞 かがみ</span></div><button class="mirBtn" data-mirbtn></button>
   <div class="mid" id="hgRep"></div>
   <div class="bar"><i id="hgProg"></i></div>
   <div class="word" id="hgWord"></div>
@@ -134,6 +140,7 @@ rt{font-size:.45em;font-weight:normal}
 <!-- タイマー系（ニップルトレーナー・どくしょ） -->
 <section class="screen" id="timerAct">
   <h2 id="taTitle"></h2>
+  <div class="mirror" data-mir><span class="lbl">🪞 かがみ</span></div><button class="mirBtn" data-mirbtn></button>
   <div class="big" id="taIcon"></div>
   <p class="mid" id="taTip"></p>
   <div class="row" id="taMins"></div>
@@ -190,6 +197,7 @@ rt{font-size:.45em;font-weight:normal}
     <button id="gTrain"><span class="ic">🚃</span>でんしゃを うごかそう</button>
     <button id="gPost"><span class="ic">🛵</span>ゆうびんやさんで はいたつ</button>
     <button id="gTruck"><span class="ic">🚚</span>たっきゅうびんで はいたつ</button>
+    <button id="gSub"><span class="ic">🚇</span>ちかてつの うんてんし</button>
   </div>
 </section>
 <section class="screen" id="train">
@@ -203,6 +211,23 @@ rt{font-size:.45em;font-weight:normal}
   <div class="q" style="background:#fff;border:3px solid #eedfc0;border-radius:18px;padding:12px;width:100%;text-align:center"><div style="font-size:24px" id="dvOrder"></div></div>
   <div id="dvMap" style="position:relative;width:100%;height:330px;border-radius:20px;overflow:hidden;background:#9fdc7c;border:3px solid #eedfc0"></div>
   <div class="mid" id="dvMsg" style="min-height:34px;font-size:24px;font-weight:bold"></div>
+</section>
+
+<section class="screen" id="subSel">
+  <h2>🚇 なごやの ちかてつ</h2>
+  <p class="mid">どの せんを うんてん する？</p>
+  <div class="menu" id="subLines"></div>
+</section>
+<section class="screen" id="sub">
+  <div class="mid" id="sbHead" style="font-weight:bold"></div>
+  <canvas id="sbCv" width="720" height="540" style="width:100%;max-width:480px;border-radius:16px;background:#000;touch-action:none"></canvas>
+  <div class="mid" id="sbMsg" style="min-height:32px;font-size:22px;font-weight:bold"></div>
+  <div class="row">
+    <button id="sbBrake" style="background:#ff5b5b;font-size:24px;padding:22px 6px">ブレーキ</button>
+    <button id="sbPower" style="background:#3cc47c;font-size:24px;padding:22px 6px">すすむ</button>
+  </div>
+  <button id="sbDoor" style="display:none;background:#4cb8ff">🚪 ドアを あける</button>
+  <p class="mid" style="font-size:15px">「すすむ」を おして はしる。えきが ちかづいたら「ブレーキ」。<br>ていしいちの <b style="color:#ff5b5b">あかい せん</b>で ぴったり とめよう！</p>
 </section>
 
 <!-- できた -->
@@ -235,7 +260,7 @@ function load(){try{return JSON.parse(localStorage.getItem("st-app")||"{}")}catc
 function save(d){try{localStorage.setItem("st-app",JSON.stringify(d))}catch(e){}}
 function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
 function today(){const d=load(),k=key(new Date());return d[k]||{done:[]}}
-function show(id){clearAll();document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));$("homeBtn").style.display=id==="home"?"none":"block";window.scrollTo(0,0)}
+function show(id){clearAll();if(typeof mirShow==="function"){if(MIR_SCREENS.includes(id))setTimeout(()=>mirShow(id),0);else mirStop()}document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));$("homeBtn").style.display=id==="home"?"none":"block";window.scrollTo(0,0)}
 function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1])}
 
 /* ---------- メニュー ---------- */
@@ -300,6 +325,23 @@ const AI=[
  {k:"う",c:"var(--u)",tip:"くちを まえに とがらせて",m:'<circle cx="100" cy="140" r="13" fill="#7a1f1f" stroke="#e05a5a" stroke-width="8"/>'},
  {k:"べ",c:"var(--be)",tip:"べろを したに べーっと",m:'<ellipse cx="100" cy="132" rx="26" ry="12" fill="#7a1f1f"/><path d="M84 132 Q84 182 100 182 Q116 182 116 132 Z" fill="#ff6f8f"/><line x1="100" y1="140" x2="100" y2="170" stroke="#d94a6a" stroke-width="3"/>'}
 ];
+
+/* ---------- かがみ（インカメラ） ---------- */
+const MIR_SCREENS=["aiube","hatsugo","timerAct"];
+let mirStream=null,mirOn=true;try{mirOn=localStorage.getItem("mirOn")!=="0"}catch(e){}
+const mirVideo=document.createElement("video");mirVideo.autoplay=true;mirVideo.muted=true;mirVideo.playsInline=true;mirVideo.setAttribute("playsinline","");
+function mirStop(){if(mirStream){mirStream.getTracks().forEach(t=>t.stop());mirStream=null}mirVideo.srcObject=null}
+async function mirShow(id){
+  const sec=$(id),box=sec&&sec.querySelector("[data-mir]"),btn=sec&&sec.querySelector("[data-mirbtn]");
+  if(!box){mirStop();return}
+  if(id==="timerAct"&&taId!=="nipple"){box.style.display="none";btn.style.display="none";mirStop();return}
+  btn.style.display="block";btn.textContent=mirOn?"🪞 かがみを けす":"🪞 かがみで じぶんの かおを みる";
+  btn.onclick=()=>{mirOn=!mirOn;try{localStorage.setItem("mirOn",mirOn?"1":"0")}catch(e){}mirShow(id)};
+  if(!mirOn){box.style.display="none";mirStop();return}
+  box.style.display="block";box.appendChild(mirVideo);
+  try{if(!mirStream)mirStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:640},height:{ideal:480}},audio:false});mirVideo.srcObject=mirStream;mirVideo.play().catch(()=>{})}
+  catch(e){box.style.display="none";btn.textContent="🪞 カメラが つかえません（せっていで きょか してね）"}
+}
 const START={};
 START.aiube=()=>{
   show("aiube");
@@ -578,6 +620,90 @@ function dvGo(i,p){
 }
 $("gPost").onclick=()=>dvStart("post");
 $("gTruck").onclick=()=>dvStart("truck");
+
+/* ---------- ごほうびゲーム：なごやの ちかてつ ---------- */
+const LINES=[
+ {n:"ひがしやません",k:"東山線",c:"#f5b400",st:["名古屋","伏見","栄","新栄町","千種","今池","池下","覚王山","本山"],y:["なごや","ふしみ","さかえ","しんさかえまち","ちくさ","いまいけ","いけした","かくおうざん","もとやま"]},
+ {n:"めいじょうせん",k:"名城線",c:"#8e44ad",st:["栄","矢場町","上前津","東別院","金山"],y:["さかえ","やばちょう","かみまえづ","ひがしべついん","かなやま"]},
+ {n:"つるまいせん",k:"鶴舞線",c:"#1e7fd8",st:["伏見","大須観音","上前津","鶴舞","荒畑","御器所"],y:["ふしみ","おおすかんのん","かみまえづ","つるまい","あらはた","ごきそ"]},
+ {n:"さくらどおりせん",k:"桜通線",c:"#e5333f",st:["名古屋","国際センター","丸の内","久屋大通","高岳","車道","今池"],y:["なごや","こくさいせんたー","まるのうち","ひさやおおどおり","たかおか","くるまみち","いまいけ"]}
+];
+const SB_GAP=400; // えきと えきの きょり(m)
+let sb=null;
+$("gSub").onclick=()=>{show("subSel");const m=$("subLines");m.innerHTML="";
+  LINES.forEach(L=>{const b=document.createElement("button");b.innerHTML=`<span class="ic" style="display:inline-block;width:30px;height:30px;border-radius:50%;background:${L.c}"></span>${L.k}（${L.n}）<small style="margin-left:auto;font-size:14px">${L.st[0]} → ${L.st[L.st.length-1]}</small>`;b.onclick=()=>sbStart(L);m.appendChild(b)})};
+function sbStart(L){
+  show("sub");sb={L,i:0,pos:0,v:0,power:false,brake:false,state:"stop",score:[],t:0,last:0};
+  sbHeadSet();$("sbMsg").textContent=`${L.st[0]}えき。「すすむ」で しゅっぱつ！`;$("sbDoor").style.display="none";
+  say(`${L.y[0]}から、${L.y[L.y.length-1]}ゆき、しゅっぱつします`);
+  sb.last=performance.now();trRaf=requestAnimationFrame(sbLoop);
+}
+function sbHeadSet(){const L=sb.L,nx=sb.i+1;$("sbHead").innerHTML=`<span style="color:${L.c}">●</span> ${L.k}　つぎは <b>${L.st[nx]||"しゅうてん"}</b>`}
+const hold=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();if(sb)sb[k]=true},off=()=>{if(sb)sb[k]=false};
+  b.addEventListener("pointerdown",on);b.addEventListener("pointerup",off);b.addEventListener("pointerleave",off);b.addEventListener("pointercancel",off)};
+hold("sbPower","power");hold("sbBrake","brake");
+$("sbDoor").onclick=()=>{if(!sb)return;$("sbDoor").style.display="none";
+  const L=sb.L;say(`${L.y[sb.i]}、${L.y[sb.i]}です。ドアが ひらきます`);sb.state="door";sb.t=0;
+  if(sb.i>=L.st.length-1){later(()=>sbEnd(),2500)}
+};
+function sbLoop(now){
+  if(!sb)return;const dt=Math.min(.05,(now-sb.last)/1000);sb.last=now;const L=sb.L;
+  if(sb.state==="run"||sb.state==="stop"&&sb.power&&!sb.brake&&sb.i<L.st.length-1){
+    if(sb.state==="stop"){sb.state="run";$("sbMsg").textContent="しゅっぱつ しんこう！";}
+    let a=-0.15; if(sb.power&&!sb.brake)a=1.0; if(sb.brake)a=-1.6;
+    sb.v=Math.max(0,Math.min(70/3.6,sb.v+a*dt));sb.pos+=sb.v*dt;
+    const target=(sb.i+1)*SB_GAP,rem=target-sb.pos;
+    if(rem<180&&rem>0&&!sb.ann){sb.ann=true;say(`まもなく ${L.y[sb.i+1]}です`)}
+    if(sb.v===0&&sb.state==="run"&&rem>40&&!sb.warned){sb.warned=true;$("sbMsg").textContent="まだ えきじゃ ないよ。「すすむ」で すすもう"}
+    if(sb.v>0)sb.warned=false;
+    if(sb.v===0&&sb.state==="run"&&rem<=40){
+      const err=Math.abs(rem);sb.i++;sb.ann=false;sb.state="arrived";
+      let r=err<1?"🌟 ぴったり！":err<4?"⭕ じょうず！":err<12?"🙂 おしい！":rem<0?"💦 いきすぎ…":"💦 てまえ すぎ…";
+      sb.score.push(err);$("sbMsg").textContent=`${r}（ずれ ${err.toFixed(1)}m）`;
+      sb.pos=target;$("sbDoor").style.display="block";sbHeadSet();
+    }
+  }
+  if(sb.state==="door"){sb.t+=dt;if(sb.t>2.5&&sb.i<L.st.length-1){sb.state="stop";$("sbMsg").textContent="ドアが しまります。「すすむ」で しゅっぱつ！"}}
+  sbDraw();trRaf=requestAnimationFrame(sbLoop);
+}
+function sbDraw(){
+  const c=$("sbCv"),g=c.getContext("2d"),W=720,H=540,L=sb.L,vx=W/2,vy=210;
+  g.fillStyle="#111";g.fillRect(0,0,W,H);
+  // トンネル
+  const grd=g.createRadialGradient(vx,vy,5,vx,vy,420);grd.addColorStop(0,"#000");grd.addColorStop(1,"#3a3a3a");g.fillStyle=grd;g.fillRect(0,0,W,380);
+  const target=(sb.i+(sb.state==="run"||sb.state==="stop"?1:0))*SB_GAP;
+  const rem=target-sb.pos;
+  const proj=z=>{const k=60/(z+60);return k};
+  // レール
+  g.strokeStyle="#777";g.lineWidth=3;[[-.6],[.6]].forEach(([x])=>{g.beginPath();g.moveTo(vx+x*10,vy+8);g.lineTo(vx+x*700,380);g.stroke()});
+  // まくらぎ・ライト
+  for(let k=0;k<26;k++){const z=((k*12-(sb.pos%12))+12)%312;const s=proj(z);const y=vy+170*s+8;
+    g.strokeStyle=`rgba(120,90,60,${.3+s*.7})`;g.lineWidth=2+6*s;g.beginPath();g.moveTo(vx-560*s,y);g.lineTo(vx+560*s,y);g.stroke();}
+  for(let k=0;k<14;k++){const z=((k*25-(sb.pos%25))+25)%350;const s=proj(z);g.fillStyle=`rgba(255,240,180,${.25+s})`;
+    g.beginPath();g.arc(vx-420*s,vy-150*s,2+8*s,0,7);g.arc(vx+420*s,vy-150*s,2+8*s,0,7);g.fill()}
+  // ホーム
+  const pz0=rem-60,pz1=rem+60;
+  if(pz1>0&&pz0<400){const s0=proj(Math.max(0,pz0)),s1=proj(Math.max(0,pz1));
+    g.fillStyle="#cfcfcf";g.beginPath();g.moveTo(vx-560*s0,vy+170*s0);g.lineTo(vx-560*s1,vy+170*s1);g.lineTo(vx-560*s1,vy+100*s1);g.lineTo(vx-560*s0,vy+100*s0);g.fill();
+    g.fillStyle=L.c;g.fillRect(vx-560*s0,vy-150*s0,(560*s0-560*s1)+1,24*s0+2);
+    const ss=proj(Math.max(0,rem-20));g.fillStyle="#fff";g.fillRect(vx-300*ss,vy-120*ss,600*ss,90*ss);g.strokeStyle=L.c;g.lineWidth=6*ss+1;g.strokeRect(vx-300*ss,vy-120*ss,600*ss,90*ss);
+    g.fillStyle="#222";g.font=`bold ${Math.max(8,52*ss)}px sans-serif`;g.textAlign="center";g.textBaseline="middle";g.fillText(L.st[sb.i+(sb.state==="run"||sb.state==="stop"?1:0)]||"",vx,vy-75*ss);
+    const sm=proj(Math.max(0,rem));if(rem>-5){g.strokeStyle="#ff3030";g.lineWidth=3+5*sm;g.beginPath();g.moveTo(vx-560*sm,vy+170*sm+8);g.lineTo(vx+560*sm,vy+170*sm+8);g.stroke()}
+  }
+  // うんてんだい
+  g.fillStyle="#2b2f38";g.fillRect(0,380,W,160);g.fillStyle=L.c;g.fillRect(0,380,W,10);
+  const kmh=sb.v*3.6;g.fillStyle="#000";g.beginPath();g.arc(150,470,62,0,7);g.fill();
+  g.strokeStyle="#ffd84a";g.lineWidth=6;g.beginPath();g.arc(150,470,52,Math.PI*.75,Math.PI*(.75+1.5*kmh/80));g.stroke();
+  g.fillStyle="#fff";g.font="bold 34px sans-serif";g.textAlign="center";g.fillText(Math.round(kmh),150,470);g.font="16px sans-serif";g.fillText("km/h",150,500);
+  g.textAlign="left";g.font="bold 24px sans-serif";g.fillStyle="#fff";
+  const d=Math.max(0,rem);g.fillText(sb.state==="run"||sb.state==="stop"?`あと ${Math.round(d)} m`:"とうちゃく",270,440);
+  g.fillStyle="#555";g.fillRect(270,465,400,22);g.fillStyle=L.c;g.fillRect(270,465,400*Math.min(1,1-d/SB_GAP),22);
+  g.fillStyle=sb.power&&!sb.brake?"#3cc47c":"#555";g.fillRect(270,500,120,22);g.fillStyle=sb.brake?"#ff5b5b":"#555";g.fillRect(400,500,120,22);
+  g.fillStyle="#fff";g.font="16px sans-serif";g.fillText("すすむ",300,517);g.fillText("ブレーキ",425,517);
+}
+function sbEnd(){const n=sb.score.length,good=sb.score.filter(e=>e<4).length;
+  $("sbMsg").innerHTML=`しゅうてん です！ ${n}えき中 ${good}えき じょうずに とまれたよ！<br><button id="sbAgain">もういちど</button>`;
+  $("sbAgain").onclick=()=>sbStart(sb.L);say("しゅうてんです。うんてんし さん、おつかれさまでした！")}
 let stS=null,stI=0;
 START.book=()=>{
   show("storyList");const m=$("stMenu");m.innerHTML="";
@@ -619,6 +745,6 @@ new MutationObserver(()=>rubyfy(document.body)).observe(document.body,{childList
 rubyfy(document.body);
 renderHome();
 </script>
-<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 8 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
+<p style="font-size:11px;color:#aaa;margin-top:20px">ばーじょん 9 ／ かきじゅん：KanjiVG (CC BY-SA 3.0) Ulrich Apel</p>
 </body>
 </html>
