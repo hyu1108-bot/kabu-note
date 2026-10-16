@@ -7,6 +7,8 @@
 #
 #   ② 3時間マスター：「IDチェック済み」フォルダの曲を番号順につなぎ、3時間までくり返す
 #      powershell -ExecutionPolicy Bypass -File onken.ps1 master "D:\SUNO\IDチェック済み" 1015_木曜
+#      8時間にしたいときは、最後に 8 を足す（土曜の8時間動画など）
+#      powershell -ExecutionPolicy Bypass -File onken.ps1 master "D:\SUNO\IDチェック済み" 1017_土曜 8
 #
 # どちらも、曲ごとの開始時刻を書いた「_曲の順番.txt」を一緒に作る。
 # 申し立てが付いたら、検出時刻をこの表と見比べれば、どの曲かすぐ分かる。
@@ -16,11 +18,11 @@
 param(
     [Parameter(Mandatory = $true)][ValidateSet('check', 'master')][string]$Mode,
     [Parameter(Mandatory = $true)][string]$Folder,
-    [string]$Name = ''
+    [string]$Name = '',
+    [int]$Hours = 3
 )
 
 $ErrorActionPreference = 'Stop'
-$Hours = 3
 
 if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host 'ffmpeg が見つかりません。インストールしてから、もう一度実行してください。' -ForegroundColor Red
@@ -82,11 +84,12 @@ if ($Mode -eq 'check') {
     Write-Host '→ YouTubeに「非公開」でアップして、著作権の欄を確認してください。'
 }
 else {
-    $master = Join-Path $outDir "${Name}_3時間.m4a"
-    Write-Host '3時間マスターを作っています...'
+    $master = Join-Path $outDir "${Name}_${Hours}時間.m4a"
+    Write-Host "${Hours}時間マスターを作っています..."
     # 最後は長いフェードアウトにしない（ライブのループで無音→急に鳴るのを避ける）
+    $fadeStart = $Hours * 3600 - 3
     & ffmpeg -y -hide_banner -loglevel error -stream_loop -1 -i $joined -t ($Hours * 3600) `
-        -af 'afade=t=out:st=10797:d=3' -c:a aac -b:a 256k $master
+        -af "afade=t=out:st=${fadeStart}:d=3" -c:a aac -b:a 256k $master
     Write-Host "できました：$master" -ForegroundColor Green
     Write-Host '→ 動画編集ソフトに読み込んで、画像・テロップと合わせてください。'
 }
