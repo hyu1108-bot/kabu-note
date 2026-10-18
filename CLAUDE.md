@@ -237,8 +237,8 @@ https://www.youtube.com/channel/UCsREzCHnXCXKUkOf2WU5VWw
 - 参考：Starry Note「秋の静寂に、心を休めるピアノ（第一集）」21曲 https://distrokid.com/hyperfollow/starrynote/B2vQjpqSBtG 。YouTubeの固定コメントで「この動画のBGMを、音楽アプリでも聴けるようになりました」と案内し、その後に季節の情景の文章を続ける形
 
 ## note（2026-10-18開始）
-- 宇宙銀行専用の新アカウント：https://note.com/uchuginko （前のアカウントは別の話題なので使わない）
-- 1本目（無料）「宇宙銀行の窓口へ、ようこそ🏦」公開済み。チャンネル・本（紙／Kindle）の紹介
+- 宇宙銀行専用の新アカウント：https://note.com/mild_peony4259 （IDは自動のまま、表示名が「uchuginko」。前のアカウントは別の話題なので使わない）
+- 1本目（無料）「宇宙銀行の窓口へ、ようこそ🏦」公開済み https://note.com/mild_peony4259/n/ndcb3da93ebe3 。チャンネル・本（紙／Kindle）の紹介
 - 階段：無料note → 500円note「残高を見るのが怖い夜の、3分の窓口ワーク（書き込みシート付）」→ 本¥1,408 → メンバー¥490。2,980円の本命noteは作らない（本が本命）。「6つの教育」「行列心理」などのあおる売り方はしない。公式LINEは使わない
 - 背景の個人的な話（家計・返済など）は書かない
 
