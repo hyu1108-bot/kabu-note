@@ -1,0 +1,6 @@
+// 宇宙銀行の窓口アプリ。GitHubのmainに保存すると、Cloudflareが自動で公開する
+{
+  "name": "uchuginko",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "." }
+}
