@@ -106,7 +106,7 @@
 - 公開URL：https://fanciful-syrniki-92720d.netlify.app/ （Netlify）。元ファイル：`bgm/omikuji/index.html`
 - 2026-09-28：結果画面の下に「この扉の先へ」としてライブ（チャンネルのライブタブ）・本（紙／Kindle）へのリンクを追加。「宇宙銀行口座」の文言を「宇宙銀行に、小さな豊かさが届きました」に修正（口座NG）。改行が反映されない不具合を修正。「MEMBERS ONLY」を「宇宙銀行より」に変更（無料のプレゼントとして公開。メンバー向けは別に凝ったものを作る予定）。OGP・ファビコン追加、結果をXでシェアするボタン（#宇宙銀行 #金運）、同じ結果が連続しないように、結果が出たら自動スクロール、引く前に見えないリンクが押せてしまう不具合を修正、音のないアプリなのに「今日流したこの音が」とあった文言を修正
 - 修正版はNetlifyの管理画面（Deploys）へ本人がアップロードする
-- **2026-10-13：アプリは「宇宙銀行の窓口」にまとめた**。案内するURLは https://uchuginko.atelier-kiki-love.workers.dev/ （Cloudflare）1つだけ。中身はおみくじ・豊かさ照会窓口・心のブロック診断（案内役キャラ「キーナス」）・幸福フローゲーム。元ファイルは `bgm/uchuginko/`。**CloudflareはGitHubのmainにつないで自動公開（2026-10-13）。アプリの修正はmainに直接保存してよい（本人OK）**。トップはおみくじを一番上に大きく（聴くだけの人が多いため）。「ラットレース」は「不安の輪」に言い換え済み（説明は「12週間の旅」）。キーナスはアプリの中だけに出し、YouTubeには出さない
+- **2026-10-13：アプリは「宇宙銀行の窓口」にまとめた**。案内するURLは https://uchuginko.atelier-kiki-love.workers.dev/ （Cloudflare）1つだけ。中身はおみくじ・豊かさ照会窓口・心のブロック診断（案内役キャラ「キーナス」）・幸福フローゲーム。元ファイルは `bgm/uchuginko/`。**CloudflareはGitHubのmainにつないで自動公開（2026-10-13）。アプリの修正はmainに直接保存してよい（本人OK）**。**2026-10-21：GitHub Actions（`.github/workflows/deploy-uchuginko.yml`、wrangler 4）でも公開するようにした**。Secretsに `CLOUDFLARE_API_TOKEN`・`CLOUDFLARE_ACCOUNT_ID` 登録済み。`bgm/uchuginko/` をmainに保存すると自動で公開され、結果・エラーはGitHubのActionsで見られる（クラウドのチャットからも確認・再実行できる）。`bgm/uchuginko/.assetsignore` でnode_modulesなどを公開対象から外している。トップはおみくじを一番上に大きく（聴くだけの人が多いため）。「ラットレース」は「不安の輪」に言い換え済み（説明は「12週間の旅」）。キーナスはアプリの中だけに出し、YouTubeには出さない
   - Netlifyの古いサイト（fanciful-syrniki・kokoro-blockなど）は、過去にXとコミュニティ投稿で案内したので消さずにそのまま。転送用ファイルは `bgm/netlify_redirect/`（本人が面倒なので未使用）
 - Xの行き先テスト（本／チャンネル／おみくじを2週ずつ、リンクのクリック数で比較）の候補の一つ
 
