@@ -62,24 +62,24 @@
   <div class="moon"></div>
   <h1>満月の窓口ワーク</h1>
   <div class="sub" id="month">月の窓口 メンバー限定</div>
-  <div class="lead">今夜は満月。<br>今月のあなたを、そっと満たしていきましょう。</div>
+  <div class="lead" id="lead">今夜は満月。<br>今月のあなたを、そっと満たしていきましょう。</div>
 
   <div id="form">
     <div class="card">
-      <div class="q">① 今月、受け取ったもの 3つ</div>
-      <div class="h">お金でなくて大丈夫。やさしい言葉、おいしいごはん、晴れた空も。</div>
+      <div class="q" id="q1"></div>
+      <div class="h" id="h1"></div>
       <input id="r1" placeholder="例：友だちからの「ありがとう」">
       <input id="r2" placeholder="例：あたたかいお茶">
       <input id="r3" placeholder="例：きれいな夕焼け">
     </div>
     <div class="card">
-      <div class="q">② 満月にそっと手放す不安 1つ</div>
-      <div class="h">書いたら、ボタンを押すだけ。考えるのは、もうおしまい。</div>
+      <div class="q" id="q2"></div>
+      <div class="h" id="h2"></div>
       <textarea id="worry" placeholder="ここに書いた言葉は、あなたのスマホの中だけに残ります"></textarea>
     </div>
     <div class="card">
-      <div class="q">③ 来月の自分へ 予祝のひとこと</div>
-      <div class="h">「〇〇できました、ありがとう」と、叶ったつもりで。</div>
+      <div class="q" id="q3"></div>
+      <div class="h" id="h3"></div>
       <textarea id="yoshuku" placeholder="例：好きなことを、楽しく続けられました。ありがとう"></textarea>
     </div>
     <button class="btn" id="go">🌕 満月にあずける</button>
@@ -89,9 +89,9 @@
   <div class="done" id="done">
     <div class="msg">✨ 受け取ったものに、ありがとう。<br>不安は、満月の光の中へ。<br>来月のあなたが、楽しみですね。</div>
     <div class="card">
-      <div class="lbl">今月、受け取ったもの</div><ul id="o-r"></ul>
-      <div class="lbl">満月に手放した不安</div><ul><li id="o-w" class="released"></li></ul>
-      <div class="lbl">来月の自分へ</div><ul><li id="o-y"></li></ul>
+      <div class="lbl" id="l1"></div><ul id="o-r"></ul>
+      <div class="lbl" id="l2"></div><ul><li id="o-w" class="released"></li></ul>
+      <div class="lbl" id="l3"></div><ul><li id="o-y"></li></ul>
     </div>
     <div class="note">書いたことは毎月ここに記録され、下の「これまでの記録」で見返せます。<br>（同じスマホ・同じブラウザで開いてください）</div>
     <button class="btn sub2" id="edit">書き直す</button>
@@ -110,6 +110,24 @@ const KEY='uchuginko-mangetsu', ids=['r1','r2','r3','worry','yoshuku'], $=id=>do
 const now=new Date(), M=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
 const label=m=>m.slice(0,4)+'年'+Number(m.slice(5))+'月';
 $('month').textContent='月の窓口 メンバー限定｜'+label(M);
+const mo=now.getMonth()+1, nx=mo%12+1;
+// 月ごとのワーク（ない月は基本形）
+const WORKS={
+ 11:{lead:'今夜は満月。<br>11月は「ありがとう」を数える月です。',
+   q1:'① 11月に「ありがとう」と思えたこと 3つ',h1:'小さなことほど大切に。だれかの笑顔、ほっとした時間も。',l1:'11月の「ありがとう」',
+   q2:'② 満月にそっと手放す「がんばりすぎ」 1つ',h2:'もう背負わなくていいことを、ひとつだけ。',l2:'手放したがんばりすぎ',
+   q3:'③ 12月の自分へ 予祝のひとこと',h3:'「〇〇できました、ありがとう」と、叶ったつもりで。',l3:'12月の自分へ'},
+ 12:{lead:'今夜は満月。<br>今年のあなたを、やさしくしめくくりましょう。',
+   q1:'① 今年、受け取ったもの 3つ',h1:'お金でなくて大丈夫。出会い、言葉、できるようになったことも。',l1:'今年、受け取ったもの',
+   q2:'② 今年のうちに手放す不安 1つ',h2:'新しい年に持っていかなくていいものを、ひとつだけ。',l2:'今年手放した不安',
+   q3:'③ 来年の自分へ 予祝のひとこと',h3:'「〇〇できました、ありがとう」と、叶ったつもりで。',l3:'来年の自分へ'}
+};
+const W0={lead:'今夜は満月。<br>'+mo+'月のあなたを、そっと満たしていきましょう。',
+   q1:'① '+mo+'月に受け取ったもの 3つ',h1:'お金でなくて大丈夫。やさしい言葉、おいしいごはん、晴れた空も。',l1:mo+'月に受け取ったもの',
+   q2:'② 満月にそっと手放す不安 1つ',h2:'書いたら、ボタンを押すだけ。考えるのは、もうおしまい。',l2:'満月に手放した不安',
+   q3:'③ '+nx+'月の自分へ 予祝のひとこと',h3:'「〇〇できました、ありがとう」と、叶ったつもりで。',l3:nx+'月の自分へ'};
+const WK=WORKS[mo]||W0;
+$('lead').innerHTML=WK.lead;['q1','h1','q2','h2','q3','h3','l1','l2','l3'].forEach(k=>$(k).textContent=WK[k]);
 function all(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
 function put(d){try{const a=all();a[M]=d;localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
 function cur(){return all()[M]||{}}
@@ -122,13 +140,13 @@ function history(){
     const h=document.createElement('div');h.className='q';h.textContent='🌕 '+label(m);c.appendChild(h);
     const add=(lb,items,cls)=>{const l=document.createElement('div');l.className='lbl';l.style.cssText='font-size:13px;color:var(--gold)';l.textContent=lb;c.appendChild(l);
       const u=document.createElement('ul');u.style.cssText='margin:4px 0 10px;padding-left:1.2em;line-height:1.8';items.forEach(t=>u.appendChild(li(t,cls)));c.appendChild(u)};
-    add('受け取ったもの',[d.r1,d.r2,d.r3].filter(Boolean).length?[d.r1,d.r2,d.r3].filter(Boolean):['（ここに来てくれたこと）']);
-    add('手放した不安',[d.worry||'（なし）'],'released');
-    add('来月の自分へ',[d.yoshuku||'（お楽しみ）']);
+    add(d.l1||'受け取ったもの',[d.r1,d.r2,d.r3].filter(Boolean).length?[d.r1,d.r2,d.r3].filter(Boolean):['（ここに来てくれたこと）']);
+    add(d.l2||'手放した不安',[d.worry||'（なし）'],'released');
+    add(d.l3||'来月の自分へ',[d.yoshuku||'（お楽しみ）']);
     $('hlist').appendChild(c)})
 }
 function show(){
-  const d=cur();ids.forEach(i=>d[i]=$(i).value.trim());d.done=true;put(d);
+  const d=cur();ids.forEach(i=>d[i]=$(i).value.trim());d.done=true;d.l1=WK.l1;d.l2=WK.l2;d.l3=WK.l3;put(d);
   $('o-r').innerHTML='';const r=[d.r1,d.r2,d.r3].filter(Boolean);(r.length?r:['（今月は、ここに来てくれたこと）']).forEach(t=>$('o-r').appendChild(li(t)));
   $('o-w').textContent=d.worry||'（なし）'; $('o-y').textContent=d.yoshuku||'（来月のお楽しみ）';
   $('form').style.display='none';$('done').classList.add('show');burst();window.scrollTo({top:0,behavior:'smooth'});history();
