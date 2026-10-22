@@ -69,16 +69,19 @@ function 神殿完成 {
 function 曲探し {
   param([Parameter(Mandatory)][string]$フォルダ, [Parameter(Mandatory, ValueFromRemainingArguments)][string[]]$時刻)
   $W = "$UBDesk\制作\$フォルダ"
-  $f = Get-ChildItem -LiteralPath $W -Filter "時刻表*.txt" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-  if (-not $f) { Write-Host "$W に時刻表がありません" -ForegroundColor Red; return }
-  Write-Host "時刻表：$($f.Name)" -ForegroundColor Cyan
-  $lines = Get-Content -LiteralPath $f.FullName -Encoding UTF8
-  foreach ($h in $時刻) {
-    $s = _UBSec $h; $hit = $null
-    foreach ($line in $lines) {
-      if ($line -match '^(\d\d:\d\d:\d\d)\s+(.+)$') { if ((_UBSec $matches[1]) -le $s) { $hit = $line } else { break } }
+  $fs = Get-ChildItem -LiteralPath $W -Filter "時刻表*.txt" | Sort-Object Name
+  if (-not $fs) { Write-Host "$W に時刻表がありません" -ForegroundColor Red; return }
+  # フォルダに時刻表が複数あるときは、全部を調べて表示する
+  foreach ($f in $fs) {
+    Write-Host "時刻表：$($f.Name)" -ForegroundColor Cyan
+    $lines = Get-Content -LiteralPath $f.FullName -Encoding UTF8
+    foreach ($h in $時刻) {
+      $s = _UBSec $h; $hit = $null
+      foreach ($line in $lines) {
+        if ($line -match '^(\d\d:\d\d:\d\d)\s+(.+)$') { if ((_UBSec $matches[1]) -le $s) { $hit = $line } else { break } }
+      }
+      "  $h → $hit"
     }
-    "$h → $hit"
   }
 }
 
