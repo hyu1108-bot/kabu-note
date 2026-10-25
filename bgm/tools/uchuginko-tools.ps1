@@ -12,7 +12,7 @@ function _UBPath($line, $base) {
   if (-not [IO.Path]::IsPathRooted($p)) { $p = Join-Path $base $p }
   $p
 }
-function _UBSec($hms) { [TimeSpan]::Parse($hms).TotalSeconds }
+function _UBSec($hms) { if ($hms -match '^\d+:\d+$') { $hms = "0:$hms" }; [TimeSpan]::Parse($hms).TotalSeconds }  # 「34:00」のような分:秒も受け付ける
 
 # 成功神殿：list.txt の曲をランダムに並べて、音源とIDチェック用の黒画面動画を作る
 # 例）神殿音源 1028        （3時間）
