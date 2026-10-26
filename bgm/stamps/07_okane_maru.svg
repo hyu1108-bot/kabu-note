@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><defs><radialGradient id="g" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".55" stop-color="#F5C542"/><stop offset="1" stop-color="#C88A12"/></radialGradient><linearGradient id="n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A3F8F"/><stop offset="1" stop-color="#121D4A"/></linearGradient></defs>
+<circle cx="128" cy="128" r="118" fill="url(#n)" stroke="url(#g)" stroke-width="12"/>
+<g transform="translate(128 134) scale(.72) translate(-128 -134)">
+<path d="M98,78 Q60,112 46,160 Q34,222 128,226 Q222,222 210,160 Q196,112 158,78Z" fill="url(#g)" stroke="#5A3A00" stroke-width="8" stroke-linejoin="round"/>
+<path d="M96,40 Q112,52 128,42 Q144,52 160,40 Q166,62 152,74 L104,74 Q90,62 96,40Z" fill="url(#g)" stroke="#5A3A00" stroke-width="8" stroke-linejoin="round"/>
+<rect x="90" y="70" width="76" height="16" rx="8" fill="#2A3F8F" stroke="#5A3A00" stroke-width="7"/>
+<text x="128" y="190" text-anchor="middle" font-family="DejaVu Sans, Arial" font-weight="bold" font-size="84" fill="#B87A0A" stroke="#5A3A00" stroke-width="3">¥</text></g></svg>
