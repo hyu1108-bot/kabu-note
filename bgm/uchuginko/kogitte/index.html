@@ -70,11 +70,13 @@
 <canvas id="cv" width="1600" height="900" hidden></canvas>
 <script>
 const WISHES = ["安心","ゆとり","うれしい知らせ","思いがけない受け取り","よい出会い","健やかな毎日","心の平和","笑顔の時間"];
-let wish = WISHES[0];
+// ?name=ひさこ&wish=安心 で名前と受け取るものを入れた状態で開く（メンバーさん用の個別リンク）
+const Q = new URLSearchParams(location.search);
+let wish = WISHES.includes(Q.get("wish")) ? Q.get("wish") : WISHES[0];
 const box = document.getElementById("wish");
 WISHES.forEach((w,i)=>{
   const b = document.createElement("button");
-  b.textContent = w; if(i===0) b.className = "on";
+  b.textContent = w; if(w===wish) b.className = "on";
   b.onclick = ()=>{ wish = w; [...box.children].forEach(c=>c.classList.toggle("on", c===b)); };
   box.appendChild(b);
 });
@@ -131,6 +133,10 @@ document.getElementById("make").onclick = async ()=>{
   document.getElementById("result").classList.add("show");
   scrollTo({top:0,behavior:"smooth"});
 };
+if(Q.get("name")){
+  document.getElementById("name").value = Q.get("name").slice(0,14);
+  document.getElementById("make").click();
+}
 document.getElementById("again").onclick = ()=>{
   document.getElementById("result").classList.remove("show");
   document.getElementById("form").style.display = "";
