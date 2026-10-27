@@ -33,7 +33,13 @@
   #result.show{display:block;animation:fade 1.2s ease}
   @keyframes fade{from{opacity:0;transform:translateY(10px)}}
   #result img{width:100%;border-radius:12px;box-shadow:0 0 30px #ffd97a55}
-  .reading{text-align:left;font-family:'Shippori Mincho',serif;font-size:17px;line-height:2;margin:18px 0}
+  .sec{text-align:left}
+  .st{font-family:'Shippori Mincho',serif;font-size:15px;color:var(--gold);letter-spacing:.08em;margin-bottom:8px}
+  .dq{font-family:'Shippori Mincho',serif;font-size:16px;line-height:1.9;white-space:pre-wrap}
+  .reading{text-align:left;font-family:'Shippori Mincho',serif;font-size:17px;line-height:2}
+  .big{font-size:22px;color:var(--gold-b)}
+  #mapbox{display:none;text-align:center;margin-top:16px}
+  #mapbox img{width:100%;max-width:360px;border-radius:14px;box-shadow:0 0 30px #ffd97a55}
   .reading b{color:var(--gold-b)}
   .msg{font-family:'Shippori Mincho',serif;font-size:18px;line-height:2;color:var(--gold-b);text-shadow:0 0 12px #ffd97a88;margin:14px 0}
   #book h2{font-family:'Shippori Mincho',serif;font-size:21px;color:var(--gold-b);text-align:center;margin:34px 0 4px}
@@ -72,8 +78,10 @@
   </div>
 
   <div id="result">
+    <div class="card sec"><div class="st">① あなたの夢</div><div class="dq" id="dq"></div></div>
+    <div class="card sec"><div class="st">② この夢の意味</div><div class="reading" id="reading"></div></div>
+    <div class="st" style="text-align:center">③ あなたへの夢の小切手</div>
     <img id="img" alt="夢の小切手">
-    <div class="reading" id="reading"></div>
     <div class="msg" id="msg"></div>
     <a class="btn" id="save" download="夢の小切手.png">画像を保存する</a>
     <div class="note">保存できないときは、画像を長押しして保存してください。</div>
@@ -84,6 +92,11 @@
     <h2>わたしの夢の小切手帳</h2>
     <div class="note" style="margin-top:0">月ごとにたまって、あなたのドリームマップになります。</div>
     <div id="list"></div>
+    <div id="mapbox">
+      <img id="mapimg" alt="ドリームマップ">
+      <a class="btn" id="mapsave" download="ドリームマップ.png">ドリームマップを保存する</a>
+      <div class="note">待ち受けサイズです。保存できないときは、画像を長押ししてください。</div>
+    </div>
   </div>
 
   <div class="foot">あっさり叶って、OK<br><a href="../">← 宇宙銀行の窓口へ</a></div>
@@ -115,7 +128,10 @@ const DEFAULT = {id:"star", icon:"✨", name:"星", read:"夢を覚えていて�
 const KEY = "uchuginko_yume";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
 function save(a){ try{ localStorage.setItem(KEY, JSON.stringify(a)); }catch(e){} }
-const pick = t => SIGNS.find(s => s.words.some(w => t.includes(w))) || DEFAULT;
+function pick(t){
+  for(const s of SIGNS){ const w = s.words.find(w => t.includes(w)); if(w) return {sign:s.id, word:w}; }
+  return {sign:DEFAULT.id, word:""};
+}
 const SIGN = id => SIGNS.find(s => s.id===id) || DEFAULT;
 
 const today = new Date(); today.setMinutes(today.getMinutes()-today.getTimezoneOffset());
@@ -181,7 +197,11 @@ async function show(e){
   const s = SIGN(e.sign), url = draw(e);
   document.getElementById("img").src = url;
   document.getElementById("save").href = url;
-  document.getElementById("reading").innerHTML = `${s.icon} <b>夢のしるし：${s.name}</b><br>${s.read}`;
+  document.getElementById("dq").textContent = e.dream;
+  document.getElementById("reading").innerHTML =
+    `<div class="big">${s.icon} 夢のしるし「${s.name}」</div>`
+    + (e.word ? `夢の中に<b>「${e.word}」</b>が出てきました。<br>` : "")
+    + `${s.read}<br><br>今のあなたが受け取るもの：<b>${s.get}</b>`;
   document.getElementById("msg").innerHTML = `${e.name}さんのもとに、<br>${s.get}がめぐってきますように✨`;
   document.getElementById("form").style.display = "none";
   document.getElementById("result").classList.add("show");
@@ -205,7 +225,50 @@ function renderBook(){
       g.appendChild(t);
     });
     el.appendChild(g);
+    const mb = document.createElement("button"); mb.className = "btn sub2"; mb.style.marginTop = "10px";
+    mb.textContent = `🗺️ ${m}月のドリームマップを作る`; mb.onclick = ()=>makeMap(y, m, by[k]);
+    el.appendChild(mb);
   });
+}
+
+// ドリームマップ：その月の夢を星座のように金色の道でつないだ待ち受け（1080×1920）
+async function makeMap(y, m, list){
+  try{ await document.fonts.load("700 64px 'Shippori Mincho'"); }catch(_){}
+  const c = document.createElement("canvas"), W = 1080, H = 1920; c.width = W; c.height = H;
+  const x = c.getContext("2d"), M = "'Shippori Mincho', serif";
+  const bg = x.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,"#0a1128"); bg.addColorStop(.55,"#1e2c64"); bg.addColorStop(1,"#3a3270");
+  x.fillStyle = bg; x.fillRect(0,0,W,H);
+  for(let i=0;i<380;i++){ x.fillStyle=`rgba(255,${220+Math.random()*35|0},160,${Math.random()*.8+.2})`; x.beginPath(); x.arc(Math.random()*W,Math.random()*H,Math.random()*2.6+.4,0,7); x.fill(); }
+  // 上に月
+  const mg = x.createRadialGradient(W/2,250,10,W/2,250,200); mg.addColorStop(0,"#fff6d0"); mg.addColorStop(.4,"#ffe2a0aa"); mg.addColorStop(1,"#ffe2a000");
+  x.fillStyle = mg; x.fillRect(0,0,W,500);
+  x.fillStyle="#fff1c4"; x.beginPath(); x.arc(W/2,250,70,0,7); x.fill();
+  x.textAlign="center"; x.fillStyle="#ffe7a3"; x.shadowColor="#ffd97a"; x.shadowBlur=24;
+  x.font=`700 84px ${M}`; x.fillText("ドリームマップ", W/2, 450); x.shadowBlur=0;
+  x.font=`500 40px ${M}`; x.fillStyle="#e8d5a3"; x.fillText(`${y}年${m}月　${list[0].name} さま`, W/2, 520);
+  // 夢を古い順にジグザグに並べ、金色の道でつなぐ
+  const items = list.slice().sort((p,q)=>p.date.localeCompare(q.date)).slice(0,8);
+  const n = items.length, top = 640, bottom = 1580, step = n>1 ? (bottom-top)/(n-1) : 0;
+  const pts = items.map((e,i)=>({e, x: n===1 ? W/2 : (i%2 ? W*.68 : W*.32), y: n===1 ? 1100 : top+step*i}));
+  x.strokeStyle="#ffd97a"; x.lineWidth=4; x.setLineDash([2,14]); x.lineCap="round";
+  x.beginPath(); pts.forEach((p,i)=> i ? x.lineTo(p.x,p.y) : x.moveTo(p.x,p.y)); x.stroke(); x.setLineDash([]);
+  const r = n>5 ? 78 : 100;
+  pts.forEach((p,i)=>{
+    const s = SIGN(p.e.sign);
+    x.shadowColor="#ffd97a"; x.shadowBlur=40; motif(x, s.motif, p.x, p.y, r); x.shadowBlur=0;
+    const tx = i%2 ? p.x - r - 30 : p.x + r + 30; x.textAlign = i%2 ? "right" : "left";
+    x.fillStyle="#e8d5a3"; x.font=`500 30px ${M}`; x.fillText(`${Number(p.e.date.slice(8))}日・${s.name}`, tx, p.y-14);
+    x.fillStyle="#ffe7a3"; x.font=`700 42px ${M}`; x.fillText(s.get, tx, p.y+40);
+  });
+  x.textAlign="center"; x.fillStyle="#ffe7a3"; x.font=`700 46px ${M}`;
+  x.fillText("あっさり叶って、OK", W/2, 1770);
+  x.font=`500 30px ${M}`; x.fillStyle="#e8d5a3"; x.fillText("宇宙銀行 夢の窓口", W/2, 1830);
+  const url = c.toDataURL("image/png");
+  document.getElementById("mapimg").src = url;
+  document.getElementById("mapsave").href = url;
+  document.getElementById("mapbox").style.display = "block";
+  document.getElementById("mapbox").scrollIntoView({behavior:"smooth"});
 }
 
 document.getElementById("make").onclick = ()=>{
@@ -214,7 +277,7 @@ document.getElementById("make").onclick = ()=>{
   const name = document.getElementById("name").value.trim() || "あなた";
   const date = document.getElementById("date").value || today.toISOString().slice(0,10);
   try{ localStorage.setItem(KEY+"_name", name); }catch(_){}
-  const e = {name, date, dream, sign: pick(dream).id};
+  const e = {name, date, dream, ...pick(dream)};
   const a = load(); a.push(e); save(a);
   renderBook(); show(e);
 };
