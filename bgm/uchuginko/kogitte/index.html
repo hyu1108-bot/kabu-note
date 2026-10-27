@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>豊かさの小切手</title>
+<meta name="description" content="宇宙銀行より。あなたの名前で、豊かさの小切手を書いて、待ち受けに。アファメーションのための絵です。">
+<meta name="theme-color" content="#0a1128">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+  :root{--deep:#0a1128;--deep2:#16224a;--gold:#e8d5a3;--gold-b:#ffe7a3;--cream:#f5f0e6}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Noto Sans JP',sans-serif;color:var(--cream);min-height:100vh;
+    background:radial-gradient(ellipse at 50% 10%,#2a3a78 0%,var(--deep2) 35%,var(--deep) 75%);padding:36px 16px 80px}
+  .wrap{max-width:560px;margin:0 auto}
+  h1{font-family:'Shippori Mincho',serif;text-align:center;font-size:32px;margin:0;color:var(--gold-b);letter-spacing:.12em;text-shadow:0 0 18px #ffd97a99}
+  .sub{text-align:center;font-size:14px;color:var(--gold);margin:8px 0 0;letter-spacing:.1em}
+  .lead{text-align:center;font-family:'Shippori Mincho',serif;font-size:16px;line-height:1.9;margin:18px 0 24px}
+  .card{border:1px solid #e8d5a366;border-radius:18px;padding:20px 18px;margin-bottom:18px;background:linear-gradient(160deg,#ffffff12,#ffffff05)}
+  .q{font-family:'Shippori Mincho',serif;font-size:19px;color:var(--gold-b);margin-bottom:10px}
+  input{width:100%;font:inherit;font-size:16px;color:var(--cream);background:#0a112899;border:1px solid #e8d5a355;border-radius:10px;padding:12px;outline:none}
+  input:focus{border-color:var(--gold-b);box-shadow:0 0 14px #ffd97a66}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips button{font:inherit;font-size:15px;color:var(--gold);background:transparent;border:1px solid #e8d5a388;border-radius:999px;padding:9px 14px;cursor:pointer}
+  .chips button.on{color:#3a2a06;background:var(--gold-b);border-color:var(--gold-b)}
+  .btn{display:block;width:100%;border:0;border-radius:999px;padding:16px;font-family:'Shippori Mincho',serif;font-size:19px;font-weight:700;color:#3a2a06;
+    background:linear-gradient(90deg,#c9962e,#ffe7a3,#f2c95a,#ffe7a3,#c9962e);background-size:200% 100%;animation:flow 4s linear infinite;box-shadow:0 0 24px #ffd97a88;cursor:pointer;margin-top:8px;text-decoration:none;text-align:center}
+  @keyframes flow{to{background-position:200% 0}}
+  .btn.sub2{background:transparent;color:var(--gold);border:1px solid #e8d5a388;box-shadow:none;animation:none;font-size:15px;padding:12px}
+  #result{display:none;text-align:center}
+  #result.show{display:block;animation:fade 1.2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}}
+  #result img{width:100%;border-radius:12px;box-shadow:0 0 30px #ffd97a55;margin:6px 0 14px}
+  .msg{font-family:'Shippori Mincho',serif;font-size:17px;line-height:2;color:var(--gold-b);margin:10px 0 16px}
+  .note{text-align:center;font-size:12px;color:#bfb38f;margin-top:14px;line-height:1.7}
+  .foot{text-align:center;font-size:14px;margin-top:28px}
+  .foot a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>豊かさの小切手</h1>
+  <div class="sub">宇宙銀行より</div>
+  <div class="lead">金額は書きません。<br>あなたに必要な豊かさが、必要なぶんだけ<br>めぐってきますように。</div>
+
+  <div id="form">
+    <div class="card">
+      <div class="q">お名前（ニックネームでも）</div>
+      <input id="name" maxlength="14" placeholder="例：ひさこ">
+    </div>
+    <div class="card">
+      <div class="q">受け取りたいものを、ひとつ</div>
+      <div class="chips" id="wish"></div>
+    </div>
+    <button class="btn" id="make">小切手を書く</button>
+    <div class="note">書いた内容はどこにも送られません。<br>この小切手はアファメーションのための絵で、お金と交換することはできません。</div>
+  </div>
+
+  <div id="result">
+    <img id="img" alt="豊かさの小切手">
+    <div class="msg" id="msg"></div>
+    <a class="btn" id="save" download="豊かさの小切手.png">画像を保存する</a>
+    <div class="note">保存できないときは、画像を長押しして保存してください。<br>待ち受けにしたり、満月の夜に見返したりしてみてくださいね。</div>
+    <button class="btn sub2" id="again" style="margin-top:16px">もう一度書く</button>
+  </div>
+
+  <div class="foot"><a href="../">← 宇宙銀行の窓口へ</a></div>
+</div>
+<canvas id="cv" width="1600" height="900" hidden></canvas>
+<script>
+const WISHES = ["安心","ゆとり","うれしい知らせ","思いがけない受け取り","よい出会い","健やかな毎日","心の平和","笑顔の時間"];
+// ?name=ひさこ&wish=安心 で名前と受け取るものを入れた状態で開く（メンバーさん用の個別リンク）
+const Q = new URLSearchParams(location.search);
+let wish = WISHES.includes(Q.get("wish")) ? Q.get("wish") : WISHES[0];
+const box = document.getElementById("wish");
+WISHES.forEach((w,i)=>{
+  const b = document.createElement("button");
+  b.textContent = w; if(w===wish) b.className = "on";
+  b.onclick = ()=>{ wish = w; [...box.children].forEach(c=>c.classList.toggle("on", c===b)); };
+  box.appendChild(b);
+});
+
+function draw(name){
+  const c = document.getElementById("cv"), x = c.getContext("2d"), W = 1600, H = 900;
+  // 夜空の背景
+  const bg = x.createRadialGradient(W/2,H*.2,50,W/2,H/2,W*.8);
+  bg.addColorStop(0,"#2a3a78"); bg.addColorStop(.5,"#16224a"); bg.addColorStop(1,"#0a1128");
+  x.fillStyle = bg; x.fillRect(0,0,W,H);
+  for(let i=0;i<220;i++){
+    x.fillStyle = `rgba(255,${220+Math.random()*35|0},150,${Math.random()*.8+.2})`;
+    x.beginPath(); x.arc(Math.random()*W,Math.random()*H,Math.random()*2.4+.4,0,7); x.fill();
+  }
+  // 紙
+  const px=110, py=150, pw=W-220, ph=600;
+  const paper = x.createLinearGradient(px,py,px+pw,py+ph);
+  paper.addColorStop(0,"#fff8e4"); paper.addColorStop(.5,"#f6e6b8"); paper.addColorStop(1,"#efd99a");
+  x.shadowColor="#ffd97a"; x.shadowBlur=60; x.fillStyle=paper;
+  x.beginPath(); x.roundRect(px,py,pw,ph,28); x.fill(); x.shadowBlur=0;
+  x.strokeStyle="#b8862b"; x.lineWidth=6; x.beginPath(); x.roundRect(px+22,py+22,pw-44,ph-44,18); x.stroke();
+  x.lineWidth=2; x.beginPath(); x.roundRect(px+36,py+36,pw-72,ph-72,12); x.stroke();
+  // 文字
+  const M = "'Shippori Mincho', serif";
+  x.fillStyle="#6b4a10"; x.textAlign="left";
+  x.font=`700 64px ${M}`; x.fillText("豊かさの小切手", px+80, py+130);
+  x.textAlign="right"; x.font=`500 34px ${M}`;
+  const d = new Date();
+  x.fillText(`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`, px+pw-80, py+120);
+  x.textAlign="left"; x.font=`500 38px ${M}`; x.fillText("この小切手を", px+80, py+235);
+  x.font=`700 70px ${M}`; x.fillText(`${name} さまへ`, px+80, py+330);
+  x.strokeStyle="#b8862b"; x.lineWidth=2; x.beginPath(); x.moveTo(px+80,py+352); x.lineTo(px+820,py+352); x.stroke();
+  x.font=`500 38px ${M}`; x.fillText(`受け取るもの：${wish}`, px+80, py+425);
+  x.fillText("必要なぶんだけ、ちょうどよいときに。", px+80, py+490);
+  // ∞ の金額欄
+  x.strokeStyle="#b8862b"; x.lineWidth=4; x.beginPath(); x.roundRect(px+pw-470,py+200,390,170,16); x.stroke();
+  x.textAlign="center"; x.font=`500 30px ${M}`; x.fillText("金額", px+pw-275, py+245);
+  const g = x.createLinearGradient(0,py+260,0,py+360); g.addColorStop(0,"#e0a93a"); g.addColorStop(1,"#8a5c12");
+  x.fillStyle=g; x.font=`700 120px ${M}`; x.fillText("∞", px+pw-275, py+355);
+  x.fillStyle="#6b4a10"; x.font=`700 40px ${M}`; x.fillText("宇宙銀行より", px+pw-275, py+480);
+  x.font=`400 22px ${M}`; x.fillStyle="#8a6a30";
+  x.fillText("※アファメーションのための絵です。お金と交換することはできません", W/2, py+ph-50);
+  return c.toDataURL("image/png");
+}
+
+document.getElementById("make").onclick = async ()=>{
+  const name = document.getElementById("name").value.trim() || "あなた";
+  try{ await document.fonts.load("700 64px 'Shippori Mincho'"); }catch(e){}
+  const url = draw(name);
+  document.getElementById("img").src = url;
+  document.getElementById("save").href = url;
+  document.getElementById("msg").innerHTML = `${name}さんのもとに、<br>${wish}がめぐってきますように✨`;
+  document.getElementById("form").style.display = "none";
+  document.getElementById("result").classList.add("show");
+  scrollTo({top:0,behavior:"smooth"});
+};
+if(Q.get("name")){
+  document.getElementById("name").value = Q.get("name").slice(0,14);
+  document.getElementById("make").click();
+}
+document.getElementById("again").onclick = ()=>{
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("form").style.display = "";
+};
+</script>
+</body>
+</html>
