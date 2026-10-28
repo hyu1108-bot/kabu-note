@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>お金のブロック診断テスト｜宇宙銀行</title>
+<meta name="description" content="15の質問に答えると、あなたのお金のブロックが「受け取る・使う・貯める・かせぐ・自分の価値」のどこにあるかがわかります。">
+<style>
+:root{--bg:#0d1430;--panel:#151f45;--line:#2a3768;--fg:#eef0f8;--mute:#a9b0cf;--gold:#e6c46a;--gold2:#fff1c2;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.7;padding:28px 16px 48px;
+background-image:radial-gradient(circle at 20% 0%,#1d2a60 0,transparent 45%),radial-gradient(circle at 90% 30%,#1a2350 0,transparent 40%)}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.ey{color:var(--gold);letter-spacing:.2em;font-size:13px}
+h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;color:var(--gold2);font-size:28px;margin:0;line-height:1.4}
+h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;color:var(--gold2);font-size:22px;margin:0}
+p{margin:0;color:var(--mute);font-size:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 18px}
+button{font:inherit;cursor:pointer}
+.btn{display:block;width:100%;padding:16px;border-radius:12px;border:1px solid var(--gold);background:linear-gradient(#e6c46a,#c9a24a);color:#1a1530;font-size:18px;font-weight:bold}
+.btn.sub{background:transparent;color:var(--gold2);font-weight:normal;font-size:16px}
+.q{font-size:20px;color:var(--fg);margin:6px 0 18px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{padding:15px;border-radius:12px;border:1px solid var(--line);background:#1b2752;color:var(--fg);font-size:18px}
+.opt:hover,.opt:focus-visible{border-color:var(--gold);outline:none}
+.bar{height:6px;background:#1b2752;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.cnt{font-size:14px;color:var(--gold)}
+.type{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;color:var(--gold2);font-size:26px;text-align:center;margin:4px 0}
+.center{text-align:center}
+svg{display:block;margin:0 auto;max-width:100%}
+.lbl{fill:#eef0f8;font-size:14px}
+.word{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:21px;color:var(--gold2);text-align:center;line-height:1.7;margin:8px 0}
+.k{color:var(--gold);font-size:14px;letter-spacing:.1em}
+ul{margin:6px 0 0;padding-left:1.2em;color:var(--fg)}
+a{color:var(--gold2)}
+.links{display:flex;flex-direction:column;gap:10px}
+.links a{display:block;text-align:center;padding:14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;background:var(--panel)}
+.note{font-size:12px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ey">宇宙銀行より</div>
+
+  <section id="start" class="wrap">
+    <h1>お金のブロック<br>診断テスト</h1>
+    <p>15の質問に、直感で答えてください。<br>あなたのお金のブロックが、どこにあるのかがわかります。</p>
+    <div class="panel">
+      <p>🫴 受け取る　💸 使う　🏦 貯める<br>🌱 かせぐ　💎 自分の価値</p>
+      <p style="margin-top:8px">この5つの場所を見ていきます。約2分です。</p>
+    </div>
+    <button class="btn" id="go">はじめる</button>
+    <button class="btn sub" id="last" hidden>前回の結果を見る</button>
+  </section>
+
+  <section id="quiz" class="wrap" hidden>
+    <div class="cnt" id="cnt"></div>
+    <div class="bar"><i id="prog"></i></div>
+    <div class="panel">
+      <div class="q" id="q"></div>
+      <div class="opts">
+        <button class="opt" data-v="2">はい</button>
+        <button class="opt" data-v="1">少しあてはまる</button>
+        <button class="opt" data-v="0">いいえ</button>
+      </div>
+    </div>
+    <button class="btn sub" id="back">ひとつ前にもどる</button>
+  </section>
+
+  <section id="result" class="wrap" hidden>
+    <p class="center">あなたは</p>
+    <div class="type" id="rtype"></div>
+    <div class="panel"><svg id="chart" viewBox="0 0 300 270" width="300" height="270" role="img" aria-label="5つの場所のブロックの大きさ"></svg></div>
+    <div class="panel">
+      <div class="k" id="rplace"></div>
+      <p id="rdesc" style="color:var(--fg);margin-top:6px"></p>
+    </div>
+    <div class="panel">
+      <div class="k">こんな口ぐせ、ありませんか？</div>
+      <ul id="rhabit"></ul>
+    </div>
+    <div class="panel">
+      <div class="k">今夜の新しい言葉</div>
+      <div class="word" id="rword"></div>
+      <p class="center">眠る前に、心の中で一度だけ唱えてみてください。</p>
+    </div>
+    <div class="panel">
+      <div class="k">ブロックをゆるめる考え方</div>
+      <h2 id="mt" style="margin-top:6px;font-size:20px"></h2>
+      <p id="mb" style="color:var(--fg);margin-top:6px"></p>
+      <p id="ma" style="color:var(--gold2);margin-top:10px"></p>
+      <p class="note" style="margin-top:10px">ロバート・キヨサキさんの本で知られる「お金に働いてもらう」考え方をもとにしています。投資や副業をすすめるものではありません。</p>
+    </div>
+    <div class="panel">
+      <div class="k">あなたに合う夜</div>
+      <p id="rday" style="color:var(--fg);margin-top:6px"></p>
+    </div>
+    <div class="links">
+      <a id="share" target="_blank" rel="noopener">結果をXでシェアする</a>
+      <a href="../kokoro/">口ぐせから気づく「心のブロック診断」へ</a>
+      <a href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ" target="_blank" rel="noopener">YouTube「宇宙銀行」で、今夜の音を聴く</a>
+      <a href="../">宇宙銀行の窓口トップへ</a>
+    </div>
+    <button class="btn sub" id="again">もう一度テストする</button>
+    <p class="note">自分の気持ちに気づくための遊びです。結果や効果を約束するものではありません。</p>
+  </section>
+</div>
+
+<script>
+const AREAS=[
+ {k:"受け取る",ic:"🫴"},{k:"使う",ic:"💸"},{k:"貯める",ic:"🏦"},{k:"かせぐ",ic:"🌱"},{k:"自分の価値",ic:"💎"}];
+const QS=[
+ [0,"人におごられたり、プレゼントをもらったりすると、申し訳なくなる"],
+ [1,"欲しかった物を買ったあと、少し罪悪感がある"],
+ [2,"今は大丈夫でも、いつかお金が尽きる気がして不安になる"],
+ [3,"お金は、苦労して働かないと入ってこないと思う"],
+ [4,"「私なんかが、豊かになっていいのかな」と思うことがある"],
+ [0,"ほめられると、つい「そんなことないです」と打ち消してしまう"],
+ [1,"自分のためにお金を使うより、家族や人のために使うほうが気が楽"],
+ [2,"通帳や残高を見るのが、なんとなく怖い"],
+ [3,"楽をして入ってきたお金は、なんだか落ち着かない"],
+ [4,"自分の仕事や時間に、高い値段をつけるのは気が引ける"],
+ [0,"人に頼るより、自分でなんとかしようとしてしまう"],
+ [1,"値段を見て、本当に欲しい物より安いほうを選びがち"],
+ [2,"貯金が減ると、大きく気持ちが沈む"],
+ [3,"お金の話をするのは、なんだか品がないと感じる"],
+ [4,"お金持ちになったら、人が変わってしまいそうで心配"]];
+const TYPES=[
+ {name:"がんばり屋の受け取りさん",mind:["ひとりで抱えない","人や仕組みに助けてもらうことは、ずるいことではありません。豊かな人ほど、自分ひとりで全部やらず、まわりの力を借りています。受け取ることは、その第一歩です。","今週ひとつだけ：だれかの「手伝おうか？」に、「ありがとう、お願いします」と答えてみる"],desc:"人に与えることが自然にできる、やさしい方です。そのぶん、自分が受け取る番になると、少し身がまえてしまうようです。それは、あなたが人を大切にしてきた証です。",
+  habit:["お気づかいなく","自分でやるから大丈夫","そんなことないです"],word:"わたしは、<br>受け取っていい",
+  day:"🌳 木曜の夜「思いがけない受け取り」の動画がおすすめです。受け取ることに、少しずつ慣れていけますように。"},
+ {name:"やさしい倹約家さん",mind:["「ただの出費」と「お金を連れてくる使い方」","お金の使い方には、使ったら終わりのものと、あとで豊かさを連れてきてくれるもの（学び・健康・人とのつながり・道具など）があります。使うことを怖がるより、どちらに使っているかを見てみましょう。","今週ひとつだけ：最近の出費を3つ思い出して、「ただの出費」か「連れてくる使い方」かに分けてみる"],desc:"お金をむだにしない、しっかりした方です。そのぶん、自分のために使うときに、ブレーキがかかりやすいようです。使ったお金は、消えるのではなく、めぐっていくものです。",
+  habit:["もったいない","わたしはこれで十分","また今度でいいや"],word:"お金は減るのではなく、<br>めぐっていくもの",
+  day:"💧 水曜の夜「お金の流れ」の動画がおすすめです。使うことも、めぐりの一部と感じられますように。"},
+ {name:"しっかり者の守り人さん",mind:["お金にも、少し働いてもらう","貯めて守ることは、とても大切です。そのうえで、「自分が働く」だけでなく「お金や仕組みにも働いてもらう」という見方があると知っておくと、尽きる不安が少しやわらぎます。","今週ひとつだけ：「自分が寝ている間にも入ってくるお金って、どんなものがあるだろう？」と、思いつくだけ書き出してみる（何かを始めなくて大丈夫です）"],desc:"先のことまで考えられる、責任感のある方です。そのぶん、「いつか尽きるかも」という不安を抱えやすいようです。その怖さは、あなたがお金を大切にしてきた証です。",
+  habit:["老後が不安","いざという時のために","残高を見るのが怖い"],word:"今日の残高は、今日の記録。<br>明日はまた、新しい一日です",
+  day:"⛰️ 土曜の夜「一生の安定」の長い動画がおすすめです。朝まで、安心して眠れますように。"},
+ {name:"まじめな働き者さん",mind:["時間とお金の交換だけが、道じゃない","がんばって働いた分だけお金になる、という道のほかに、仕組みや人の力でお金が生まれる道もあります。苦労しないと入ってこない、という思いこみをゆるめる見方です。","今週ひとつだけ：「もし自分が1日休んでも、まわり続けるものは何だろう？」と考えてみる"],desc:"努力を惜しまない、まじめな方です。そのぶん、「苦労しないと入ってこない」と感じやすいようです。豊かさは、がんばった分だけでなく、思いがけない形でも届きます。",
+  habit:["楽して稼げるわけがない","もっとがんばらなきゃ","お金の話ははしたない"],word:"豊かさは、<br>気楽な道からも届く",
+  day:"🪙 金曜の夜「運を味方にする」動画がおすすめです。肩の力をぬいて、ラッキーを受け取れますように。"},
+ {name:"ひかえめな宝石さん",mind:["あなたの得意は、育てられる宝物","自分では当たり前にできることが、人にとっては価値のあることがよくあります。得意なことを形にしていくと、それはあなたの小さな「資産」になっていきます。","今週ひとつだけ：人から「ありがとう」と言われたことを3つ書き出してみる"],desc:"謙虚で、まわりを立てられる方です。そのぶん、自分の価値を小さく見積もりやすいようです。数字は、あなたの価値ではありません。あなたは、ちゃんと豊かになっていい人です。",
+  habit:["私なんかが","どうせ私には無理","それほどの者じゃない"],word:"数字は、<br>あなたの価値ではありません",
+  day:"🌞 日曜の夜「不安を手放す」動画がおすすめです。新しい週を、軽やかに迎えられますように。"}];
+const FREE={name:"のびのび受け取り上手さん",mind:["今の軽やかさを、育てていく","お金とのつきあい方がのびやかな今は、「お金の見方」を広げるのにいいときです。働いて受け取るだけでなく、仕組みや人の力でお金がめぐる、という見方も楽しんでみてください。","今週ひとつだけ：「お金がめぐってきてうれしかったこと」を1つ思い出して、心の中でお礼を言う"],desc:"今のところ、大きなブロックは見当たりません。お金とのつきあい方が、のびやかな方です。この軽やかさを、これからも大切にしてください。",
+  habit:["ありがとう、うれしい","なんとかなる","いいことあるかも"],word:"あなたは、思っているより<br>たくさん受け取っています",
+  day:"🌕 月曜18時からのライブで、みんなと一緒に夜を過ごすのもおすすめです。"};
+
+const $=id=>document.getElementById(id);
+const KEY="block_last";
+let i=0,ans=[];
+function show(id){["start","quiz","result"].forEach(s=>$(s).hidden=s!==id);scrollTo(0,0)}
+function ask(){$("cnt").textContent=`${i+1} / ${QS.length}`;$("prog").style.width=(i/QS.length*100)+"%";$("q").textContent=QS[i][1];$("back").hidden=i===0}
+function start(){i=0;ans=[];show("quiz");ask()}
+document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ans[i]=+b.dataset.v;i++;if(i<QS.length)ask();else finish()});
+$("back").onclick=()=>{if(i>0){i--;ask()}};
+$("go").onclick=start;$("again").onclick=start;
+function finish(){
+  const sc=[0,0,0,0,0];QS.forEach((q,n)=>sc[q[0]]+=ans[n]);
+  try{localStorage.setItem(KEY,JSON.stringify(sc))}catch(e){}
+  render(sc)}
+function render(sc){
+  const max=Math.max(...sc),top=sc.indexOf(max),t=max<=2?FREE:TYPES[top];
+  $("rtype").textContent=t.name;
+  $("rplace").textContent=max<=2?"ブロックの場所":"いちばん大きいのは「"+AREAS[top].ic+" "+AREAS[top].k+"」の場所";
+  $("rdesc").textContent=t.desc;
+  $("rhabit").innerHTML=t.habit.map(h=>`<li>「${h}」</li>`).join("");
+  $("rword").innerHTML=t.word;$("mt").textContent=t.mind[0];$("mb").textContent=t.mind[1];$("ma").textContent=t.mind[2];$("rday").textContent=t.day;
+  drawChart(sc);
+  const txt=`お金のブロック診断テストをしてみたら、わたしは「${t.name}」でした✨\n#宇宙銀行 #金運\n`;
+  $("share").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(location.href.split("?")[0]);
+  show("result")}
+function drawChart(sc){
+  const cx=150,cy=140,R=95,N=5,pt=(k,r)=>{const a=-Math.PI/2+k*2*Math.PI/N;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+  let s="";
+  [1,2,3].forEach(l=>{s+=`<polygon points="${[0,1,2,3,4].map(k=>pt(k,R*l/3).join(",")).join(" ")}" fill="none" stroke="#2a3768"/>`});
+  [0,1,2,3,4].forEach(k=>{const[x,y]=pt(k,R);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2a3768"/>`});
+  s+=`<polygon points="${sc.map((v,k)=>pt(k,R*Math.max(v,.3)/6).join(",")).join(" ")}" fill="rgba(230,196,106,.35)" stroke="#e6c46a" stroke-width="2"/>`;
+  AREAS.forEach((a,k)=>{const[x,y]=pt(k,R+24);s+=`<text class="lbl" x="${x}" y="${y+5}" text-anchor="middle">${a.ic}${a.k}</text>`});
+  $("chart").innerHTML=s}
+let last=null;try{last=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(Array.isArray(last)&&last.length===5){$("last").hidden=false;$("last").onclick=()=>render(last)}
+</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a4ac069cd41b4ae5b1f8d1192129d536"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
