@@ -57,4 +57,5 @@ function listV(){const v=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.re
 vl.innerHTML=v.map((x,i)=>`<div style="margin:10px 0"><b style="color:#fff1c2">${i+1}. ${x.name}</b><br>${P.map((q,j)=>`<button class="g" data-v="${i}" data-q="${j}">${q[0]}</button>`).join("")}</div>`).join("");
 vl.querySelectorAll("button").forEach(b=>b.onclick=()=>{const x=v[+b.dataset.v],q=P[+b.dataset.q];speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(W);u.lang="ja-JP";u.voice=x;u.pitch=q[1];u.rate=q[2];speechSynthesis.speak(u)})}
 if("speechSynthesis" in window){listV();speechSynthesis.onvoiceschanged=listV}
-</script></body></html>
+</script><!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a4ac069cd41b4ae5b1f8d1192129d536"}'></script><!-- End Cloudflare Web Analytics -->
+</body></html>
