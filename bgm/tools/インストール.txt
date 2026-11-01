@@ -68,7 +68,9 @@ function 神殿完成 {
 #     宇宙音源 1102 1103 1104 -ライブ 1102 （1102は月曜ライブ用＝全曲を1回ずつの長さ）
 #     宇宙音源 1107 -長さ 09:00:00          （土曜の9時間）
 function 宇宙音源 {
-  param([Parameter(Mandatory, ValueFromRemainingArguments)][string[]]$日付, [string]$ライブ = "", [string]$長さ = "03:33:33")
+  [CmdletBinding(PositionalBinding = $false)]
+  param([Parameter(Mandatory, Position = 0, ValueFromRemainingArguments)][string[]]$日付, [string]$ライブ = "", [string]$長さ = "03:33:33")
+  if ($長さ -notmatch '^\d+:\d\d:\d\d$') { Write-Host "長さは 03:33:33 の形で書いてください（いま：$長さ）" -ForegroundColor Red; return }
   $all = @(Get-ChildItem -LiteralPath "$UBDesk\IDチェック済み", "$UBDesk\IDチェック済み金庫" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '\.(mp3|m4a|wav)$' })
   if ($all.Count -lt 10) { Write-Host "曲が $($all.Count) 曲しかありません。デスクトップの「IDチェック済み」「IDチェック済み金庫」を確認してください" -ForegroundColor Red; return }
   Write-Host "曲の長さを調べています（$($all.Count)曲）…" -ForegroundColor Cyan
