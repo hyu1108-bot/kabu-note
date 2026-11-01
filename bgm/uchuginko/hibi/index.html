@@ -3,100 +3,119 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>7日間の豊かさえらび｜宇宙銀行</title>
+<title>30日の豊かさチャレンジ｜宇宙銀行</title>
 <style>
-:root{--bg:#0b1033;--card:#141a4a;--gold:#f2c66d;--text:#f6efe0;--sub:#c9c2b0;--line:#3a4180}
+:root{--bg:#0b1033;--card:#141a4a;--gold:#f2c66d;--text:#f6efe0;--sub:#c9c2b0;--line:#3a4180;--red:#ff8f8f;--green:#9fe0a8}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(ellipse at top,#1c2462,var(--bg) 70%);color:var(--text);font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;min-height:100vh;display:flex;justify-content:center}
-.wrap{width:100%;max-width:560px;padding:24px 16px 48px}
-h1{color:var(--gold);font-size:28px;text-align:center;margin:8px 0 4px;letter-spacing:.05em}
-.lead{text-align:center;color:var(--sub);font-size:17px;line-height:1.8;margin:0 0 20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px;margin-bottom:16px}
-.day{color:var(--gold);font-size:18px;margin:0 0 6px}
-.scene{font-size:20px;line-height:1.8;margin:0 0 18px}
-button{display:block;width:100%;font:inherit;font-size:19px;line-height:1.6;color:var(--text);background:#1d2563;border:1.5px solid var(--gold);border-radius:12px;padding:14px 16px;margin:10px 0;cursor:pointer;text-align:left}
-button:active,button:hover{background:#2a3380}
-.start{text-align:center;background:var(--gold);color:#1b1640;font-weight:bold}
-.meters{display:grid;gap:10px}
-.m{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;font-size:17px}
-.bar{height:14px;background:#0d1238;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#c99a3c,var(--gold));transition:width .5s}
-.note{font-size:17px;line-height:1.8;color:var(--sub);margin:10px 0 0}
-.type{color:var(--gold);font-size:26px;text-align:center;margin:6px 0 10px}
-.small{font-size:14px;color:var(--sub);text-align:center;line-height:1.7;margin-top:24px}
+.wrap{width:100%;max-width:560px;padding:20px 16px 48px}
+h1{color:var(--gold);font-size:27px;text-align:center;margin:6px 0 4px}
+.lead{text-align:center;color:var(--sub);font-size:16px;line-height:1.8;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:14px}
+.ttl{color:var(--gold);font-size:18px;margin:0 0 8px}
+p{font-size:18px;line-height:1.8;margin:0 0 10px}
+button{display:block;width:100%;font:inherit;font-size:18px;line-height:1.5;color:var(--text);background:#1d2563;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;margin:9px 0;cursor:pointer;text-align:left}
+button:hover{background:#2a3380}button:disabled{opacity:.45;cursor:default}
+button small{display:block;color:var(--sub);font-size:14px}
+.main{text-align:center;background:var(--gold);color:#1b1640;font-weight:bold}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.st{background:#0d1238;border:1px solid var(--line);border-radius:10px;padding:8px 4px}
+.st b{display:block;font-size:22px;color:var(--gold)}.st span{font-size:14px;color:var(--sub)}
+.st em{font-style:normal;font-size:13px;display:block;color:var(--sub)}
+.ok b{color:var(--green)}
+.days{height:10px;background:#0d1238;border-radius:5px;overflow:hidden;margin:10px 0 2px;border:1px solid var(--line)}
+.days i{display:block;height:100%;background:linear-gradient(90deg,#c99a3c,var(--gold));transition:width .5s}
+.dl{font-size:14px;color:var(--sub);text-align:right}
+.ev{border-color:var(--gold);animation:pop .4s}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.d{font-size:15px;color:var(--sub)}.plus{color:var(--green)}.minus{color:var(--red)}
+.end h2{color:var(--gold);text-align:center;font-size:26px;margin:4px 0 12px}
+.big{font-size:54px;text-align:center;margin:0}
+.small{font-size:13px;color:var(--sub);text-align:center;line-height:1.7;margin-top:20px}
 .hide{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>7日間の豊かさえらび</h1>
-  <p class="lead">毎日ひとつ、えらぶだけ。<br>お金・ゆとり・人とのつながり<br>あなたの「豊かさのかたち」が見えてきます。</p>
+<h1>30日の豊かさチャレンジ</h1>
+<p class="lead">お金・元気・つながり。<br>3つをそろえて、30日後の目標をかなえよう。</p>
 
-  <div id="intro" class="card">
-    <p class="scene">これから7日間、毎日ちいさな分かれ道があります。<br>正解はありません。<br>いまの気持ちで、えらんでみてください。</p>
-    <button class="start" onclick="start()">はじめる</button>
+<div id="s0" class="card">
+  <p class="ttl">まず、30日後の目標をえらんでください</p>
+  <div id="goals"></div>
+</div>
+
+<div id="s1" class="hide">
+  <div class="card">
+    <p class="ttl" id="goalname"></p>
+    <div class="stats" id="stats"></div>
+    <div class="days"><i id="dbar"></i></div><div class="dl" id="dl"></div>
   </div>
-
-  <div id="play" class="hide">
-    <div class="card">
-      <p class="day" id="day"></p>
-      <p class="scene" id="scene"></p>
-      <button id="a" onclick="pick(0)"></button>
-      <button id="b" onclick="pick(1)"></button>
-      <p class="note" id="after"></p>
-    </div>
-    <div class="card meters" id="meters"></div>
+  <div class="card" id="turn">
+    <p class="ttl" id="turnttl"></p>
+    <p id="turnmsg" style="font-size:16px;color:var(--sub)">この3日間、どう過ごしますか？</p>
+    <div id="acts"></div>
   </div>
+  <div class="card ev hide" id="ev"></div>
+</div>
 
-  <div id="result" class="hide">
-    <div class="card">
-      <p class="day">あなたの豊かさのかたち</p>
-      <p class="type" id="rtype"></p>
-      <p class="scene" id="rtext"></p>
-    </div>
-    <div class="card meters" id="rmeters"></div>
-    <button class="start" onclick="location.reload()">もう一度あそぶ</button>
-  </div>
+<div id="s2" class="card end hide"></div>
 
-  <p class="small">宇宙銀行より<br>※ あそびのゲームです。結果をお約束するものではありません。</p>
+<p class="small">宇宙銀行より<br>※ あそびのゲームです。結果や金額をお約束するものではありません。</p>
 </div>
 <script>
-const DAYS=[
- {s:"月曜日。上司から「今日、少し残業できる？」と声をかけられました。",
-  a:["💰 引き受けて、少しだけ多く受け取る",{m:2,t:-1,c:0},"がんばった分が、ちゃんと届きました。"],
-  b:["⏳ 今日は早く帰って、ゆっくり夕ごはん",{m:0,t:2,c:1},"あたたかいごはんで、心がほどけました。"]},
- {s:"火曜日。昔の友人から「久しぶりにお茶でもどう？」と連絡が。",
-  a:["💰 今月は節約。また今度にする",{m:1,t:0,c:-1},"お財布に、すこし余裕が残りました。"],
-  b:["🤝 行ってみる。話したいこともあるし",{m:-1,t:0,c:2},"笑い声のあと、気持ちが軽くなりました。"]},
- {s:"水曜日。ポイントが2倍になる日。気になっていた物があります。",
-  a:["💰 今は買わずに、ためておく",{m:2,t:0,c:0},"『いつでも買える』安心が残りました。"],
-  b:["⏳ 買って、今日からさっそく楽しむ",{m:-1,t:2,c:0},"小さなうれしさで、一日が明るくなりました。"]},
- {s:"木曜日。思いがけず、ちょっとした臨時収入がありました。",
-  a:["💰 そのまま貯金にまわす",{m:2,t:0,c:0},"豊かさが、静かに積み重なりました。"],
-  b:["🤝 家族や大切な人に、ささやかなお土産を",{m:-1,t:0,c:2},"「ありがとう」が、何倍にもなって返ってきました。"]},
- {s:"金曜日。週末に副業や手伝いの話がきました。",
-  a:["💰 引き受けて、収入の柱をふやす",{m:2,t:-1,c:0},"新しい流れが、ひとつ生まれました。"],
-  b:["⏳ 週末は、からだを休めることにする",{m:0,t:2,c:0},"よく眠れて、朝の空気がおいしく感じました。"]},
- {s:"土曜日。家族（または近所の人）から、手伝いを頼まれました。",
-  a:["💰 用事があるので、今回はことわる",{m:1,t:1,c:-1},"自分のペースを守れました。"],
-  b:["🤝 よろこんで手伝う",{m:0,t:-1,c:2},"だれかの役に立てた、あたたかさが残りました。"]},
- {s:"日曜日。一週間のさいご。夜、少しだけ時間があります。",
-  a:["💰 来週のお金の計画を、ノートに書く",{m:2,t:0,c:0},"数字を見るのが、すこし怖くなくなりました。"],
-  b:["⏳ 好きな音楽を流して、早めに眠る",{m:0,t:2,c:1},"「今週もよくがんばった」と思えました。"]}
-];
-const N={m:"お金",t:"ゆとり",c:"つながり"};
-let d=0,s={m:5,t:5,c:5},lock=false;
-function meters(el){el.innerHTML=Object.keys(N).map(k=>`<div class="m"><span>${N[k]}</span><div class="bar"><i style="width:${Math.max(4,Math.min(100,s[k]*7))}%"></i></div></div>`).join("")}
-function show(){const x=DAYS[d];day.textContent=`${d+1}日目`;scene.textContent=x.s;a.textContent=x.a[0];b.textContent=x.b[0];after.textContent="";a.disabled=b.disabled=false;meters(document.getElementById("meters"))}
-function start(){intro.classList.add("hide");play.classList.remove("hide");show()}
-function pick(i){if(lock)return;lock=true;const o=i?DAYS[d].b:DAYS[d].a;for(const k in o[1])s[k]+=o[1][k];after.textContent="✨ "+o[2];a.disabled=b.disabled=true;meters(document.getElementById("meters"));setTimeout(()=>{lock=false;d++;d<DAYS.length?show():end()},1800)}
-function end(){play.classList.add("hide");result.classList.remove("hide");
- const k=Object.keys(s).sort((x,y)=>s[y]-s[x]);const spread=s[k[0]]-s[k[2]];
- const T={m:["コツコツ育てる「金庫番」タイプ","あなたは、豊かさをていねいに育てていく人。その堅実さは、あなたの大きな安心です。ときどき「ゆとり」や「人との時間」にも、少しだけ使ってみてくださいね。お金は、めぐるともっと楽しくなります。"],
-          t:["心をととのえる「月あかり」タイプ","あなたは、自分の心とからだを大切にできる人。ゆとりのある心には、良いご縁や考えが自然と入ってきます。そのペースのまま、小さな「ためる」も楽しんでみてください。"],
-          c:["人とめぐる「架け橋」タイプ","あなたは、人とのつながりを豊かさに変えられる人。あなたが渡したやさしさは、きっと形を変えて戻ってきます。ときどきは、自分のためにも受け取ってくださいね。"]};
- const r=spread<=2?["ちょうどいい「天秤」タイプ","お金・ゆとり・つながりを、バランスよく大切にできる人。それは、とてもめずらしい豊かさです。今の感覚を信じて、安心して進んでいきましょう。"]:T[k[0]];
- rtype.textContent=r[0];rtext.textContent=r[1];meters(document.getElementById("rmeters"))}
+const GOALS=[
+ {id:"onsen",icon:"♨️",name:"家族と温泉旅行に行く",need:{m:12,h:40,c:60},hint:"お金も、元気も、一緒に行く人も大切"},
+ {id:"gift",icon:"⌚",name:"自分に、ずっと欲しかった物を",need:{m:20,h:40,c:20},hint:"しっかりためる人向け。でも倒れたら意味がない"},
+ {id:"thanks",icon:"🍽️",name:"お世話になった人に恩返しの食事会",need:{m:8,h:40,c:80},hint:"人とのつながりがカギ"}];
+const ACTS=[
+ {k:"work2",t:"💰 しっかり働く",d:"お金 +5万／元気 −22",f:s=>{s.m+=5;s.h-=22}},
+ {k:"work1",t:"💼 ほどほどに働く",d:"お金 +3万／元気 −10",f:s=>{s.m+=3;s.h-=10}},
+ {k:"rest",t:"🛌 ゆっくり休む",d:"元気 +22",f:s=>{s.h+=22}},
+ {k:"people",t:"🤝 人と過ごす",d:"つながり +15／お金 −1万／元気 +5",f:s=>{s.c+=15;s.m-=1;s.h+=5}}];
+// ハプニング：状態によって起きやすさが変わる
+const EVENTS=[
+ {w:s=>s.c>=50?3:0.5,t:"🌟 友人から、いい仕事を紹介されました！",f:s=>{s.m+=4},msg:"お金 +4万"},
+ {w:s=>s.c>=40?2:0.3,t:"🎁 「いつもありがとう」と、思いがけないお礼が届きました。",f:s=>{s.m+=2;s.h+=5},msg:"お金 +2万／元気 +5"},
+ {w:s=>s.h<=30?4:0.3,t:"🤒 無理がたたって、風邪をひいてしまいました…",f:s=>{s.h-=12;s.m-=2},msg:"元気 −12／お金 −2万（病院代）"},
+ {w:()=>1.2,t:"💸 急な出費！家電がこわれてしまいました。",f:s=>{s.m-=4},msg:"お金 −4万"},
+ {w:s=>s.c<=25?2.5:0.5,t:"🌧️ なんだかさみしい夜。だれかと話したくなりました。",f:s=>{s.h-=8},msg:"元気 −8"},
+ {w:s=>s.h>=60?2:0.5,t:"☀️ 体が軽い！いつもより仕事がはかどりました。",f:s=>{s.m+=2},msg:"お金 +2万"},
+ {w:()=>0.8,t:"🌠 流れ星に願った夜。宝くじで少しだけ当たりました。",f:s=>{s.m+=3},msg:"お金 +3万"},
+ {w:s=>s.c>=60?2:0,t:"🤝 困ったとき、仲間が手伝ってくれました。",f:s=>{s.h+=12},msg:"元気 +12"}];
+let G,S,turn,busy=false;
+const $=id=>document.getElementById(id);
+$("goals").innerHTML=GOALS.map((g,i)=>`<button onclick="start(${i})">${g.icon} ${g.name}<small>必要：お金${g.need.m}万・元気${g.need.h}・つながり${g.need.c}｜${g.hint}</small></button>`).join("");
+function start(i){G=GOALS[i];S={m:3,h:70,c:30};turn=0;$("s0").classList.add("hide");$("s1").classList.remove("hide");$("goalname").textContent=`目標：${G.icon} ${G.name}`;draw();}
+function draw(){
+ const it=[["m","お金","万"],["h","元気",""],["c","つながり",""]];
+ $("stats").innerHTML=it.map(([k,n,u])=>`<div class="st ${S[k]>=G.need[k]?"ok":""}"><span>${n}</span><b>${S[k]}${u}</b><em>目標 ${G.need[k]}${u}</em></div>`).join("");
+ $("dbar").style.width=(turn/10*100)+"%";$("dl").textContent=`${turn*3}日目 ／ 30日`;
+ $("turnttl").textContent=`${turn*3+1}〜${turn*3+3}日目`;
+ $("acts").innerHTML=ACTS.map((a,i)=>`<button onclick="act(${i})">${a.t}<small>${a.d}</small></button>`).join("");}
+function act(i){if(busy)return;busy=true;document.querySelectorAll("#acts button").forEach(b=>b.disabled=true);
+ const b={...S};ACTS[i].f(S);S.m-=1;// 生活費
+ let html=`<p class="ttl">${ACTS[i].t.slice(2)}ことにしました</p><p class="d">（3日分の生活費 −1万）</p>`;
+ if(Math.random()<0.55){const ws=EVENTS.map(e=>e.w(S)),sum=ws.reduce((a,c)=>a+c,0);let r=Math.random()*sum,e=EVENTS[0];for(let j=0;j<EVENTS.length;j++){r-=ws[j];if(r<=0){e=EVENTS[j];break}}e.f(S);html+=`<p>${e.t}</p><p class="d">${e.msg}</p>`;}
+ S.h=Math.min(100,S.h);S.c=Math.min(100,Math.max(0,S.c));
+ $("ev").innerHTML=html;$("ev").classList.remove("hide");$("ev").classList.remove("ev");void $("ev").offsetWidth;$("ev").classList.add("ev");
+ turn++;draw();document.querySelectorAll("#acts button").forEach(b=>b.disabled=true);
+ setTimeout(()=>{busy=false;
+  if(S.h<=0)return end("down");
+  if(S.m<0)return end("broke");
+  if(turn>=10)return end("judge");
+  draw();},1900);}
+function end(type){
+ $("s1").classList.add("hide");const e=$("s2");e.classList.remove("hide");
+ const okM=S.m>=G.need.m,okH=S.h>=G.need.h,okC=S.c>=G.need.c;let ic,ti,tx;
+ if(type==="down"){ic="🌙";ti="今回は、ここで休憩";tx="がんばりすぎて、からだが「少し休んで」と言っています。お金よりも先に、あなた自身を大切にしてくださいね。元気があれば、何度でもやり直せます。";}
+ else if(type==="broke"){ic="🍂";ti="今月は、乗り切れませんでした";tx="急な出費が重なると、だれでもこうなることがあります。あなたのせいではありません。次は、少しだけ「ためる日」を増やしてみましょう。";}
+ else if(okM&&okH&&okC){ic="✨";ti="目標達成！最高の30日";tx=`「${G.name}」がかないました。お金・元気・つながりがそろうと、豊かさはこんなにあたたかいものになります。この感覚を、どうか覚えておいてください。`;}
+ else if(okM&&!okC){ic="💰";ti="かなったけれど、少しさみしい";tx="目標の物はそろいました。でも、「一緒によろこんでくれる人」がいると、もっと豊かだったかもしれません。次は、人と過ごす日もつくってみましょう。";}
+ else if(okM&&!okH){ic="😮‍💨";ti="かなったけれど、へとへと";tx="目標には届きました。でも、からだはくたくたです。せっかくの豊かさを楽しむために、休むことも大切な「投資」です。";}
+ else if(!okM&&okC){ic="🤝";ti="お金は足りない、でも心はあたたか";tx="目標の金額には届きませんでした。それでも、あなたのまわりには支えてくれる人がいます。それは、お金では買えない大きな豊かさです。";}
+ else{ic="🌱";ti="もう少しで、とどきそう";tx="今回は目標に届きませんでした。でも、30日間の選び方で、何が大切か少し見えてきたはずです。もう一度、ちがう選び方を試してみませんか？";}
+ e.innerHTML=`<p class="big">${ic}</p><h2>${ti}</h2><p>${tx}</p><div class="stats"><div class="st ${okM?"ok":""}"><span>お金</span><b>${S.m}万</b><em>目標 ${G.need.m}万</em></div><div class="st ${okH?"ok":""}"><span>元気</span><b>${Math.max(0,S.h)}</b><em>目標 ${G.need.h}</em></div><div class="st ${okC?"ok":""}"><span>つながり</span><b>${S.c}</b><em>目標 ${G.need.c}</em></div></div><button class="main" style="margin-top:16px" onclick="location.reload()">もう一度チャレンジ</button>`;}
 </script>
 </body>
 </html>
