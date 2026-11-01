@@ -61,6 +61,31 @@ function 神殿完成 {
   Write-Host "できました：$W\完成_神殿$日付.mp4" -ForegroundColor Green
 }
 
+# 宇宙銀行：Filmoraの書き出し（vMMDD.mp4）を、テロップ後ろ（inpoint）からくり返して延ばし、音源と合わせる
+# 例）宇宙完成 1101 102                    （inpoint 102秒・3時間33分33秒・音源は 音源_1101*.m4a のいちばん新しいもの）
+#     宇宙完成 1101 102 -音源 音源_1101b.m4a  （音源を指定）
+#     宇宙完成 1107 120 -長さ 09:00:00        （土曜の9時間）
+function 宇宙完成 {
+  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int]$秒, [string]$長さ = "03:33:33", [string]$音源 = "", [string]$映像 = "")
+  $W = "$UBDesk\制作\$日付"
+  if (-not (Test-Path -LiteralPath $W)) { Write-Host "$W がありません" -ForegroundColor Red; return }
+  Set-Location $W
+  if ($映像) { $v = $映像 } else { $v = @("v$日付.mp4", "v$日付.mp4.mp4") | Where-Object { Test-Path -LiteralPath "$W\$_" } | Select-Object -First 1 }
+  if (-not $v -or -not (Test-Path -LiteralPath "$W\$v")) { Write-Host "v$日付.mp4 が $W にありません（v$日付-1 などの名前なら -映像 v$日付-1.mp4 と付ける）" -ForegroundColor Red; return }
+  if ($音源) { $a = $音源 } else { $a = Get-ChildItem -LiteralPath $W -Filter "音源_$日付*.m4a" | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name }
+  if (-not $a -or -not (Test-Path -LiteralPath "$W\$a")) { Write-Host "音源_$日付.m4a が $W にありません" -ForegroundColor Red; return }
+  Write-Host "映像：$v ／ 音源：$a ／ inpoint：$秒 秒 ／ 長さ：$長さ" -ForegroundColor Cyan
+  $loop = (_UBDur "$W\$v") - $秒
+  if ($loop -le 0) { Write-Host "inpointの秒数が映像より長いです" -ForegroundColor Red; return }
+  $n = [math]::Ceiling((_UBSec $長さ) / $loop) + 1
+  $l = @("file '$v'"); 1..$n | ForEach-Object { $l += "file '$v'"; $l += "inpoint $秒" }
+  [IO.File]::WriteAllLines("$W\list$日付.txt", $l, $UBEnc)
+  $cut = (_UBSec $長さ) - 0.5
+  $fs = @(); if ($cut -le 4 * 3600) { $fs = @("-movflags", "+faststart") }  # 9時間は空き容量が2倍いるので外す
+  ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "list$日付.txt" -i $a -map 0:v -map 1:a -c copy -t $cut @fs -y "完成_$日付.mp4"
+  Write-Host "できました：$W\完成_$日付.mp4（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
+}
+
 # 申し立ての時刻に流れていた曲を調べる（宇宙銀行・成功神殿どちらでも）
 # 例）曲探し 1020 01:25:04 01:26:44
 #     曲探し 神殿1028 00:41:10
@@ -83,4 +108,4 @@ function 曲探し {
   }
 }
 
-Write-Host "宇宙銀行ツールを読み込みました（神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
+Write-Host "宇宙銀行ツールを読み込みました（宇宙完成／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
