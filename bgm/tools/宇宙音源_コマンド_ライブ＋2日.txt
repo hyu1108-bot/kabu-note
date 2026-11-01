@@ -1,0 +1,11 @@
+# 宇宙銀行：月曜ライブ（1周ぶん）＋火・水の3時間、3日分の音源を1回で作る（2026-11-01作成）
+# 1行ずつ貼って、そのたびに Enter を押す（前の行の結果が出てから次を貼る）
+# 日付は 1102（ライブ）・1103・1104 の部分を変える。ライブは「0」＝曲を1周した長さ（3:33:33にそろえない）
+# IDチェック_1102.mp4 に全曲が1回ずつ入るので、3日分のIDチェックはこれ1本でよい（今日中に非公開アップ）
+# 注意：PowerShellは $d と $D を区別しない。デスクトップは $DK、フォルダ名は $fd を使う
+
+$DK = "$HOME\Desktop"; $enc = New-Object System.Text.UTF8Encoding($false); $ng = @()
+
+$all = @(Get-ChildItem -LiteralPath "$DK\IDチェック済み", "$DK\IDチェック済み金庫" -File | Where-Object { $_.Name -match '\.(mp3|m4a|wav)$' -and $ng -notcontains $_.Name }); $dur = @{}; foreach ($f in $all) { $dur[$f.FullName] = [double](ffprobe -v error -show_entries format=duration -of csv=p=0 "$($f.FullName)") }; "曲数：$($all.Count)　1周：{0:hh\:mm\:ss}" -f [TimeSpan]::FromSeconds(($dur.Values | Measure-Object -Sum).Sum)
+
+if ($all.Count -lt 10) { "曲が足りないので止めます" } else { foreach ($job in @(@("1102", "0", $true), @("1103", "03:33:33", $false), @("1104", "03:33:33", $false))) { $day = $job[0]; $end = if ($job[1] -eq "0") { ($dur.Values | Measure-Object -Sum).Sum + 0.5 } else { [TimeSpan]::Parse($job[1]).TotalSeconds }; $files = $all | Get-Random -Count $all.Count; $W = "$DK\制作\$day"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W; $list = @(); $tt = @(); $t = 0; while ($t -lt $end) { foreach ($f in $files) { $list += "file '" + ($f.FullName -replace "'", "'\''") + "'"; $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), $f.Name; $t += $dur[$f.FullName]; if ($t -ge $end) { break } } }; [IO.File]::WriteAllLines("$W\order_$day.txt", $list, $enc); [IO.File]::WriteAllLines("$W\時刻表_$day.txt", $tt, $enc); ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "order_$day.txt" -vn -c:a aac -b:a 192k -t ($end - 0.5) -y "音源_$day.m4a"; if ($job[2]) { $one = ($dur.Values | Measure-Object -Sum).Sum; ffmpeg -hide_banner -loglevel error -stats -f lavfi -i color=black:s=1280x720:r=1 -i "音源_$day.m4a" -t $one -c:v libx264 -tune stillimage -c:a copy -movflags +faststart -y "IDチェック_$day.mp4" }; "できました：$W" } }
