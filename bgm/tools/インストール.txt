@@ -63,12 +63,51 @@ function 神殿完成 {
   Write-Host "できました：$W\完成_神殿$日付.mp4" -ForegroundColor Green
 }
 
+# 宇宙銀行：IDチェック済み＋IDチェック済み金庫の曲をランダムに並べて、日ごとに音源・時刻表・order・IDチェック動画を作る
+# 例）宇宙音源 1103 1104                 （それぞれ3時間33分33秒。日ごとに順番を変える）
+#     宇宙音源 1102 1103 1104 -ライブ 1102 （1102は月曜ライブ用＝全曲を1回ずつの長さ）
+#     宇宙音源 1107 -長さ 09:00:00          （土曜の9時間）
+function 宇宙音源 {
+  param([Parameter(Mandatory, ValueFromRemainingArguments)][string[]]$日付, [string]$ライブ = "", [string]$長さ = "03:33:33")
+  $all = @(Get-ChildItem -LiteralPath "$UBDesk\IDチェック済み", "$UBDesk\IDチェック済み金庫" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '\.(mp3|m4a|wav)$' })
+  if ($all.Count -lt 10) { Write-Host "曲が $($all.Count) 曲しかありません。デスクトップの「IDチェック済み」「IDチェック済み金庫」を確認してください" -ForegroundColor Red; return }
+  Write-Host "曲の長さを調べています（$($all.Count)曲）…" -ForegroundColor Cyan
+  $dur = @{}; foreach ($f in $all) { $dur[$f.FullName] = _UBDur $f.FullName }
+  $one = ($dur.Values | Measure-Object -Sum).Sum
+  Write-Host ("曲数：{0}　全曲1周：{1:hh\:mm\:ss}" -f $all.Count, [TimeSpan]::FromSeconds($one)) -ForegroundColor Cyan
+  foreach ($day in $日付) {
+    $live = ($day -eq $ライブ)
+    $W = "$UBDesk\制作\$day"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
+    $order = $all | Get-Random -Count $all.Count
+    $list = @(); $tt = @(); $t = 0
+    if ($live) { $end = $one } else { $end = _UBSec $長さ }
+    while ($t -lt $end - 1) {
+      foreach ($f in $order) {
+        $list += _UBLine $f.FullName
+        $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), $f.Name
+        $t += $dur[$f.FullName]
+        if ($t -ge $end - 1) { break }
+      }
+    }
+    [IO.File]::WriteAllLines("$W\order_$day.txt", $list, $UBEnc)
+    [IO.File]::WriteAllLines("$W\時刻表_$day.txt", $tt, $UBEnc)
+    if ($live) { $cut = $end } else { $cut = $end - 0.5 }
+    Write-Host "$day の音源を作っています…" -ForegroundColor Cyan
+    ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "order_$day.txt" -vn -c:a aac -b:a 192k -t $cut -y "音源_$day.m4a"
+    ffmpeg -hide_banner -loglevel error -stats -f lavfi -i color=black:s=1280x720:r=1 -i "音源_$day.m4a" -c:v libx264 -tune stillimage -c:a copy -shortest -movflags +faststart -y "IDチェック_$day.mp4"
+    $kind = if ($live) { "ライブ用・全曲1周" } else { "長さ $長さ" }
+    Write-Host "できました：$W（$kind）音源・時刻表・order・IDチェック動画" -ForegroundColor Green
+  }
+  Write-Host "次：各フォルダの IDチェック_〇〇.mp4 を非公開でアップして、著作権の欄を確認" -ForegroundColor Green
+}
+
 # 宇宙銀行：Filmoraの書き出し（vMMDD.mp4）を、テロップ後ろ（inpoint）からくり返して延ばし、音源と合わせる
 # 例）宇宙完成 1101 102                    （inpoint 102秒・3時間33分33秒・音源は 音源_1101*.m4a のいちばん新しいもの）
 #     宇宙完成 1101 102 -音源 音源_1101b.m4a  （音源を指定）
 #     宇宙完成 1107 120 -長さ 09:00:00        （土曜の9時間）
+#     宇宙完成 1102 106 -ライブ                （月曜ライブ用：音源1周の長さで ライブ_1102.mp4 を作る）
 function 宇宙完成 {
-  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int]$秒, [string]$長さ = "03:33:33", [string]$音源 = "", [string]$映像 = "")
+  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int]$秒, [string]$長さ = "03:33:33", [string]$音源 = "", [string]$映像 = "", [switch]$ライブ)
   $W = "$UBDesk\制作\$日付"
   if (-not (Test-Path -LiteralPath $W)) { Write-Host "$W がありません" -ForegroundColor Red; return }
   Set-Location $W
@@ -76,6 +115,8 @@ function 宇宙完成 {
   if (-not $v -or -not (Test-Path -LiteralPath "$W\$v")) { Write-Host "v$日付.mp4 が $W にありません（v$日付-1 などの名前なら -映像 v$日付-1.mp4 と付ける）" -ForegroundColor Red; return }
   if ($音源) { $a = $音源 } else { $a = Get-ChildItem -LiteralPath $W -Filter "音源_$日付*.m4a" | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name }
   if (-not $a -or -not (Test-Path -LiteralPath "$W\$a")) { Write-Host "音源_$日付.m4a が $W にありません" -ForegroundColor Red; return }
+  $out = "完成_$日付.mp4"
+  if ($ライブ) { $長さ = "{0:hh\:mm\:ss\.ff}" -f [TimeSpan]::FromSeconds((_UBDur "$W\$a") + 0.5); $out = "ライブ_$日付.mp4" }
   Write-Host "映像：$v ／ 音源：$a ／ inpoint：$秒 秒 ／ 長さ：$長さ" -ForegroundColor Cyan
   $loop = (_UBDur "$W\$v") - $秒
   if ($loop -le 0) { Write-Host "inpointの秒数が映像より長いです" -ForegroundColor Red; return }
@@ -84,8 +125,8 @@ function 宇宙完成 {
   [IO.File]::WriteAllLines("$W\list$日付.txt", $l, $UBEnc)
   $cut = (_UBSec $長さ) - 0.5
   $fs = @(); if ($cut -le 4 * 3600) { $fs = @("-movflags", "+faststart") }  # 9時間は空き容量が2倍いるので外す
-  ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "list$日付.txt" -i $a -map 0:v -map 1:a -c copy -t $cut @fs -y "完成_$日付.mp4"
-  Write-Host "できました：$W\完成_$日付.mp4（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
+  ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "list$日付.txt" -i $a -map 0:v -map 1:a -c copy -t $cut @fs -y $out
+  Write-Host "できました：$W\$out（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
 }
 
 # 申し立ての時刻に流れていた曲を調べる（宇宙銀行・成功神殿どちらでも）
@@ -110,7 +151,7 @@ function 曲探し {
   }
 }
 
-Write-Host "宇宙銀行ツールを読み込みました（宇宙完成／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
+Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
 '@
 Set-Content -Path $dst -Value $code -Encoding UTF8
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force
