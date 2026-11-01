@@ -3,119 +3,122 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>30日の豊かさチャレンジ｜宇宙銀行</title>
+<title>夜の両替窓口｜宇宙銀行</title>
 <style>
-:root{--bg:#0b1033;--card:#141a4a;--gold:#f2c66d;--text:#f6efe0;--sub:#c9c2b0;--line:#3a4180;--red:#ff8f8f;--green:#9fe0a8}
+:root{--bg:#090c28;--card:#12173f;--gold:#f2c66d;--text:#f6efe0;--sub:#bdb7a6;--line:#343b78;--red:#ff9a8a;--blue:#9ec8ff}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at top,#1c2462,var(--bg) 70%);color:var(--text);font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;min-height:100vh;display:flex;justify-content:center}
+body{margin:0;background:radial-gradient(ellipse at top,#1a2060,var(--bg) 70%);color:var(--text);font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;min-height:100vh;display:flex;justify-content:center}
 .wrap{width:100%;max-width:560px;padding:20px 16px 48px}
-h1{color:var(--gold);font-size:27px;text-align:center;margin:6px 0 4px}
-.lead{text-align:center;color:var(--sub);font-size:16px;line-height:1.8;margin:0 0 16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:14px}
-.ttl{color:var(--gold);font-size:18px;margin:0 0 8px}
-p{font-size:18px;line-height:1.8;margin:0 0 10px}
-button{display:block;width:100%;font:inherit;font-size:18px;line-height:1.5;color:var(--text);background:#1d2563;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;margin:9px 0;cursor:pointer;text-align:left}
-button:hover{background:#2a3380}button:disabled{opacity:.45;cursor:default}
-button small{display:block;color:var(--sub);font-size:14px}
+h1{color:var(--gold);font-size:27px;text-align:center;margin:6px 0 2px;letter-spacing:.08em}
+.lead{text-align:center;color:var(--sub);font-size:16px;line-height:1.9;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:14px;animation:in .45s}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.night{color:var(--gold);font-size:16px;margin:0 0 6px;letter-spacing:.1em}
+.who{font-size:20px;color:var(--gold);margin:0 0 8px}
+p{font-size:18px;line-height:1.9;margin:0 0 10px}
+.say{border-left:3px solid var(--gold);padding-left:12px}
+button{display:block;width:100%;font:inherit;font-size:18px;line-height:1.5;color:var(--text);background:#1b2260;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;margin:9px 0;cursor:pointer;text-align:left}
+button:hover{background:#283080}
 .main{text-align:center;background:var(--gold);color:#1b1640;font-weight:bold}
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
-.st{background:#0d1238;border:1px solid var(--line);border-radius:10px;padding:8px 4px}
-.st b{display:block;font-size:22px;color:var(--gold)}.st span{font-size:14px;color:var(--sub)}
-.st em{font-style:normal;font-size:13px;display:block;color:var(--sub)}
-.ok b{color:var(--green)}
-.days{height:10px;background:#0d1238;border-radius:5px;overflow:hidden;margin:10px 0 2px;border:1px solid var(--line)}
-.days i{display:block;height:100%;background:linear-gradient(90deg,#c99a3c,var(--gold));transition:width .5s}
-.dl{font-size:14px;color:var(--sub);text-align:right}
-.ev{border-color:var(--gold);animation:pop .4s}
-@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
-.d{font-size:15px;color:var(--sub)}.plus{color:var(--green)}.minus{color:var(--red)}
-.end h2{color:var(--gold);text-align:center;font-size:26px;margin:4px 0 12px}
-.big{font-size:54px;text-align:center;margin:0}
+.scale{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--sub)}
+.beam{flex:1;height:12px;background:#0b0f30;border:1px solid var(--line);border-radius:6px;position:relative}
+.beam i{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);transition:left .6s;box-shadow:0 0 10px var(--gold)}
+.beam:before{content:"";position:absolute;left:50%;top:-6px;bottom:-6px;border-left:1px dashed var(--sub)}
+.lamp{text-align:center;font-size:15px;color:var(--sub);margin-top:8px}
+.after{color:var(--sub);font-size:16px}
+.ep{font-size:16px;line-height:1.8;color:var(--sub);margin:6px 0}
+.end h2{color:var(--gold);text-align:center;font-size:25px;margin:6px 0 12px}
+.big{font-size:50px;text-align:center;margin:0}
 .small{font-size:13px;color:var(--sub);text-align:center;line-height:1.7;margin-top:20px}
 .hide{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>30日の豊かさチャレンジ</h1>
-<p class="lead">お金・元気・つながり。<br>3つをそろえて、30日後の目標をかなえよう。</p>
+<h1>夜の両替窓口</h1>
+<p class="lead">宇宙銀行には、夜にだけ開く窓口がある。<br>ここでは、お金と「時間」を両替できる。<br>あなたは今夜から、その窓口係。</p>
 
-<div id="s0" class="card">
-  <p class="ttl">まず、30日後の目標をえらんでください</p>
-  <div id="goals"></div>
+<div id="hud" class="card hide">
+  <div class="scale"><span>⏳時間</span><div class="beam"><i id="pin"></i></div><span>金貨🪙</span></div>
+  <div class="lamp" id="lamp"></div>
 </div>
-
-<div id="s1" class="hide">
-  <div class="card">
-    <p class="ttl" id="goalname"></p>
-    <div class="stats" id="stats"></div>
-    <div class="days"><i id="dbar"></i></div><div class="dl" id="dl"></div>
-  </div>
-  <div class="card" id="turn">
-    <p class="ttl" id="turnttl"></p>
-    <p id="turnmsg" style="font-size:16px;color:var(--sub)">この3日間、どう過ごしますか？</p>
-    <div id="acts"></div>
-  </div>
-  <div class="card ev hide" id="ev"></div>
-</div>
-
-<div id="s2" class="card end hide"></div>
-
-<p class="small">宇宙銀行より<br>※ あそびのゲームです。結果や金額をお約束するものではありません。</p>
+<div id="stage"></div>
+<p class="small">宇宙銀行より<br>※ あそびの物語です。</p>
 </div>
 <script>
-const GOALS=[
- {id:"onsen",icon:"♨️",name:"家族と温泉旅行に行く",need:{m:12,h:40,c:60},hint:"お金も、元気も、一緒に行く人も大切"},
- {id:"gift",icon:"⌚",name:"自分に、ずっと欲しかった物を",need:{m:20,h:40,c:20},hint:"しっかりためる人向け。でも倒れたら意味がない"},
- {id:"thanks",icon:"🍽️",name:"お世話になった人に恩返しの食事会",need:{m:8,h:40,c:80},hint:"人とのつながりがカギ"}];
-const ACTS=[
- {k:"work2",t:"💰 しっかり働く",d:"お金 +5万／元気 −22",f:s=>{s.m+=5;s.h-=22}},
- {k:"work1",t:"💼 ほどほどに働く",d:"お金 +3万／元気 −10",f:s=>{s.m+=3;s.h-=10}},
- {k:"rest",t:"🛌 ゆっくり休む",d:"元気 +22",f:s=>{s.h+=22}},
- {k:"people",t:"🤝 人と過ごす",d:"つながり +15／お金 −1万／元気 +5",f:s=>{s.c+=15;s.m-=1;s.h+=5}}];
-// ハプニング：状態によって起きやすさが変わる
-const EVENTS=[
- {w:s=>s.c>=50?3:0.5,t:"🌟 友人から、いい仕事を紹介されました！",f:s=>{s.m+=4},msg:"お金 +4万"},
- {w:s=>s.c>=40?2:0.3,t:"🎁 「いつもありがとう」と、思いがけないお礼が届きました。",f:s=>{s.m+=2;s.h+=5},msg:"お金 +2万／元気 +5"},
- {w:s=>s.h<=30?4:0.3,t:"🤒 無理がたたって、風邪をひいてしまいました…",f:s=>{s.h-=12;s.m-=2},msg:"元気 −12／お金 −2万（病院代）"},
- {w:()=>1.2,t:"💸 急な出費！家電がこわれてしまいました。",f:s=>{s.m-=4},msg:"お金 −4万"},
- {w:s=>s.c<=25?2.5:0.5,t:"🌧️ なんだかさみしい夜。だれかと話したくなりました。",f:s=>{s.h-=8},msg:"元気 −8"},
- {w:s=>s.h>=60?2:0.5,t:"☀️ 体が軽い！いつもより仕事がはかどりました。",f:s=>{s.m+=2},msg:"お金 +2万"},
- {w:()=>0.8,t:"🌠 流れ星に願った夜。宝くじで少しだけ当たりました。",f:s=>{s.m+=3},msg:"お金 +3万"},
- {w:s=>s.c>=60?2:0,t:"🤝 困ったとき、仲間が手伝ってくれました。",f:s=>{s.h+=12},msg:"元気 +12"}];
-let G,S,turn,busy=false;
+// lean: +なら金貨側、−なら時間側。±4で天秤が倒れて閉店（失敗）
+let F={lean:0,lamp:0},night=0,step=0;
 const $=id=>document.getElementById(id);
-$("goals").innerHTML=GOALS.map((g,i)=>`<button onclick="start(${i})">${g.icon} ${g.name}<small>必要：お金${g.need.m}万・元気${g.need.h}・つながり${g.need.c}｜${g.hint}</small></button>`).join("");
-function start(i){G=GOALS[i];S={m:3,h:70,c:30};turn=0;$("s0").classList.add("hide");$("s1").classList.remove("hide");$("goalname").textContent=`目標：${G.icon} ${G.name}`;draw();}
-function draw(){
- const it=[["m","お金","万"],["h","元気",""],["c","つながり",""]];
- $("stats").innerHTML=it.map(([k,n,u])=>`<div class="st ${S[k]>=G.need[k]?"ok":""}"><span>${n}</span><b>${S[k]}${u}</b><em>目標 ${G.need[k]}${u}</em></div>`).join("");
- $("dbar").style.width=(turn/10*100)+"%";$("dl").textContent=`${turn*3}日目 ／ 30日`;
- $("turnttl").textContent=`${turn*3+1}〜${turn*3+3}日目`;
- $("acts").innerHTML=ACTS.map((a,i)=>`<button onclick="act(${i})">${a.t}<small>${a.d}</small></button>`).join("");}
-function act(i){if(busy)return;busy=true;document.querySelectorAll("#acts button").forEach(b=>b.disabled=true);
- const b={...S};ACTS[i].f(S);S.m-=1;// 生活費
- let html=`<p class="ttl">${ACTS[i].t.slice(2)}ことにしました</p><p class="d">（3日分の生活費 −1万）</p>`;
- if(Math.random()<0.55){const ws=EVENTS.map(e=>e.w(S)),sum=ws.reduce((a,c)=>a+c,0);let r=Math.random()*sum,e=EVENTS[0];for(let j=0;j<EVENTS.length;j++){r-=ws[j];if(r<=0){e=EVENTS[j];break}}e.f(S);html+=`<p>${e.t}</p><p class="d">${e.msg}</p>`;}
- S.h=Math.min(100,S.h);S.c=Math.min(100,Math.max(0,S.c));
- $("ev").innerHTML=html;$("ev").classList.remove("hide");$("ev").classList.remove("ev");void $("ev").offsetWidth;$("ev").classList.add("ev");
- turn++;draw();document.querySelectorAll("#acts button").forEach(b=>b.disabled=true);
- setTimeout(()=>{busy=false;
-  if(S.h<=0)return end("down");
-  if(S.m<0)return end("broke");
-  if(turn>=10)return end("judge");
-  draw();},1900);}
-function end(type){
- $("s1").classList.add("hide");const e=$("s2");e.classList.remove("hide");
- const okM=S.m>=G.need.m,okH=S.h>=G.need.h,okC=S.c>=G.need.c;let ic,ti,tx;
- if(type==="down"){ic="🌙";ti="今回は、ここで休憩";tx="がんばりすぎて、からだが「少し休んで」と言っています。お金よりも先に、あなた自身を大切にしてくださいね。元気があれば、何度でもやり直せます。";}
- else if(type==="broke"){ic="🍂";ti="今月は、乗り切れませんでした";tx="急な出費が重なると、だれでもこうなることがあります。あなたのせいではありません。次は、少しだけ「ためる日」を増やしてみましょう。";}
- else if(okM&&okH&&okC){ic="✨";ti="目標達成！最高の30日";tx=`「${G.name}」がかないました。お金・元気・つながりがそろうと、豊かさはこんなにあたたかいものになります。この感覚を、どうか覚えておいてください。`;}
- else if(okM&&!okC){ic="💰";ti="かなったけれど、少しさみしい";tx="目標の物はそろいました。でも、「一緒によろこんでくれる人」がいると、もっと豊かだったかもしれません。次は、人と過ごす日もつくってみましょう。";}
- else if(okM&&!okH){ic="😮‍💨";ti="かなったけれど、へとへと";tx="目標には届きました。でも、からだはくたくたです。せっかくの豊かさを楽しむために、休むことも大切な「投資」です。";}
- else if(!okM&&okC){ic="🤝";ti="お金は足りない、でも心はあたたか";tx="目標の金額には届きませんでした。それでも、あなたのまわりには支えてくれる人がいます。それは、お金では買えない大きな豊かさです。";}
- else{ic="🌱";ti="もう少しで、とどきそう";tx="今回は目標に届きませんでした。でも、30日間の選び方で、何が大切か少し見えてきたはずです。もう一度、ちがう選び方を試してみませんか？";}
- e.innerHTML=`<p class="big">${ic}</p><h2>${ti}</h2><p>${tx}</p><div class="stats"><div class="st ${okM?"ok":""}"><span>お金</span><b>${S.m}万</b><em>目標 ${G.need.m}万</em></div><div class="st ${okH?"ok":""}"><span>元気</span><b>${Math.max(0,S.h)}</b><em>目標 ${G.need.h}</em></div><div class="st ${okC?"ok":""}"><span>つながり</span><b>${S.c}</b><em>目標 ${G.need.c}</em></div></div><button class="main" style="margin-top:16px" onclick="location.reload()">もう一度チャレンジ</button>`;}
+function hud(){$("hud").classList.remove("hide");$("pin").style.left=`calc(${50+F.lean*11}% - 9px)`;$("lamp").textContent="窓口の灯り "+("●".repeat(Math.max(0,F.lamp))||"―");}
+function A(lean=0,lamp=0,set={}){return s=>{F.lean+=lean;F.lamp+=lamp;Object.assign(F,set);}}
+// 夜ごとの客。関数なので、前の夜の選択で中身が変わる
+const SCENES=[
+ ()=>({n:"一夜目",who:"岩城さん（漁師・72歳）",say:"孫がこの夏、泊まりにくる。そのひと夏を、金にしてくれんか。船のエンジンが止まってな。",
+  o:[["ひと夏ぶん、まるごと両替する",A(1,0,{iw:1}),"岩城さんは金貨の袋を、両手で受け取った。"],
+     ["三日ぶんだけ両替する",A(0,0,{iw:2}),"「三日か…」岩城さんは少し笑って帰っていった。"],
+     ["両替は受けつけない",A(0,0,{iw:0}),"岩城さんは黙って帽子をかぶり直した。"]]}),
+ ()=>({n:"一夜目",who:"ミナさん（料理人・34歳）",say:"通帳の数字、ぜんぶ時間に換えたいの。一年、何の予定もない時間に。",
+  o:[["ぜんぶ両替する",A(-1,0,{mi:1}),"ミナさんは、空っぽの手帳を一冊受け取った。"],
+     ["半年ぶんにしておく",A(0,0,{mi:2}),"「半年ね」ミナさんはエプロンを外した。"],
+     ["今はやめておきましょう",A(0,0,{mi:0}),"ミナさんは、明日の仕込みのことを考えながら帰った。"]]}),
+ ()=>({n:"二夜目",who:"トキくん（10歳）",say:"父さんの腕時計、止まったままなんだ。動かすには、何を払えばいい？",
+  o:[["きみの放課後、ひと月ぶん",A(1,0,{tk:1}),"トキくんは迷わずうなずいた。"],
+     ["銀貨三枚",A(0,0,{tk:2}),"「三枚…ためてくる」トキくんは走って帰った。"],
+     ["止まったまま、預かっておく",A(-1,0,{tk:0}),"時計は、窓口の棚にそっと置かれた。"]]}),
+ ()=>({n:"二夜目",who:"影のない客",say:"この町の全員から、明日の一時間ずつもらいたい。代わりに、全員の枕元へ金貨を一枚。",
+  o:[["承認する",A(2,0,{sh:1}),"客は、音を立てずに出ていった。"],
+     ["拒否する",A(0,0,{sh:0}),"客は、窓口の明かりを長いこと見ていた。"]]}),
+ ()=>F.iw===1?{n:"三夜目",who:"岩城さん、ふたたび",say:"船は直った。だが、孫は来なかった。あの夏のぶんが、どこにもない。金は返すから、戻せんか。",
+   o:[["戻す（規則にはない）",A(-1,1),"小さな麦わら帽子が、窓口の奥から出てきた。"],["両替は戻せない規則です",A(0,-1),"岩城さんは、直った船で一人、沖へ出ていった。"]]}
+  :F.iw===2?{n:"三夜目",who:"岩城さん、ふたたび",say:"孫は三日だけ来た。船は半分直った。残りは、二人で漕いで帰ってきたよ。",
+   o:[["日焼けした写真を、預かる",A(0,1),"写真の二人は、オールを片方ずつ持っていた。"],["金貨を一枚、おまけで渡す",A(1,0),"岩城さんは、それをお守りにすると言った。"]]}
+  :{n:"三夜目",who:"岩城さん、ふたたび",say:"船は動かん。だから孫と、浜で網をつくろった。ほら、あの子が編んだ。",
+   o:[["その網目を、金庫で預かる",A(-1,1),"ほつれだらけの網目が、金庫で一番いい棚に収まった。"],["修理代を少し貸す",A(1,0),"「来年は、船で沖まで連れていける」"]]},
+ ()=>F.mi===1?{n:"三夜目",who:"ミナさん、ふたたび",say:"何もしない一年って、三日で長すぎるとわかった。屋台をやってみたいの。元手だけ、ほしい。",
+   o:[["時間を少し、金貨に戻す",A(1,1),"屋台の名前は『ひまな料理人』になった。"],["一年は一年です",A(-1,-1),"ミナさんは、空の手帳に毎日『なし』と書いた。"]]}
+  :F.mi===2?{n:"三夜目",who:"ミナさん、ふたたび",say:"半年のうちに、近所の子に卵焼きを教えたの。お礼に、どんぐりをもらった。",
+   o:[["どんぐりを、預かる",A(-1,1),"金庫に、帽子つきのどんぐりが一つ増えた。"],["半年が終わったら店に戻ると約束させる",A(1,0),"「戻るよ。前より、ちょっと甘くするけど」"]]}
+  :{n:"三夜目",who:"ミナさん、ふたたび",say:"厨房で、立ったまま眠ってた。…一日だけでいい、両替して。",
+   o:[["一日ぶん、両替する",A(-1,1),"次の朝、ミナさんは目覚ましをかけなかった。"],["今は繁忙期ですよね",A(1,-1),"ミナさんは、また仕込みに戻った。"]]},
+ ()=>F.tk===1?{n:"四夜目",who:"トキくん、ふたたび",say:"時計は動いた。でも、放課後がなくて、みんなの遊びの話がわからなくなった。",
+   o:[["時計を止めて、放課後を返す",A(-1,1),"トキくんは、止まった時計を腕に巻いて走っていった。"],["約束は約束だよ",A(1,-1),"秒針の音だけが、やけに大きく聞こえた。"]]}
+  :F.tk===2?{n:"四夜目",who:"トキくん、ふたたび",say:"新聞配達で、銀貨三枚ためた。手、ちょっとあかぎれてる。",
+   o:[["三枚、受け取る",A(1,0),"時計は動いた。トキくんは、自分の手で巻いた。"],["一枚でいい、と言う",A(-1,1),"残りの二枚で、トキくんは手袋を買った。"]]}
+  :{n:"四夜目",who:"トキくん、ふたたび",say:"毎晩、あの時計を見にきてたら、中の歯車が見たくなった。開けていい？",
+   o:[["小さなドライバーを貸す",A(-1,1),"三週間後、時計は自分の力で動きだした。"],["それは預かり物だから",A(0,-1),"トキくんは、ガラス越しに見るだけにした。"]]},
+ ()=>F.sh===1?{n:"四夜目",who:"影のない客、ふたたび",say:"町は少し裕福になった。誰も、夕焼けを見なくなったけれど。もう一時間、どうだろう。",
+   o:[["承認する",A(2,0),"その日から、町の時計台は一時間ずれたまま動いている。"],["もう受けつけない",A(-1,0),"客は、自分の足もとをじっと見て、去った。"]]}
+  :{n:"四夜目",who:"隣町の郵便配達",say:"影のない客が、うちの町に来たんです。時計台が止まりました。少しだけ、時間を貸してもらえませんか。",
+   o:[["この町の時間を、少し分ける",A(-1,1),"隣町の時計台が、一時間遅れで鐘を鳴らした。"],["窓口は、この町のためのものです",A(1,0),"配達人は、自転車で暗い道へ戻っていった。"]]},
+ ()=>({n:"最後の夜",who:"銀行の主",say:"窓口係。今夜は、きみの番だ。きみの『夜明けまで』を両替するなら、金庫はいっぱいになる。",
+  o:[["両替して、金庫を満たす",A(1,0,{me:1}),"金庫の扉が、重たい音で閉まった。"],
+     ["窓を閉めて、夜明けを見にいく",A(-1,1,{me:0}),"東の空が、うすく金色にほどけていった。"]]})
+];
+function show(){
+ if(Math.abs(F.lean)>=4)return fall();
+ if(step>=SCENES.length)return ending();
+ const s=SCENES[step]();hud();
+ $("stage").innerHTML=`<div class="card"><p class="night">${s.n}</p><p class="who">${s.who}</p><p class="say">${s.say}</p>${s.o.map((o,i)=>`<button onclick="pick(${i})">${o[0]}</button>`).join("")}</div>`;
+ window._s=s;}
+function pick(i){const o=_s.o[i];o[1]();hud();
+ $("stage").innerHTML=`<div class="card"><p class="who">${_s.who}</p><p class="after">${o[2]}</p><button class="main" onclick="step++;show()">次の客を呼ぶ</button></div>`;}
+function fall(){const g=F.lean>0;$("stage").innerHTML=`<div class="card end"><p class="big">${g?"🪙":"⏳"}</p><h2>${g?"金庫がいっぱいで、今夜は店じまい":"時間を配りすぎて、今夜は店じまい"}</h2><p>${g?"金庫の扉が、もう閉まらない。窓口係のあなたは、あふれた金貨を一枚ポケットに入れて、屋台のおでんを食べに行った。湯気の向こうで、岩城さんが手を振っていた。":"配った時間で、町じゅうが昼寝をしている。窓口係のあなたも、つられてカウンターにほおをつけた。起きたら、肩に知らない毛布がかかっていた。"}</p><p class="after">天秤が倒れきると、その夜はおしまい。でも、窓口は明日もあきます。</p><button class="main" onclick="location.reload()">明日の夜も、窓口をあける</button></div>`;}
+function ending(){
+ const L=F.lean,G=F.lamp;let ic,t,x;
+ if(G>=5&&Math.abs(L)<=1){ic="🌅";t="夜明けの窓口";x="天秤はまっすぐのまま、灯りは朝まで消えなかった。金庫の中身は、麦わら帽子と、どんぐりと、ほつれた網目。どれも、値段のつけようがないものばかり。";}
+ else if(L>=2){ic="🏛️";t="にぎやかな金庫";x="金庫はぴかぴかに満ちた。窓口係のあなたは、その金貨で町じゅうに焼きいもを配った。もらった人が、また誰かに半分わけていた。";}
+ else if(L<=-2){ic="🕰️";t="のんびり時計の町";x="町の時計は、ちょっとずつゆっくりになった。誰も遅刻を気にしない。夕焼けが終わるまで、みんな屋根の上にいた。";}
+ else if(G<=1){ic="🧾";t="きちょうめんな窓口";x="帳簿は一円も、一秒もずれていない。窓口係のあなたは、自分のていねいさに少し笑って、あたたかいココアをいれた。明日は、規則をひとつだけ破ってみようかな。";}
+ else{ic="🌙";t="いつもの朝";x="大きなことは何も起きなかった。岩城さんは港へ、ミナさんは厨房へ、トキくんは学校へ。窓口係のあなたは、あくびをひとつして、朝ごはんを何にするか考えはじめた。";}
+ const ep=[
+  F.iw===1?"岩城さん：直った船のへさきに、小さな麦わら帽子を結んでいる。":F.iw===2?"岩城さん：来年の夏は、孫が船を漕ぐ番らしい。":"岩城さん：浜に干された網は、潮風で少しずつ形を変えている。",
+  F.mi===1?"ミナさん：屋台は、雨の日だけ休む。":F.mi===2?"ミナさん：店の卵焼きが、前より少し甘くなった。":"ミナさん：月に一度、目覚ましをかけない日をつくった。",
+  F.tk===1?"トキくん：止まった時計を、今でも左腕に巻いている。":F.tk===2?"トキくん：自分で巻いた時計は、一分だけ進んでいる。":"トキくん：将来の夢の欄に『時計屋』と書いた。"];
+ const me=F.me===0?"窓を閉めて見た夜明けは、思っていたより、ずっと金色だった。":"金庫の鍵を首にさげて、帰り道、パン屋の一番乗りになった。";
+ $("hud").classList.add("hide");
+ $("stage").innerHTML=`<div class="card end"><p class="big">${ic}</p><h2>${t}</h2><p>${x}</p>${ep.map(e=>`<p class="ep">${e}</p>`).join("")}</div>
+ <div class="card"><p class="night">窓口係のあなたへ</p><p>${me}</p><p>五夜のあいだ、あなたが選んだことで、だれかの明日が少しずつ変わった。どの選び方にも、ちゃんと朝が来た。</p><p style="color:var(--gold)">だから、あなたもだいじょうぶ。<br>今日の続きも、たのしんでいい。</p><button class="main" style="margin-top:6px" onclick="location.reload()">ちがう夜も、のぞいてみる</button></div>`;}
+$("stage").innerHTML=`<div class="card"><p>客は、全部で五夜ぶん。<br>同じ人が、また訪ねてくることもあります。<br><br>天秤が<b>金貨</b>か<b>時間</b>のどちらかに倒れきると、窓口は閉店です。</p><button class="main" onclick="show()">窓口をあける</button></div>`;
 </script>
 </body>
 </html>
