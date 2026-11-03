@@ -49,6 +49,9 @@ textarea{min-height:90px;resize:vertical}
 .drop.in{opacity:1;transform:none}
 .legend{display:grid;gap:6px;font-size:15px}
 .legend b{display:inline-block;min-width:96px;color:#c4642a}
+.refl{display:grid;gap:10px;margin-top:8px}
+.refl label{font-size:14px;color:var(--muted);display:grid;gap:4px}
+.refl textarea{min-height:56px}
 </style>
 </head>
 <body>
@@ -104,8 +107,12 @@ textarea{min-height:90px;resize:vertical}
   <h2>あなたの「大きな石」</h2>
   <div class="bigstone" id="bigOne"></div>
   <div class="box">
-    <p><b>ふりかえり</b>（シェアのときのメモに）</p>
-    <p class="muted">・なぜ、これが大きな石だったのでしょう<br>・「あとで入れる」を選ぶとき、いちばん迷ったものは？<br>・いま、どんな気持ちですか</p>
+    <p><b>ふりかえり</b>（シェアのときのメモに。書かなくても大丈夫です）</p>
+    <div class="refl">
+      <label>なぜ、これが大きな石だったのでしょう<textarea id="q1" rows="2"></textarea></label>
+      <label>「あとで入れる」を選ぶとき、いちばん迷ったものは？<textarea id="q2" rows="2"></textarea></label>
+      <label>いま、どんな気持ちですか<textarea id="q3" rows="2"></textarea></label>
+    </div>
   </div>
   <p><b>新しい一年に向けて</b></p>
   <p class="muted">この大きな石を、来年いちばん先にツボへ入れるために、やってみたい小さなことを1つ。</p>
@@ -183,16 +190,18 @@ function fillJar(){
   [0,1,2,3].forEach(k=>setTimeout(()=>{$("d"+k).classList.add("in");$("jarMsg").textContent=msgs[k]},400+k*1500));
   setTimeout(()=>{
     $("jarMsg").innerHTML="<b>9つ ぜんぶ、ツボに入りました。</b><br>大きな石を先に入れれば、ほかの大切なものも、ちゃんと入ります。";
-    $("legend").innerHTML=`<div><b>大きな石</b>${esc(big)}</div><div><b>中くらいの石</b>${esc(mid.join("、"))}</div><div><b>小石</b>${esc(small.join("、"))}</div><div><b>砂</b>${esc(sand.join("、"))}</div><div style="margin-top:6px"><b>来年の一歩</b>${esc($("next").value.trim()||"（未記入）")}</div>`;
+    $("legend").innerHTML=`<div><b>大きな石</b>${esc(big)}</div><div><b>中くらいの石</b>${esc(mid.join("、"))}</div><div><b>小石</b>${esc(small.join("、"))}</div><div><b>砂</b>${esc(sand.join("、"))}</div><div style="margin-top:6px"><b>来年の一歩</b>${esc($("next").value.trim()||"（未記入）")}</div>`+[1,2,3].filter(k=>qv(k)).map(k=>`<div style="margin-top:4px"><b style="display:block">${QS[k-1]}</b>${esc(qv(k))}</div>`).join("");
     $("legend").style.display="grid";$("endBtns").style.display="flex";
   },400+4*1500+400);
 }
+const qv=k=>$("q"+k).value.trim();
+const QS=["なぜ大きな石だったか","いちばん迷ったもの","いまの気持ち"];
 function copySum(){
   const big=items[bigIdx()],f=k=>order[k].map(i=>items[i]).join("、");
-  const t=`【大きな石のワーク】\n大きな石：${big}\n中くらいの石：${f(2)}\n小石：${f(1)}\n砂：${f(0)}\n来年の一歩：${$("next").value.trim()}`;
+  const t=`【大きな石のワーク】\n大きな石：${big}\n中くらいの石：${f(2)}\n小石：${f(1)}\n砂：${f(0)}\n来年の一歩：${$("next").value.trim()}`+[1,2,3].filter(k=>qv(k)).map(k=>`\n${QS[k-1]}：${qv(k)}`).join("");
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>$("copied").textContent="コピーしました").catch(()=>$("copied").textContent="コピーできませんでした");
 }
-function resetAll(){if(!confirm("はじめからやり直しますか？"))return;try{localStorage.removeItem("bigstone")}catch(e){}ins.forEach(v=>v.value="");$("next").value="";$("toRound").disabled=true;go("s0")}
+function resetAll(){if(!confirm("はじめからやり直しますか？"))return;try{localStorage.removeItem("bigstone")}catch(e){}ins.forEach(v=>v.value="");$("next").value="";[1,2,3].forEach(k=>$("q"+k).value="");$("toRound").disabled=true;go("s0")}
 </script>
 </body>
 </html>
