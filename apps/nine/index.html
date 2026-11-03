@@ -159,7 +159,7 @@ function setAside(){
   const left=items.length-aside.length,nx=ROUNDS[r].n;
   $("rTitle").textContent=`残りは ${left}つ です`;
   $("rText").textContent=r===ROUNDS.length-1?`次は ${nx}つを横に置いて、最後に1つだけ残します。`:`次は さらに ${nx}つを横に置きます。`;
-  $("rWait").textContent="司会の合図があるまで、少しだけ待ちましょう。";
+  $("rWait").textContent="司会の合図があったら、「次へすすむ」を押してください。";
   $("rBtn").textContent="次へすすむ";$("rBtn").disabled=false;$("rBtn").onclick=drawRound;
 }
 const bigIdx=()=>items.findIndex((_,i)=>!aside.includes(i));
