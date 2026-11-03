@@ -101,7 +101,7 @@ textarea{min-height:90px;resize:vertical}
 const $=id=>document.getElementById(id);
 const ROUNDS=[{n:3,title:"1回目：3つ手放します",text:"9つの中から、手放すものを3つ選んでください。"},
               {n:3,title:"2回目：さらに3つ手放します",text:"残った6つの中から、3つ選んでください。"},
-              {n:2,title:"3回目：最後の選択です",text:"残った3つの中から、2つ手放してください。最後に1つだけが残ります。"}];
+              {n:2,title:"3回目：2つ手放して、1つ残します",text:"残った3つの中から、2つ手放してください。最後に1つだけが残ります。"}];
 let items=[],gone=[],order=[],r=0,sel=new Set();
 
 function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
@@ -131,6 +131,9 @@ function letGo(){
   document.querySelectorAll("#cards .c").forEach((d,i)=>{if(sel.has(i)){d.classList.remove("sel");d.classList.add("gone")}});
   $("rBtn").disabled=true;r++;save();
   if(r>=ROUNDS.length){setTimeout(()=>{const last=items.findIndex((_,i)=>!gone.includes(i));$("lastOne").textContent=items[last];go("s3")},1400);return}
+  const left=items.length-gone.length,nx=ROUNDS[r].n;
+  $("rTitle").textContent=`残りは ${left}つ です`;
+  $("rText").textContent=r===ROUNDS.length-1?`次は ${nx}つ 手放して、最後に1つだけ残します。`:`次は さらに ${nx}つ 手放します。`;
   $("rWait").textContent="司会の合図があるまで、少しだけ待ちましょう。";
   $("rBtn").textContent="次へすすむ";$("rBtn").disabled=false;$("rBtn").onclick=()=>{$("rBtn").onclick=letGo;drawRound()};
 }
