@@ -28,7 +28,8 @@ input,textarea{font:inherit;font-size:16px;width:100%;padding:11px 12px;border-r
 textarea{min-height:90px;resize:vertical}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .c{background:var(--card);border:2px solid var(--line);border-radius:14px;min-height:92px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:15px;cursor:pointer;transition:transform .15s,opacity .4s,border-color .15s;word-break:break-word}
-.c.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--card))}
+.c.sel{border-color:var(--accent);border-width:3px;background:color-mix(in srgb,var(--accent) 28%,var(--card));font-weight:600}
+.c.sel::after{content:" ✓";color:var(--accent)}
 .c.gone{opacity:.25;cursor:default;transform:scale(.94);text-decoration:line-through}
 .c.gone.back{opacity:1;text-decoration:none;transform:none}
 .c.last{border-color:var(--accent);font-weight:600;font-size:17px}
@@ -102,7 +103,7 @@ const $=id=>document.getElementById(id);
 const ROUNDS=[{n:3,title:"1回目：3つ手放します",text:"9つの中から、手放すものを3つ選んでください。"},
               {n:3,title:"2回目：さらに3つ手放します",text:"残った6つの中から、3つ選んでください。"},
               {n:2,title:"3回目：2つ手放して、1つ残します",text:"残った3つの中から、2つ手放してください。最後に1つだけが残ります。"}];
-let items=[],gone=[],order=[],r=0,sel=new Set();
+let items=[],gone=[],order=[],r=0,sel=new Set(),waiting=false;
 
 function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
 function save(){try{localStorage.setItem("nine",JSON.stringify({items,gone,order,r,next:$("next").value}))}catch(e){}}
@@ -116,12 +117,12 @@ ins.forEach(x=>x.addEventListener("input",()=>{$("toRound").disabled=ins.some(v=
 function startRounds(){items=ins.map(v=>v.value.trim());gone=[];order=[];r=0;go("s2");drawRound();save()}
 
 function drawRound(){
-  const R=ROUNDS[r];sel=new Set();
+  const R=ROUNDS[r];sel=new Set();waiting=false;
   $("step").querySelectorAll("i").forEach((e,k)=>e.classList.toggle("on",k<=r));
   $("rTitle").textContent=R.title;$("rText").textContent=R.text;$("rWait").textContent="";
   const c=$("cards");c.innerHTML="";
   items.forEach((t,i)=>{const d=document.createElement("div");d.className="c"+(gone.includes(i)?" gone":"");d.textContent=t;
-    d.onclick=()=>{if(gone.includes(i))return;if(sel.has(i))sel.delete(i);else if(sel.size<R.n)sel.add(i);d.classList.toggle("sel",sel.has(i));upd()};c.appendChild(d)});
+    d.onclick=()=>{if(waiting||gone.includes(i))return;if(sel.has(i))sel.delete(i);else if(sel.size<R.n)sel.add(i);d.classList.toggle("sel",sel.has(i));upd()};c.appendChild(d)});
   upd();
 }
 function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").textContent=sel.size===R.n?`この${R.n}つを手放す`:`あと${R.n-sel.size}つ選んでください`}
@@ -129,7 +130,7 @@ function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").tex
 function letGo(){
   sel.forEach(i=>{gone.push(i)});order.push([...sel].map(i=>items[i]));
   document.querySelectorAll("#cards .c").forEach((d,i)=>{if(sel.has(i)){d.classList.remove("sel");d.classList.add("gone")}});
-  $("rBtn").disabled=true;r++;save();
+  $("rBtn").disabled=true;r++;waiting=true;sel=new Set();save();
   if(r>=ROUNDS.length){setTimeout(()=>{const last=items.findIndex((_,i)=>!gone.includes(i));$("lastOne").textContent=items[last];go("s3")},1400);return}
   const left=items.length-gone.length,nx=ROUNDS[r].n;
   $("rTitle").textContent=`残りは ${left}つ です`;
