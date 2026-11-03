@@ -32,7 +32,7 @@ textarea{min-height:90px;resize:vertical}
 .c{position:relative;background:#fff;border:2px solid var(--line);border-radius:22px 26px 20px 28px;min-height:88px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:15px;cursor:pointer;transition:transform .2s,opacity .5s,background .2s;word-break:break-word}
 .c::before{content:"🪨";position:absolute;left:6px;top:4px;font-size:13px;opacity:.7}
 .c.sel{border-color:var(--accent);border-width:3px;background:#fff1e2;font-weight:700;transform:scale(.97)}
-.c.sel::after{content:"→ 横へ";position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--accent)}
+.c.sel::after{content:"あとで入れる";position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--accent)}
 .c.side{opacity:.35;cursor:default;transform:scale(.92);background:#f7efe2}
 .step{display:flex;gap:6px}
 .step i{flex:1;height:7px;border-radius:4px;background:#f2e2c8}
@@ -78,7 +78,7 @@ textarea{min-height:90px;resize:vertical}
   </div>
   <div class="box">
     <p>あなたの<b>新しい一年</b>というツボに、いちばん先に入れたい<b>大きな石</b>は何でしょう。</p>
-    <p class="muted" style="margin-top:6px">大切なものを9つ書いて、少しずつ「横に置いて」いきます。最後に残ったものが、あなたの大きな石です。横に置いたものも、最後にはぜんぶツボに入ります。</p>
+    <p class="muted" style="margin-top:6px">大切なものを9つ書いて、「これは<b>あとで入れる</b>」という石を、少しずつ選んでいきます。最後に残ったものが、いちばん先に入れる「大きな石」です。あとで入れる石も、最後にはぜんぶツボに入ります。</p>
     <p class="muted" style="margin-top:6px">書いた内容は、この端末の中だけに残り、どこにも送られません。</p>
   </div>
   <button class="warm" onclick="go('s1')">はじめる</button>
@@ -105,7 +105,7 @@ textarea{min-height:90px;resize:vertical}
   <div class="bigstone" id="bigOne"></div>
   <div class="box">
     <p><b>ふりかえり</b>（シェアのときのメモに）</p>
-    <p class="muted">・なぜ、これが大きな石だったのでしょう<br>・横に置くのが、いちばん迷ったものは？<br>・いま、どんな気持ちですか</p>
+    <p class="muted">・なぜ、これが大きな石だったのでしょう<br>・「あとで入れる」を選ぶとき、いちばん迷ったものは？<br>・いま、どんな気持ちですか</p>
   </div>
   <p><b>新しい一年に向けて</b></p>
   <p class="muted">この大きな石を、来年いちばん先にツボへ入れるために、やってみたい小さなことを1つ。</p>
@@ -125,9 +125,9 @@ textarea{min-height:90px;resize:vertical}
 </main>
 <script>
 const $=id=>document.getElementById(id);
-const ROUNDS=[{n:3,title:"1回目：3つを横に置きます",text:"9つの石の中から、今回は横に置いておくものを3つ選んでください。"},
-              {n:3,title:"2回目：さらに3つを横に置きます",text:"残った6つの中から、3つ選んでください。"},
-              {n:2,title:"3回目：2つを横に置いて、1つ残します",text:"残った3つの中から、2つ選んでください。最後に残る1つが、あなたの大きな石です。"}];
+const ROUNDS=[{n:3,title:"1回目：あとで入れる石を3つ",text:"9つの中から、「これは、あとで入れてもいいかな」と思うものを3つ選んでください。選んだ石も、最後にはちゃんとツボに入ります。"},
+              {n:3,title:"2回目：あとで入れる石を、さらに3つ",text:"残った6つの中から、あとで入れるものを3つ選んでください。"},
+              {n:2,title:"3回目：いちばん先に入れる1つを決めます",text:"残った3つの中から、あとで入れるものを2つ選んでください。最後に残る1つが、いちばん先にツボに入れる「大きな石」です。"}];
 let items=[],aside=[],order=[],r=0,sel=new Set(),waiting=false;
 
 function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
@@ -149,7 +149,7 @@ function drawRound(){
     d.onclick=()=>{if(waiting||aside.includes(i))return;if(sel.has(i))sel.delete(i);else if(sel.size<R.n)sel.add(i);d.classList.toggle("sel",sel.has(i));upd()};c.appendChild(d)});
   $("rBtn").onclick=setAside;upd();
 }
-function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").textContent=sel.size===R.n?`この${R.n}つを横に置く`:`あと${R.n-sel.size}つ選んでください`}
+function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").textContent=sel.size===R.n?`この${R.n}つは あとで入れる`:`あと${R.n-sel.size}つ選んでください`}
 
 function setAside(){
   sel.forEach(i=>aside.push(i));order.push([...sel]);
@@ -158,7 +158,7 @@ function setAside(){
   if(r>=ROUNDS.length){$("rBtn").disabled=true;setTimeout(()=>{$("bigOne").textContent="🪨 "+items[bigIdx()];go("s3")},1300);return}
   const left=items.length-aside.length,nx=ROUNDS[r].n;
   $("rTitle").textContent=`残りは ${left}つ です`;
-  $("rText").textContent=r===ROUNDS.length-1?`次は ${nx}つを横に置いて、最後に1つだけ残します。`:`次は さらに ${nx}つを横に置きます。`;
+  $("rText").textContent=r===ROUNDS.length-1?`次は あとで入れる石を${nx}つ選んで、最後に1つだけ残します。`:`次は あとで入れる石を、さらに${nx}つ選びます。`;
   $("rWait").textContent="司会の合図があったら、「次へすすむ」を押してください。";
   $("rBtn").textContent="次へすすむ";$("rBtn").disabled=false;$("rBtn").onclick=drawRound;
 }
