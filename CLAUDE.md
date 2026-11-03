@@ -336,6 +336,15 @@ $W = "$HOME\Desktop\制作\MMDD"; cd $W; $l = "file 'vMMDD.mp4'"; 1..80 | % { $l
 - → SUNOのプロンプトで「チャリン」を強めた版を試す：`ambient, soft gentle harp melody, gentle sparkling coin chimes as a main feature, clear high golden chime tones, subtle music box accents, soft crystal wind chimes, warm soft pads, tender, soothing, gentle, warm, hopeful, very slow, sleep, no piano, no guitar, no flute, no drums, instrumental`（うるさく感じたら元のプロンプトに戻す）
 - 視聴者は「眠るときに流す」人が多い（本人の実感）。アンケートは聴くだけの人も押せるよう「聴くだけの方も、タップひとつで大丈夫です」を添える
 
+### 2026-11 アプリのアンケート「夢」（72票・画像付き、いいね33）
+| 選択肢 | 得票率 |
+|---|---|
+| 夢の意味を知りたい | 54% |
+| 夢はあまり覚えていない | 24% |
+| いつでも見られるドリームマップがほしい | 13% |
+| 見た夢を解釈して、絵にして見たい | 10% |
+- 次のアプリは「夢の意味がわかる」形が第一候補（覚えていない人24%も多いので、短い言葉でも引ける形に）
+
 ### 2026-10 「あなたにとって、お金ってどんな存在ですか？」（最終61票・画像付き。9月の63票とほぼ同じ）
 | 選択肢 | 得票率 |
 |---|---|
