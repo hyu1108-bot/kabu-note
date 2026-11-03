@@ -3,64 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>9つの大切なもの</title>
-<meta name="theme-color" content="#2f4a6d">
+<title>大きな石のワーク</title>
+<meta name="theme-color" content="#fde7c4">
 <style>
-:root{--bg:#f6f2ea;--ink:#2c2a26;--main:#2f4a6d;--accent:#c98b3a;--card:#fff;--line:#e3dccd;--muted:#8a8479}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1f24;--ink:#ece8df;--main:#8fb0d8;--accent:#e0aa5e;--card:#2a2d33;--line:#3b3f47;--muted:#9c978d}}
+:root{--bg1:#fff8ec;--bg2:#fde7c4;--ink:#4a3a2a;--main:#2f8f83;--accent:#f08a3c;--card:#fffdf8;--line:#f0dcbc;--muted:#9a8670;--stone:#9c8b7a;--big:#e9a15a}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:24px 16px 40px;line-height:1.7}
+body{background:linear-gradient(180deg,var(--bg1),var(--bg2)) fixed;color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:24px 16px 48px;line-height:1.8}
 main{width:100%;max-width:560px}
 .screen{display:none;flex-direction:column;gap:16px}
-.screen.on{display:flex}
-h1{font-size:26px;font-weight:600;letter-spacing:.04em}
-h2{font-size:21px;font-weight:600}
+.screen.on{display:flex;animation:fade .5s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+h1{font-size:27px;letter-spacing:.04em;color:#c4642a}
+h2{font-size:21px}
 p{font-size:16px}
 .muted{color:var(--muted);font-size:14px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-button{font:inherit;border:none;border-radius:12px;padding:14px 18px;font-size:17px;font-weight:600;color:#fff;background:var(--main);cursor:pointer;width:100%}
-button:disabled{opacity:.4;cursor:default}
-button.sub{background:transparent;color:var(--main);border:1px solid var(--line)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 4px 14px rgba(200,140,60,.08)}
+button{font:inherit;border:none;border-radius:14px;padding:15px 18px;font-size:17px;font-weight:700;color:#fff;background:var(--main);cursor:pointer;width:100%;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+button:disabled{opacity:.45;cursor:default}
+button.sub{background:var(--card);color:var(--main);border:1px solid var(--line);box-shadow:none}
+button.warm{background:var(--accent)}
 .inputs{display:grid;gap:8px}
 .inputs label{display:flex;align-items:center;gap:10px}
 .inputs span{width:22px;color:var(--muted);text-align:right;font-size:14px}
-input,textarea{font:inherit;font-size:16px;width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+input,textarea{font:inherit;font-size:16px;width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink)}
 textarea{min-height:90px;resize:vertical}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.c{background:var(--card);border:2px solid var(--line);border-radius:14px;min-height:92px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:15px;cursor:pointer;transition:transform .15s,opacity .4s,border-color .15s;word-break:break-word}
-.c.sel{border-color:var(--accent);border-width:3px;background:color-mix(in srgb,var(--accent) 28%,var(--card));font-weight:600}
-.c.sel::after{content:" ✓";color:var(--accent)}
-.c.gone{opacity:.25;cursor:default;transform:scale(.94);text-decoration:line-through}
-.c.gone.back{opacity:1;text-decoration:none;transform:none}
-.c.last{border-color:var(--accent);font-weight:600;font-size:17px}
+.c{position:relative;background:#fff;border:2px solid var(--line);border-radius:22px 26px 20px 28px;min-height:88px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:15px;cursor:pointer;transition:transform .2s,opacity .5s,background .2s;word-break:break-word}
+.c::before{content:"🪨";position:absolute;left:6px;top:4px;font-size:13px;opacity:.7}
+.c.sel{border-color:var(--accent);border-width:3px;background:#fff1e2;font-weight:700;transform:scale(.97)}
+.c.sel::after{content:"→ 横へ";position:absolute;bottom:4px;right:8px;font-size:11px;color:var(--accent)}
+.c.side{opacity:.35;cursor:default;transform:scale(.92);background:#f7efe2}
 .step{display:flex;gap:6px}
-.step i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.step i{flex:1;height:7px;border-radius:4px;background:#f2e2c8}
 .step i.on{background:var(--accent)}
-.big{font-size:28px;font-weight:600;text-align:center;padding:18px 8px}
 .quiet{text-align:center;font-size:15px;color:var(--muted)}
 .row{display:flex;gap:10px}
 .copied{color:var(--accent);font-size:14px;text-align:center;min-height:20px}
+.jars{display:flex;gap:12px;justify-content:center}
+.jars figure{flex:1;text-align:center;font-size:13px}
+.jars svg{width:100%;max-width:200px}
+.bigstone{font-size:26px;font-weight:700;text-align:center;padding:16px;background:linear-gradient(135deg,#ffd9a8,#f5b06b);border-radius:40px 46px 38px 50px;color:#5a3412;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
+#jarBox svg{width:100%;max-width:420px;display:block;margin:0 auto}
+.drop{opacity:0;transform:translateY(-260px);transition:transform .9s cubic-bezier(.3,1.4,.6,1),opacity .3s}
+.drop.in{opacity:1;transform:none}
+.legend{display:grid;gap:6px;font-size:15px}
+.legend b{display:inline-block;min-width:96px;color:#c4642a}
 </style>
 </head>
 <body>
 <main>
 
+<!-- はじめに：ツボのおはなし -->
 <section class="screen on" id="s0">
-  <h1>9つの大切なもの</h1>
-  <p>あなたにとって大切なものを9つ書き、少しずつ手放していきます。最後に残るものは何でしょう。</p>
+  <h1>大きな石のワーク</h1>
   <div class="box">
-    <p><b>このワークの約束</b></p>
-    <p>・手放すのは画面の上だけです。最後に全部戻ります。<br>・正解はありません。迷う時間も大切にしてください。<br>・書いた内容はこの端末の中だけに残り、どこにも送られません。</p>
+    <p>ある先生が、教室でツボを用意しました。<br>まず<b>大きな石</b>を入れて、すき間に<b>小石</b>、さらに<b>砂</b>を入れると、ぜんぶ入りました。</p>
+    <p style="margin-top:8px">でも、先に砂を入れてしまうと……大きな石は、もう入りません。</p>
   </div>
-  <p class="muted">司会の合図に合わせて進めてください。</p>
-  <button onclick="go('s1')">はじめる</button>
+  <div class="jars">
+    <figure>
+      <svg viewBox="0 0 160 190"><path d="M45 20h70v14c0 6 25 18 25 50v80c0 10-8 16-18 16H38c-10 0-18-6-18-16V84c0-32 25-44 25-50z" fill="#fff" stroke="#c9a77a" stroke-width="4"/>
+      <path d="M24 100h112v64c0 8-6 12-14 12H38c-8 0-14-4-14-12z" fill="#f3d9a4"/>
+      <ellipse cx="80" cy="74" rx="34" ry="26" fill="#e9a15a"/><text x="80" y="80" font-size="14" text-anchor="middle" fill="#5a3412" font-weight="bold">大きな石</text></svg>
+      <figcaption>砂から入れると<br>大きな石が入らない</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 160 190"><path d="M45 20h70v14c0 6 25 18 25 50v80c0 10-8 16-18 16H38c-10 0-18-6-18-16V84c0-32 25-44 25-50z" fill="#fff" stroke="#c9a77a" stroke-width="4"/>
+      <path d="M24 120h112v44c0 8-6 12-14 12H38c-8 0-14-4-14-12z" fill="#f3d9a4"/>
+      <ellipse cx="80" cy="140" rx="36" ry="28" fill="#e9a15a"/><text x="80" y="146" font-size="14" text-anchor="middle" fill="#5a3412" font-weight="bold">大きな石</text>
+      <circle cx="40" cy="118" r="11" fill="#b9a690"/><circle cx="122" cy="120" r="12" fill="#b9a690"/><circle cx="60" cy="98" r="9" fill="#cbb9a3"/><circle cx="104" cy="100" r="9" fill="#cbb9a3"/></svg>
+      <figcaption>大きな石から入れると<br>ぜんぶ入る</figcaption>
+    </figure>
+  </div>
+  <div class="box">
+    <p>あなたの<b>新しい一年</b>というツボに、いちばん先に入れたい<b>大きな石</b>は何でしょう。</p>
+    <p class="muted" style="margin-top:6px">大切なものを9つ書いて、少しずつ「横に置いて」いきます。最後に残ったものが、あなたの大きな石です。横に置いたものも、最後にはぜんぶツボに入ります。</p>
+    <p class="muted" style="margin-top:6px">書いた内容は、この端末の中だけに残り、どこにも送られません。</p>
+  </div>
+  <button class="warm" onclick="go('s1')">はじめる</button>
 </section>
 
 <section class="screen" id="s1">
-  <h2>大切なものを9つ書きましょう</h2>
-  <p class="muted">人・もの・こと・気持ちなど、なんでもかまいません。<br>例：家族、友人、健康、家、仕事、趣味、自由、思い出の品、笑顔</p>
+  <h2>あなたの大切なもの（石）を9つ</h2>
+  <p class="muted">人・もの・こと・気持ちなど、なんでもかまいません。<br>例：家族、友人、健康、仕事、趣味、学び、自由、旅、笑顔</p>
   <div class="inputs" id="inputs"></div>
-  <button id="toRound" disabled onclick="startRounds()">9つ書けました</button>
+  <button id="toRound" disabled onclick="startRounds()">9つの石がそろいました</button>
 </section>
 
 <section class="screen" id="s2">
@@ -68,92 +96,103 @@ textarea{min-height:90px;resize:vertical}
   <h2 id="rTitle"></h2>
   <p id="rText"></p>
   <div class="cards" id="cards"></div>
-  <button id="rBtn" disabled onclick="letGo()"></button>
+  <button id="rBtn" disabled onclick="setAside()"></button>
   <p class="quiet" id="rWait"></p>
 </section>
 
 <section class="screen" id="s3">
-  <h2>最後に残ったもの</h2>
-  <div class="box big" id="lastOne"></div>
+  <h2>あなたの「大きな石」</h2>
+  <div class="bigstone" id="bigOne"></div>
   <div class="box">
     <p><b>ふりかえり</b>（シェアのときのメモに）</p>
-    <p class="muted">・なぜ、これが最後に残ったのでしょう<br>・いちばん手放しにくかったのは、どれでしたか<br>・いま、どんな気持ちですか</p>
+    <p class="muted">・なぜ、これが大きな石だったのでしょう<br>・横に置くのが、いちばん迷ったものは？<br>・いま、どんな気持ちですか</p>
   </div>
-  <p><b>新しい年に向けて</b></p>
-  <p class="muted">この大切なものを大事にするために、来年やってみたい小さなことを1つ。</p>
-  <textarea id="next" placeholder="例：月に1回、家族とゆっくりごはんを食べる"></textarea>
-  <button onclick="restore()">すべてを手元に戻す</button>
+  <p><b>新しい一年に向けて</b></p>
+  <p class="muted">この大きな石を、来年いちばん先にツボへ入れるために、やってみたい小さなことを1つ。</p>
+  <textarea id="next" placeholder="例：毎週日曜の夜は、家族との時間を先に予定に入れる"></textarea>
+  <button class="warm" onclick="fillJar()">ツボに入れてみる</button>
 </section>
 
 <section class="screen" id="s4">
-  <h2>すべて、まだあなたの手元にあります</h2>
-  <div class="cards" id="allCards"></div>
-  <div class="box">
-    <p class="muted">最後に残ったもの</p><p id="sumLast" style="font-weight:600"></p>
-    <p class="muted" style="margin-top:8px">手放した順番</p><p id="sumOrder" style="font-size:15px"></p>
-    <p class="muted" style="margin-top:8px">来年やってみたいこと</p><p id="sumNext"></p>
-  </div>
-  <div class="row"><button class="sub" onclick="copySum()">メモをコピー</button><button class="sub" onclick="resetAll()">はじめから</button></div>
+  <h2>大きな石から入れると……</h2>
+  <div class="box" id="jarBox"></div>
+  <p class="quiet" id="jarMsg" style="color:var(--ink);font-size:16px">&nbsp;</p>
+  <div class="box legend" id="legend" style="display:none"></div>
+  <div class="row" id="endBtns" style="display:none"><button class="sub" onclick="copySum()">メモをコピー</button><button class="sub" onclick="resetAll()">はじめから</button></div>
   <p class="copied" id="copied"></p>
 </section>
 
 </main>
 <script>
 const $=id=>document.getElementById(id);
-const ROUNDS=[{n:3,title:"1回目：3つ手放します",text:"9つの中から、手放すものを3つ選んでください。"},
-              {n:3,title:"2回目：さらに3つ手放します",text:"残った6つの中から、3つ選んでください。"},
-              {n:2,title:"3回目：2つ手放して、1つ残します",text:"残った3つの中から、2つ手放してください。最後に1つだけが残ります。"}];
-let items=[],gone=[],order=[],r=0,sel=new Set(),waiting=false;
+const ROUNDS=[{n:3,title:"1回目：3つを横に置きます",text:"9つの石の中から、今回は横に置いておくものを3つ選んでください。"},
+              {n:3,title:"2回目：さらに3つを横に置きます",text:"残った6つの中から、3つ選んでください。"},
+              {n:2,title:"3回目：2つを横に置いて、1つ残します",text:"残った3つの中から、2つ選んでください。最後に残る1つが、あなたの大きな石です。"}];
+let items=[],aside=[],order=[],r=0,sel=new Set(),waiting=false;
 
 function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));scrollTo(0,0)}
-function save(){try{localStorage.setItem("nine",JSON.stringify({items,gone,order,r,next:$("next").value}))}catch(e){}}
+function save(){try{localStorage.setItem("bigstone",JSON.stringify({items,aside,order,r,next:$("next").value}))}catch(e){}}
 
-// 入力欄
 const box=$("inputs");
 for(let i=0;i<9;i++){const l=document.createElement("label");l.innerHTML=`<span>${i+1}</span><input maxlength="20">`;box.appendChild(l)}
 const ins=[...box.querySelectorAll("input")];
 ins.forEach(x=>x.addEventListener("input",()=>{$("toRound").disabled=ins.some(v=>!v.value.trim())}));
 
-function startRounds(){items=ins.map(v=>v.value.trim());gone=[];order=[];r=0;go("s2");drawRound();save()}
+function startRounds(){items=ins.map(v=>v.value.trim());aside=[];order=[];r=0;go("s2");drawRound();save()}
 
 function drawRound(){
   const R=ROUNDS[r];sel=new Set();waiting=false;
   $("step").querySelectorAll("i").forEach((e,k)=>e.classList.toggle("on",k<=r));
   $("rTitle").textContent=R.title;$("rText").textContent=R.text;$("rWait").textContent="";
   const c=$("cards");c.innerHTML="";
-  items.forEach((t,i)=>{const d=document.createElement("div");d.className="c"+(gone.includes(i)?" gone":"");d.textContent=t;
-    d.onclick=()=>{if(waiting||gone.includes(i))return;if(sel.has(i))sel.delete(i);else if(sel.size<R.n)sel.add(i);d.classList.toggle("sel",sel.has(i));upd()};c.appendChild(d)});
-  upd();
+  items.forEach((t,i)=>{const d=document.createElement("div");d.className="c"+(aside.includes(i)?" side":"");d.textContent=t;
+    d.onclick=()=>{if(waiting||aside.includes(i))return;if(sel.has(i))sel.delete(i);else if(sel.size<R.n)sel.add(i);d.classList.toggle("sel",sel.has(i));upd()};c.appendChild(d)});
+  $("rBtn").onclick=setAside;upd();
 }
-function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").textContent=sel.size===R.n?`この${R.n}つを手放す`:`あと${R.n-sel.size}つ選んでください`}
+function upd(){const R=ROUNDS[r];$("rBtn").disabled=sel.size!==R.n;$("rBtn").textContent=sel.size===R.n?`この${R.n}つを横に置く`:`あと${R.n-sel.size}つ選んでください`}
 
-function letGo(){
-  sel.forEach(i=>{gone.push(i)});order.push([...sel].map(i=>items[i]));
-  document.querySelectorAll("#cards .c").forEach((d,i)=>{if(sel.has(i)){d.classList.remove("sel");d.classList.add("gone")}});
-  $("rBtn").disabled=true;r++;waiting=true;sel=new Set();save();
-  if(r>=ROUNDS.length){setTimeout(()=>{const last=items.findIndex((_,i)=>!gone.includes(i));$("lastOne").textContent=items[last];go("s3")},1400);return}
-  const left=items.length-gone.length,nx=ROUNDS[r].n;
+function setAside(){
+  sel.forEach(i=>aside.push(i));order.push([...sel]);
+  document.querySelectorAll("#cards .c").forEach((d,i)=>{if(sel.has(i)){d.classList.remove("sel");d.classList.add("side")}});
+  r++;waiting=true;sel=new Set();save();
+  if(r>=ROUNDS.length){$("rBtn").disabled=true;setTimeout(()=>{$("bigOne").textContent="🪨 "+items[bigIdx()];go("s3")},1300);return}
+  const left=items.length-aside.length,nx=ROUNDS[r].n;
   $("rTitle").textContent=`残りは ${left}つ です`;
-  $("rText").textContent=r===ROUNDS.length-1?`次は ${nx}つ 手放して、最後に1つだけ残します。`:`次は さらに ${nx}つ 手放します。`;
+  $("rText").textContent=r===ROUNDS.length-1?`次は ${nx}つを横に置いて、最後に1つだけ残します。`:`次は さらに ${nx}つを横に置きます。`;
   $("rWait").textContent="司会の合図があるまで、少しだけ待ちましょう。";
-  $("rBtn").textContent="次へすすむ";$("rBtn").disabled=false;$("rBtn").onclick=()=>{$("rBtn").onclick=letGo;drawRound()};
+  $("rBtn").textContent="次へすすむ";$("rBtn").disabled=false;$("rBtn").onclick=drawRound;
 }
+const bigIdx=()=>items.findIndex((_,i)=>!aside.includes(i));
 
-function restore(){
-  save();go("s4");const last=items.findIndex((_,i)=>!gone.includes(i));
-  const c=$("allCards");c.innerHTML="";
-  items.forEach((t,i)=>{const d=document.createElement("div");d.className="c"+(i===last?" last":" gone");d.textContent=t;c.appendChild(d);
-    if(i!==last)setTimeout(()=>d.classList.add("back"),300+i*120)});
-  $("sumLast").textContent=items[last];
-  $("sumOrder").innerHTML=order.map((g,k)=>`${k+1}回目：${g.join("、")}`).join("<br>");
-  $("sumNext").textContent=$("next").value.trim()||"（未記入）";
+/* ツボに入れる：大きな石 → 中くらいの石(3回目) → 小石(2回目) → 砂(1回目) */
+function fillJar(){
+  save();go("s4");$("legend").style.display="none";$("endBtns").style.display="none";
+  const big=items[bigIdx()],mid=order[2].map(i=>items[i]),small=order[1].map(i=>items[i]),sand=order[0].map(i=>items[i]);
+  const esc=t=>t.replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+  const lab=(x,y,t,sz)=>`<text x="${x}" y="${y}" font-size="${sz}" text-anchor="middle" fill="#4a3a2a" font-weight="bold">${esc(t)}</text>`;
+  $("jarBox").innerHTML=`<svg viewBox="0 0 320 380">
+    <path d="M95 30h130v22c0 10 60 32 60 96v170c0 22-16 34-38 34H73c-22 0-38-12-38-34V148c0-64 60-86 60-96z" fill="#ffffff" stroke="#c9a77a" stroke-width="6"/>
+    <g class="drop" id="d0"><ellipse cx="160" cy="292" rx="88" ry="54" fill="#e9a15a"/><ellipse cx="140" cy="276" rx="40" ry="14" fill="#f4c086" opacity=".7"/>${lab(160,300,big,20)}</g>
+    <g class="drop" id="d1"><ellipse cx="96" cy="200" rx="52" ry="34" fill="#c9a07a"/>${lab(96,206,mid[0],14)}<ellipse cx="224" cy="200" rx="52" ry="34" fill="#c9a07a"/>${lab(224,206,mid[1],14)}</g>
+    <g class="drop" id="d2"><circle cx="160" cy="174" r="27" fill="#b9a690"/>${lab(160,179,small[0],12)}<circle cx="66" cy="262" r="24" fill="#b9a690"/>${lab(66,266,small[1],11)}<circle cx="254" cy="262" r="24" fill="#b9a690"/>${lab(254,266,small[2],11)}</g>
+    <g class="drop" id="d3"><path d="M50 124c36-8 74 6 110 0s74-10 110 0v16H50z" fill="#f3d9a4" opacity=".95"/>
+      ${[...Array(60)].map((_,k)=>`<circle cx="${50+Math.random()*220}" cy="${140+Math.random()*208}" r="1.6" fill="#e2c07e"/>`).join("")}
+      ${lab(88,116,sand[0],12)}${lab(160,110,sand[1],12)}${lab(232,116,sand[2],12)}</g>
+  </svg>`;
+  const msgs=[`まず、大きな石「${big}」`,`次に、中くらいの石「${mid.join("」「")}」`,`すき間に、小石「${small.join("」「")}」`,`最後に、砂「${sand.join("」「")}」`];
+  [0,1,2,3].forEach(k=>setTimeout(()=>{$("d"+k).classList.add("in");$("jarMsg").textContent=msgs[k]},400+k*1500));
+  setTimeout(()=>{
+    $("jarMsg").innerHTML="<b>9つ ぜんぶ、ツボに入りました。</b><br>大きな石を先に入れれば、ほかの大切なものも、ちゃんと入ります。";
+    $("legend").innerHTML=`<div><b>大きな石</b>${esc(big)}</div><div><b>中くらいの石</b>${esc(mid.join("、"))}</div><div><b>小石</b>${esc(small.join("、"))}</div><div><b>砂</b>${esc(sand.join("、"))}</div><div style="margin-top:6px"><b>来年の一歩</b>${esc($("next").value.trim()||"（未記入）")}</div>`;
+    $("legend").style.display="grid";$("endBtns").style.display="flex";
+  },400+4*1500+400);
 }
 function copySum(){
-  const last=items.findIndex((_,i)=>!gone.includes(i));
-  const t=`【9つの大切なもの】\n最後に残ったもの：${items[last]}\n${order.map((g,k)=>`${k+1}回目に手放したもの：${g.join("、")}`).join("\n")}\n来年やってみたいこと：${$("next").value.trim()}`;
+  const big=items[bigIdx()],f=k=>order[k].map(i=>items[i]).join("、");
+  const t=`【大きな石のワーク】\n大きな石：${big}\n中くらいの石：${f(2)}\n小石：${f(1)}\n砂：${f(0)}\n来年の一歩：${$("next").value.trim()}`;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>$("copied").textContent="コピーしました").catch(()=>$("copied").textContent="コピーできませんでした");
 }
-function resetAll(){if(!confirm("はじめからやり直しますか？"))return;try{localStorage.removeItem("nine")}catch(e){}ins.forEach(v=>v.value="");$("next").value="";$("toRound").disabled=true;go("s0")}
+function resetAll(){if(!confirm("はじめからやり直しますか？"))return;try{localStorage.removeItem("bigstone")}catch(e){}ins.forEach(v=>v.value="");$("next").value="";$("toRound").disabled=true;go("s0")}
 </script>
 </body>
 </html>
