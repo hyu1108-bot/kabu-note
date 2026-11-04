@@ -1,0 +1,8 @@
+# 1104：申し立ての曲「10_2026-08-10_【予備用】金運 (40).mp3」を外して作り直す（2026-11-04）
+# PowerShellに1ブロックずつ貼る（①が終わってから②）
+
+# ① 音源_1104b を作る（orderから(40)だけ外し、足りない分は最初の曲からつぎ足す）
+$W = "$HOME\Desktop\制作\1104"; cd $W; $ng = "10_2026-08-10_【予備用】金運 (40).mp3"; $src = [IO.File]::ReadAllLines("$W\order_1104.txt") | Where-Object { $_ -match "^file " -and (Split-Path (_UBPath $_ $W) -Leaf) -ne $ng }; $end = 12812.5; $list = @(); $tt = @(); $t = 0; while ($t -lt $end) { foreach ($x in $src) { $p = _UBPath $x $W; if (-not (Test-Path -LiteralPath $p)) { continue }; $list += $x; $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), (Split-Path $p -Leaf); $t += _UBDur $p; if ($t -ge $end) { break } } }; [IO.File]::WriteAllLines("$W\order_1104b.txt", $list, $UBEnc); [IO.File]::WriteAllLines("$W\時刻表_1104b.txt", $tt, $UBEnc); ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i order_1104b.txt -vn -c:a aac -b:a 192k -t $end -y 音源_1104b.m4a; Write-Host "できました：音源_1104b.m4a（(40)が入っていないか：$(@(Select-String -LiteralPath 時刻表_1104b.txt -SimpleMatch '(40)').Count) 件）" -ForegroundColor Green
+
+# ② 映像を軽くして、テロップを1時間おきに入れた 完成_1104.mp4 を作る
+$W = "$HOME\Desktop\制作\1104"; cd $W; ffmpeg -hide_banner -loglevel error -stats -i v1104.mp4 -c:v libx264 -b:v 2000k -preset fast -an -y v1104s.mp4; $v = "v1104s.mp4"; $ip = 105; $len = _UBDur "$W\$v"; $n = [math]::Ceiling(3600 / ($len - $ip)); $l = ""; 1..4 | % { $l += "file '$v'`n"; 1..$n | % { $l += "file '$v'`ninpoint $ip`n" } }; Set-Content list1104.txt $l -Encoding ascii; ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i list1104.txt -i 音源_1104b.m4a -map 0:v -map 1:a -c copy -t 03:33:32.5 -movflags +faststart -y 完成_1104.mp4; Write-Host "できました：完成_1104.mp4（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
