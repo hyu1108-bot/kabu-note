@@ -129,6 +129,34 @@ function 宇宙完成 {
   Write-Host "できました：$W\$out（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
 }
 
+# 宇宙銀行：申し立ての曲を外して、同じ順番のまま音源を作り直す（足りない分は最初の曲からつぎ足す）
+# 例）曲はずし 1104 "10_2026-08-10_【予備用】金運 (40).mp3"
+#     曲はずし 1104 "曲A.mp3" "曲B.mp3"            （2曲以上も可）
+#     曲はずし 1107 "曲A.mp3" -長さ 09:00:00         （9時間）
+# 元にするのは order_MMDD*.txt のいちばん新しいもの。できるのは 音源_MMDDb（次はc…）・時刻表・order
+function 曲はずし {
+  [CmdletBinding(PositionalBinding = $false)]
+  param([Parameter(Mandatory, Position = 0)][string]$日付, [Parameter(Mandatory, Position = 1, ValueFromRemainingArguments)][string[]]$曲, [string]$長さ = "03:33:33")
+  $W = "$UBDesk\制作\$日付"
+  if (-not (Test-Path -LiteralPath $W)) { Write-Host "$W がありません" -ForegroundColor Red; return }
+  Set-Location $W
+  $src = Get-ChildItem -LiteralPath $W -Filter "order_$日付*.txt" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if (-not $src) { Write-Host "order_$日付.txt がありません" -ForegroundColor Red; return }
+  $tag = $null; foreach ($c in [char[]]'bcdefghijk') { if (-not (Test-Path -LiteralPath "$W\order_$日付$c.txt")) { $tag = "$日付$c"; break } }
+  $lines = @([IO.File]::ReadAllLines($src.FullName) | Where-Object { $_ -match "^file " })
+  $keep = @(); $out = 0
+  foreach ($x in $lines) { $p = _UBPath $x $W; $n = Split-Path $p -Leaf; if ($曲 -contains $n) { $out++; continue }; if (Test-Path -LiteralPath $p) { $keep += $x } }
+  if ($out -eq 0) { Write-Host "外す曲が $($src.Name) に見つかりません。曲名を時刻表からそのまま写してください" -ForegroundColor Red; return }
+  $seen = @{}; $uniq = @(); foreach ($x in $keep) { if (-not $seen[$x]) { $seen[$x] = 1; $uniq += $x } }
+  $end = (_UBSec $長さ) - 0.5; $list = @(); $tt = @(); $t = 0; $dur = @{}
+  while ($t -lt $end) { foreach ($x in $uniq) { $p = _UBPath $x $W; if (-not $dur[$p]) { $dur[$p] = _UBDur $p }; $list += $x; $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), (Split-Path $p -Leaf); $t += $dur[$p]; if ($t -ge $end) { break } } }
+  [IO.File]::WriteAllLines("$W\order_$tag.txt", $list, $UBEnc)
+  [IO.File]::WriteAllLines("$W\時刻表_$tag.txt", $tt, $UBEnc)
+  Write-Host "$($src.Name) から $out か所を外して 音源_$tag を作っています…" -ForegroundColor Cyan
+  ffmpeg -hide_banner -loglevel error -stats -f concat -safe 0 -i "order_$tag.txt" -vn -c:a aac -b:a 192k -t $end -y "音源_$tag.m4a"
+  Write-Host "できました：音源_$tag.m4a ／ 時刻表_$tag.txt（次は 宇宙完成 $日付 秒 -音源 音源_$tag.m4a）" -ForegroundColor Green
+}
+
 # 申し立ての時刻に流れていた曲を調べる（宇宙銀行・成功神殿どちらでも）
 # 例）曲探し 1020 01:25:04 01:26:44
 #     曲探し 神殿1028 00:41:10
@@ -151,4 +179,4 @@ function 曲探し {
   }
 }
 
-Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
+Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／曲はずし／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
