@@ -108,8 +108,9 @@ function 宇宙音源 {
 #     宇宙完成 1101 102 -音源 音源_1101b.m4a  （音源を指定）
 #     宇宙完成 1107 120 -長さ 09:00:00        （土曜の9時間）
 #     宇宙完成 1102 106 -ライブ                （月曜ライブ用：音源1周の長さで ライブ_1102.mp4 を作る）
+#     宇宙完成 1105 124 -テロップ間隔 60       （テロップを最初＋1時間ごとにもう一度出す）
 function 宇宙完成 {
-  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int]$秒, [string]$長さ = "03:33:33", [string]$音源 = "", [string]$映像 = "", [switch]$ライブ)
+  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int]$秒, [string]$長さ = "03:33:33", [string]$音源 = "", [string]$映像 = "", [switch]$ライブ, [int]$テロップ間隔 = 0)
   $W = "$UBDesk\制作\$日付"
   if (-not (Test-Path -LiteralPath $W)) { Write-Host "$W がありません" -ForegroundColor Red; return }
   Set-Location $W
@@ -122,8 +123,22 @@ function 宇宙完成 {
   Write-Host "映像：$v ／ 音源：$a ／ inpoint：$秒 秒 ／ 長さ：$長さ" -ForegroundColor Cyan
   $loop = (_UBDur "$W\$v") - $秒
   if ($loop -le 0) { Write-Host "inpointの秒数が映像より長いです" -ForegroundColor Red; return }
-  $n = [math]::Ceiling((_UBSec $長さ) / $loop) + 1
-  $l = @("file '$v'"); 1..$n | ForEach-Object { $l += "file '$v'"; $l += "inpoint $秒" }
+  $full = _UBDur "$W\$v"; $total = _UBSec $長さ
+  $l = @("file '$v'"); $t = $full
+  if ($テロップ間隔 -gt 0) {
+    $step = $テロップ間隔 * 60; $next = $step
+    while ($t -lt $total) {
+      if ($next -lt $total -and $t + $loop -gt $next) {
+        $rest = $next - $t
+        if ($rest -gt 1) { $l += "file '$v'"; $l += "inpoint $秒"; $l += ("outpoint {0:0.###}" -f ($秒 + $rest)) }
+        $l += "file '$v'"; $t = $next + $full; $next += $step
+      } else { $l += "file '$v'"; $l += "inpoint $秒"; $t += $loop }
+    }
+    Write-Host "テロップ：最初と、$テロップ間隔 分ごとに出します" -ForegroundColor Cyan
+  } else {
+    $n = [math]::Ceiling($total / $loop) + 1
+    1..$n | ForEach-Object { $l += "file '$v'"; $l += "inpoint $秒" }
+  }
   [IO.File]::WriteAllLines("$W\list$日付.txt", $l, $UBEnc)
   $cut = (_UBSec $長さ) - 0.5
   $fs = @(); if ($cut -le 4 * 3600) { $fs = @("-movflags", "+faststart") }  # 9時間は空き容量が2倍いるので外す
