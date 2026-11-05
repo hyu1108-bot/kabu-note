@@ -158,21 +158,22 @@ function 曲探し {
 #     宇宙ズーム 1105 -秒 15
 #     宇宙ズーム 1105 -動き 右へ,左へ
 #     宇宙ズーム 1105 -フェード      （全部の動画の最初と最後を1秒ずつ黒からフェード）
+#     宇宙ズーム 1105 -強さ 0.2      （動きを大きく・速く。初期値0.08、0.15〜0.25くらいがおすすめ）
 function 宇宙ズーム {
-  param([Parameter(Mandatory)][string]$日付, [int]$秒 = 10, [string[]]$動き = @("寄る","引く","右へ","左へ","フェード"), [switch]$フェード)
+  param([Parameter(Mandatory)][string]$日付, [int]$秒 = 10, [string[]]$動き = @("寄る","引く","右へ","左へ","フェード"), [switch]$フェード, [double]$強さ = 0.08)
   $W = "$UBDesk\制作\$日付"; $I = "$W\画像"; $O = "$W\ズーム"
   if (-not (Test-Path -LiteralPath $I)) { New-Item -ItemType Directory -Force $I | Out-Null; Write-Host "画像フォルダを作りました。ここに画像を入れてから、もう一度実行してください：$I" -ForegroundColor Yellow; return }
   $imgs = Get-ChildItem -LiteralPath $I -File | Where-Object { $_.Extension -match '^\.(jpg|jpeg|png|webp)$' } | Sort-Object Name
   if (-not $imgs) { Write-Host "画像が見つかりません：$I" -ForegroundColor Red; return }
   New-Item -ItemType Directory -Force $O | Out-Null
-  $N = $秒 * 30; $k = 0; $c = "iw/2-(iw/zoom/2)"
+  $N = $秒 * 30; $k = 0; $c = "iw/2-(iw/zoom/2)"; $a = $強さ; $b = 1 + $強さ
   foreach ($f in $imgs) {
     $m = $動き[$k % $動き.Count]; $fd = $フェード
     switch ($m) {
-      "寄る"     { $z = "1+0.08*on/$N"; $x = $c }
-      "引く"     { $z = "1.08-0.08*on/$N"; $x = $c }
-      "右へ"     { $z = "1.08"; $x = "(iw-iw/zoom)*on/$N" }
-      "左へ"     { $z = "1.08"; $x = "(iw-iw/zoom)*(1-on/$N)" }
+      "寄る"     { $z = "1+$a*on/$N"; $x = $c }
+      "引く"     { $z = "$b-$a*on/$N"; $x = $c }
+      "右へ"     { $z = "$b"; $x = "(iw-iw/zoom)*on/$N" }
+      "左へ"     { $z = "$b"; $x = "(iw-iw/zoom)*(1-on/$N)" }
       "フェード" { $z = "1+0.03*on/$N"; $x = $c; $fd = $true }
       default    { Write-Host "動きの名前がちがいます：$m（寄る／引く／右へ／左へ／フェード）" -ForegroundColor Red; return }
     }
