@@ -108,7 +108,6 @@ a{color:var(--gold2)}
       <p id="rday" style="color:var(--fg);margin-top:8px"></p>
     </div>
     <div class="links">
-      <a id="shareFb" target="_blank" rel="noopener">結果をFacebookでシェアする</a>
       <a id="shareLine" target="_blank" rel="noopener">結果をLINEで送る</a>
       <a id="share" target="_blank" rel="noopener">結果をXでシェアする</a>
       <a href="../kokoro/">口ぐせから気づく「心のブロック診断」へ</a>
@@ -183,7 +182,6 @@ function render(sc){
   const txt=`お金のブロック診断テストをしてみたら、わたしは「${t.name}」でした✨\n#宇宙銀行 #金運\n`;
   $("share").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(location.href.split("?")[0]);
   const u=encodeURIComponent(location.href.split("?")[0]);
-  $("shareFb").href="https://www.facebook.com/sharer/sharer.php?u="+u;
   $("shareLine").href="https://social-plugins.line.me/lineit/share?url="+u+"&text="+encodeURIComponent(txt);
   show("result")}
 function drawChart(sc){
