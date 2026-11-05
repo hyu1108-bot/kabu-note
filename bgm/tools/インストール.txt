@@ -179,12 +179,12 @@ function 宇宙ズーム {
       "フェード" { $z = "1+0.03*on/$N"; $x = $c; $fd = $true }
       default    { Write-Host "動きの名前がちがいます：$m（寄る／引く／右へ／左へ／フェード）" -ForegroundColor Red; return }
     }
-    $vf = "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160,zoompan=z='$z':x='$x':y='ih/2-(ih/zoom/2)':d=${N}:s=1920x1080:fps=30"
+    $vf = "scale=2880:1620:force_original_aspect_ratio=increase,crop=2880:1620,zoompan=z='$z':x='$x':y='ih/2-(ih/zoom/2)':d=${N}:s=1920x1080:fps=30"
     if ($fd) { $vf += ",fade=t=in:st=0:d=1,fade=t=out:st=$($秒 - 1):d=1" }
     $vf += ",format=yuv420p"
     $out = Join-Path $O ($f.BaseName + ".mp4")
     Write-Host ("（{0}/{1}）{2} … {3}" -f ($k + 1), $imgs.Count, $f.Name, $m)
-    ffmpeg -v error -y -loop 1 -i $f.FullName -vf $vf -frames:v $N -c:v libx264 -preset medium -crf 18 $out
+    ffmpeg -v error -y -loop 1 -i $f.FullName -vf $vf -frames:v $N -c:v libx264 -preset veryfast -crf 20 $out
     $k++
   }
   Write-Host "できました：$O（$($imgs.Count)本・各$($秒)秒）" -ForegroundColor Green
