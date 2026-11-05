@@ -163,14 +163,15 @@ const KEY="block_last";
 let i=0,ans=[];
 function show(id){["start","quiz","result"].forEach(s=>$(s).hidden=s!==id);scrollTo(0,0)}
 function ask(){$("cnt").textContent=`${i+1} / ${QS.length}`;$("prog").style.width=(i/QS.length*100)+"%";$("q").textContent=QS[i][1];$("back").hidden=i===0}
-function start(){i=0;ans=[];show("quiz");ask()}
+function start(){i=0;ans=[];show("quiz");ask();try{gtag("event","shindan_start",{app:"block"})}catch(e){}}
 document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{b.blur();ans[i]=+b.dataset.v;i++;if(i<QS.length)ask();else finish()});
 $("back").onclick=()=>{if(i>0){i--;ask()}};
 $("go").onclick=start;$("again").onclick=start;
 function finish(){
   const sc=[0,0,0,0,0];QS.forEach((q,n)=>sc[q[0]]+=ans[n]);
   try{localStorage.setItem(KEY,JSON.stringify(sc))}catch(e){}
-  render(sc)}
+  render(sc);
+  try{const m=Math.max(...sc);gtag("event","shindan_kanryo",{app:"block",result_type:m<=2?FREE.name:TYPES[sc.indexOf(m)].name})}catch(e){}}
 function render(sc){
   const max=Math.max(...sc),top=sc.indexOf(max),t=max<=2?FREE:TYPES[top];
   $("rtype").textContent=t.name;
