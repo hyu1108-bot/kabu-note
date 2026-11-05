@@ -48,6 +48,10 @@ textarea{min-height:90px;resize:vertical}
 #jarBox svg{width:100%;max-width:420px;display:block;margin:0 auto}
 .drop{opacity:0;transform:translateY(-260px);transition:transform .9s cubic-bezier(.3,1.4,.6,1),opacity .3s}
 .drop.in{opacity:1;transform:none}
+.hint{font-size:14px;color:var(--muted)}
+.kw{display:flex;flex-wrap:wrap;gap:7px}
+.kw button{width:auto;padding:7px 13px;font-size:15px;font-weight:400;border-radius:20px;background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.kw button.used{background:#fff1e2;border-color:var(--accent);color:var(--accent)}
 .legend{display:grid;gap:6px;font-size:15px}
 .legend b{display:inline-block;min-width:96px;color:#c4642a}
 .refl{display:grid;gap:10px;margin-top:8px}
@@ -92,6 +96,10 @@ textarea{min-height:90px;resize:vertical}
   <h2>あなたの大切なもの（石）を9つ</h2>
   <p class="muted">人・もの・こと・気持ちなど、なんでもかまいません。<br>例：家族、友人、健康、仕事、趣味、学び、自由、旅、笑顔</p>
   <div class="inputs" id="inputs"></div>
+  <div class="box">
+    <p class="hint">思いつかないときは、ここから選んでも大丈夫です。<br>押すと、空いている欄に入ります（もう一度押すと消えます）。</p>
+    <div class="kw" id="kw" style="margin-top:10px"></div>
+  </div>
   <button id="toRound" disabled onclick="startRounds()">9つの石がそろいました</button>
 </section>
 
@@ -144,7 +152,9 @@ function save(){try{localStorage.setItem("bigstone",JSON.stringify({items,aside,
 const box=$("inputs");
 for(let i=0;i<9;i++){const l=document.createElement("label");l.innerHTML=`<span>${i+1}</span><input maxlength="20">`;box.appendChild(l)}
 const ins=[...box.querySelectorAll("input")];
-ins.forEach(x=>x.addEventListener("input",()=>{$("toRound").disabled=ins.some(v=>!v.value.trim())}));
+const chk=()=>{$("toRound").disabled=ins.some(v=>!v.value.trim());[...$("kw").children].forEach(b=>b.classList.toggle("used",ins.some(v=>v.value.trim()===b.textContent)))};
+ins.forEach(x=>x.addEventListener("input",chk));
+"家族,パートナー,子ども,親,友人,仲間,つながり,ペット,健康,心のゆとり,睡眠,時間,自由,お金,仕事,学び,挑戦,成長,夢,趣味,推し活,旅行,自然,住まい,おいしいごはん,笑顔,感謝,思い出,ひとりの時間,地域・社会".split(",").forEach(w=>{const b=document.createElement("button");b.type="button";b.textContent=w;b.onclick=()=>{const hit=ins.find(v=>v.value.trim()===w);if(hit)hit.value="";else{const e=ins.find(v=>!v.value.trim());if(!e)return;e.value=w}chk()};$("kw").appendChild(b)});
 
 function startRounds(){items=ins.map(v=>v.value.trim());aside=[];order=[];r=0;go("s2");drawRound();save()}
 
