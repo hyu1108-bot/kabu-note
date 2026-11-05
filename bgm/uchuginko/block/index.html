@@ -22,7 +22,8 @@ button{font:inherit;cursor:pointer}
 .q{font-size:20px;color:var(--fg);margin:6px 0 18px;line-height:1.6}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{padding:15px;border-radius:12px;border:1px solid var(--line);background:#1b2752;color:var(--fg);font-size:18px}
-.opt:hover,.opt:focus-visible{border-color:var(--gold);outline:none}
+.opt:focus-visible{border-color:var(--gold);outline:none}
+@media (hover:hover){.opt:hover{border-color:var(--gold)}}
 .bar{height:6px;background:#1b2752;border-radius:3px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
 .cnt{font-size:14px;color:var(--gold)}
@@ -102,10 +103,13 @@ a{color:var(--gold2)}
       <p class="note" style="margin-top:10px">ロバート・キヨサキさんの本で知られる「お金に働いてもらう」考え方をもとにしています。投資や副業をすすめるものではありません。</p>
     </div>
     <div class="panel">
-      <div class="k">あなたに合う夜</div>
-      <p id="rday" style="color:var(--fg);margin-top:6px"></p>
+      <div class="k">あなたにおすすめの夜の音楽</div>
+      <p style="color:var(--fg);margin-top:6px;font-size:15px">YouTubeチャンネル「宇宙銀行」では、眠る前に流せる金運の音楽を、毎日夕方に公開しています（無料）。</p>
+      <p id="rday" style="color:var(--fg);margin-top:8px"></p>
     </div>
     <div class="links">
+      <a id="shareFb" target="_blank" rel="noopener">結果をFacebookでシェアする</a>
+      <a id="shareLine" target="_blank" rel="noopener">結果をLINEで送る</a>
       <a id="share" target="_blank" rel="noopener">結果をXでシェアする</a>
       <a href="../kokoro/">口ぐせから気づく「心のブロック診断」へ</a>
       <a href="https://www.youtube.com/channel/UC3dlft_Coe09A5SvCvmFNeQ" target="_blank" rel="noopener">YouTube「宇宙銀行」で、今夜の音を聴く</a>
@@ -153,7 +157,7 @@ const TYPES=[
   day:"🌞 日曜の夜「不安を手放す」動画がおすすめです。新しい週を、軽やかに迎えられますように。"}];
 const FREE={name:"のびのび受け取り上手さん",mind:["今の軽やかさを、育てていく","お金とのつきあい方がのびやかな今は、「お金の見方」を広げるのにいいときです。働いて受け取るだけでなく、仕組みや人の力でお金がめぐる、という見方も楽しんでみてください。","今週ひとつだけ：「お金がめぐってきてうれしかったこと」を1つ思い出して、心の中でお礼を言う"],desc:"今のところ、大きなブロックは見当たりません。お金とのつきあい方が、のびやかな方です。この軽やかさを、これからも大切にしてください。",
   habit:["ありがとう、うれしい","なんとかなる","いいことあるかも"],word:"あなたは、思っているより<br>たくさん受け取っています",
-  day:"🌕 月曜18時からのライブで、みんなと一緒に夜を過ごすのもおすすめです。"};
+  day:"🌕 毎週月曜18時からは、朝まで流れるライブ配信もしています。チャットで、みんなと一緒に夜を過ごすのもおすすめです。"};
 
 const $=id=>document.getElementById(id);
 const KEY="block_last";
@@ -161,7 +165,7 @@ let i=0,ans=[];
 function show(id){["start","quiz","result"].forEach(s=>$(s).hidden=s!==id);scrollTo(0,0)}
 function ask(){$("cnt").textContent=`${i+1} / ${QS.length}`;$("prog").style.width=(i/QS.length*100)+"%";$("q").textContent=QS[i][1];$("back").hidden=i===0}
 function start(){i=0;ans=[];show("quiz");ask()}
-document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ans[i]=+b.dataset.v;i++;if(i<QS.length)ask();else finish()});
+document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{b.blur();ans[i]=+b.dataset.v;i++;if(i<QS.length)ask();else finish()});
 $("back").onclick=()=>{if(i>0){i--;ask()}};
 $("go").onclick=start;$("again").onclick=start;
 function finish(){
@@ -178,6 +182,9 @@ function render(sc){
   drawChart(sc);
   const txt=`お金のブロック診断テストをしてみたら、わたしは「${t.name}」でした✨\n#宇宙銀行 #金運\n`;
   $("share").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(location.href.split("?")[0]);
+  const u=encodeURIComponent(location.href.split("?")[0]);
+  $("shareFb").href="https://www.facebook.com/sharer/sharer.php?u="+u;
+  $("shareLine").href="https://social-plugins.line.me/lineit/share?url="+u+"&text="+encodeURIComponent(txt);
   show("result")}
 function drawChart(sc){
   const cx=150,cy=140,R=95,N=5,pt=(k,r)=>{const a=-Math.PI/2+k*2*Math.PI/N;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
