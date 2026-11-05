@@ -153,26 +153,34 @@ function 曲探し {
 
 # 画像をゆっくり動く動画にする（Filmoraに並べる素材用）
 # 制作\MMDD\画像 に入れた画像（jpg/png/webp）を、1枚ずつ10秒の動画にして 制作\MMDD\ズーム に作る
-# 動きは「ゆっくり寄る → ゆっくり引く → ゆっくり横に流れる」を順番にくり返す
+# 動きは -動き で選ぶ（寄る／引く／右へ／左へ／フェード）。指定しなければ5種類を順番にくり返す
 # 例）宇宙ズーム 1105
 #     宇宙ズーム 1105 -秒 15
+#     宇宙ズーム 1105 -動き 右へ,左へ
+#     宇宙ズーム 1105 -フェード      （全部の動画の最初と最後を1秒ずつ黒からフェード）
 function 宇宙ズーム {
-  param([Parameter(Mandatory)][string]$日付, [int]$秒 = 10)
+  param([Parameter(Mandatory)][string]$日付, [int]$秒 = 10, [string[]]$動き = @("寄る","引く","右へ","左へ","フェード"), [switch]$フェード)
   $W = "$UBDesk\制作\$日付"; $I = "$W\画像"; $O = "$W\ズーム"
   if (-not (Test-Path -LiteralPath $I)) { New-Item -ItemType Directory -Force $I | Out-Null; Write-Host "画像フォルダを作りました。ここに画像を入れてから、もう一度実行してください：$I" -ForegroundColor Yellow; return }
   $imgs = Get-ChildItem -LiteralPath $I -File | Where-Object { $_.Extension -match '^\.(jpg|jpeg|png|webp)$' } | Sort-Object Name
   if (-not $imgs) { Write-Host "画像が見つかりません：$I" -ForegroundColor Red; return }
   New-Item -ItemType Directory -Force $O | Out-Null
-  $N = $秒 * 30; $k = 0
+  $N = $秒 * 30; $k = 0; $c = "iw/2-(iw/zoom/2)"
   foreach ($f in $imgs) {
-    switch ($k % 3) {
-      0 { $z = "1+0.08*on/$N"; $x = "iw/2-(iw/zoom/2)" }
-      1 { $z = "1.08-0.08*on/$N"; $x = "iw/2-(iw/zoom/2)" }
-      2 { $z = "1.08"; $x = "(iw-iw/zoom)*on/$N" }
+    $m = $動き[$k % $動き.Count]; $fd = $フェード
+    switch ($m) {
+      "寄る"     { $z = "1+0.08*on/$N"; $x = $c }
+      "引く"     { $z = "1.08-0.08*on/$N"; $x = $c }
+      "右へ"     { $z = "1.08"; $x = "(iw-iw/zoom)*on/$N" }
+      "左へ"     { $z = "1.08"; $x = "(iw-iw/zoom)*(1-on/$N)" }
+      "フェード" { $z = "1+0.03*on/$N"; $x = $c; $fd = $true }
+      default    { Write-Host "動きの名前がちがいます：$m（寄る／引く／右へ／左へ／フェード）" -ForegroundColor Red; return }
     }
-    $vf = "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160,zoompan=z='$z':x='$x':y='ih/2-(ih/zoom/2)':d=${N}:s=1920x1080:fps=30,format=yuv420p"
+    $vf = "scale=3840:2160:force_original_aspect_ratio=increase,crop=3840:2160,zoompan=z='$z':x='$x':y='ih/2-(ih/zoom/2)':d=${N}:s=1920x1080:fps=30"
+    if ($fd) { $vf += ",fade=t=in:st=0:d=1,fade=t=out:st=$($秒 - 1):d=1" }
+    $vf += ",format=yuv420p"
     $out = Join-Path $O ($f.BaseName + ".mp4")
-    Write-Host ("（{0}/{1}）{2}" -f ($k + 1), $imgs.Count, $f.Name)
+    Write-Host ("（{0}/{1}）{2} … {3}" -f ($k + 1), $imgs.Count, $f.Name, $m)
     ffmpeg -v error -y -loop 1 -i $f.FullName -vf $vf -frames:v $N -c:v libx264 -preset medium -crf 18 $out
     $k++
   }
