@@ -154,9 +154,9 @@ function 素材一覧 {
 # 例）宇宙テロップ 1108                  （素材の指定なし＝「1108日曜日」などのフォルダの素材を名前順に全部使う）
 #     宇宙テロップ 1108 -素材 3,7,12,15,21,22
 #     宇宙テロップ 1107 -素材 1,2,3,4,5,6 -長さ 09:00:00
-#     -秒 20（テロップ1枚の秒数）  -遅く 2（素材を何倍ゆっくりにするか）  -完成しない（vMMDD.mp4 だけ作る）
+#     -秒 20（テロップ1枚の秒数）  -遅く 2（動画を2倍ゆっくりにする）  -完成しない（vMMDD.mp4 だけ作る）
 function 宇宙テロップ {
-  param([Parameter(Mandatory)][string]$日付, [int[]]$素材 = @(), [double]$秒 = 20, [double]$遅く = 2, [string]$長さ = "03:33:33", [switch]$完成しない)
+  param([Parameter(Mandatory)][string]$日付, [int[]]$素材 = @(), [double]$秒 = 20, [double]$遅く = 1, [string]$長さ = "03:33:33", [switch]$完成しない)
   $W = "$UBDesk\制作\$日付"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
   $tf = "$W\テロップ_$日付.txt"
   if (-not (Test-Path -LiteralPath $tf)) { Write-Host "$tf がありません。メモ帳でテロップを書いて保存してください（1枚ごとに空行で区切る）" -ForegroundColor Red; return }
@@ -176,7 +176,7 @@ function 宇宙テロップ {
   $font = @("yumindb.ttf", "yumin.ttf", "msmincho.ttc") | % { "$env:WINDIR\Fonts\$_" } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
   if (-not $font) { Write-Host "游明朝のフォントが見つかりません" -ForegroundColor Red; return }
   $ff = ($font -replace '\\', '/') -replace ':', '\:'
-  # 1) 素材を 1920x1080・25fps・ゆっくり・前後フェードにそろえる
+  # 1) 素材を 1920x1080・25fps にそろえる（画像＝20秒＋前後フェード、動画＝そのまま）
   $tmp = "$W\_tmp"; New-Item -ItemType Directory -Force $tmp | Out-Null; Remove-Item "$tmp\*" -ErrorAction SilentlyContinue
   $parts = @(); $k = 0
   foreach ($n in $素材) {
@@ -189,8 +189,8 @@ function 宇宙テロップ {
       # 画像は20秒の静止画（前後フェード）
       ffmpeg -hide_banner -loglevel error -loop 1 -t 20 -i $src -an -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=19:d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
     } else {
-      $d = (_UBDur $src) * $遅く; $fo = [math]::Max($d - 1, 0)
-      ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=$($fo):d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+      # アニメーション化した動画は、そのまま並べる（フェードなし。-遅く 2 で2倍ゆっくりにもできる）
+      ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p" -c:v libx264 -b:v 2000k -preset fast -y $o
     }
     $parts += $o
   }
