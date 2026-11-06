@@ -158,7 +158,7 @@ function 素材一覧 {
 #     宇宙テロップ 1107 -素材 1,2,3,4,5,6 -長さ 09:00:00
 #     -秒 20（テロップ1枚の秒数）  -遅く 2（動画を2倍ゆっくりにする）  -完成しない（vMMDD.mp4 だけ作る）
 function 宇宙テロップ {
-  param([Parameter(Mandatory)][string]$日付, [int[]]$素材 = @(), [double]$秒 = 20, [double]$遅く = 1, [string]$長さ = "03:33:33", [switch]$完成しない)
+  param([Parameter(Mandatory)][string]$日付, [int[]]$素材 = @(), [double]$秒 = 20, [double]$遅く = 1, [string]$長さ = "03:33:33", [switch]$完成しない, [switch]$動きなし)
   $W = "$UBDesk\制作\$日付"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
   $tf = "$W\テロップ_$日付.txt"
   if (-not (Test-Path -LiteralPath $tf)) { Write-Host "$tf がありません。メモ帳でテロップを書いて保存してください（1枚ごとに空行で区切る）" -ForegroundColor Red; return }
@@ -188,8 +188,10 @@ function 宇宙テロップ {
     $k++; $o = "$tmp\{0:D3}.mp4" -f $k
     Write-Host "素材 $n を準備中：$($map[$n])" -ForegroundColor Cyan
     if ($src -match '\.(jpg|jpeg|png|webp)$') {
-      # 画像は20秒の静止画（前後フェード）
-      ffmpeg -hide_banner -loglevel error -loop 1 -t 20 -i $src -an -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=19:d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+      # 画像は20秒。ゆっくり寄っていく動き（約15%）＋前後フェード。-動きなし で静止画のまま
+      if ($動きなし) { $mv = "fps=25" } else { $mv = "scale=3840:2160,zoompan=z='min(1+0.0003*on,1.15)':d=500:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=25" }
+      $lp = @(); if ($動きなし) { $lp = @("-loop", "1", "-t", "20") }
+      ffmpeg -hide_banner -loglevel error @lp -i $src -an -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,$mv,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=19:d=1" -t 20 -c:v libx264 -b:v 2000k -preset fast -y $o
     } else {
       # アニメーション化した動画は、そのまま並べる（フェードなし。-遅く 2 で2倍ゆっくりにもできる）
       ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p" -c:v libx264 -b:v 2000k -preset fast -y $o
