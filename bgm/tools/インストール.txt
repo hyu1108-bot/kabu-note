@@ -131,6 +131,25 @@ function 宇宙完成 {
   Write-Host "できました：$W\$out（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
 }
 
+# 素材一覧：フォルダの動画・画像の1コマを1枚に並べる（番号は 宇宙テロップ -素材 で使う）
+# 例）素材一覧                       （ダウンロードの新しい順40個）
+#     素材一覧 "$HOME\Desktop\素材ライブラリ"   （フォルダを指定）
+function 素材一覧 {
+  param([string]$フォルダ = "$HOME\Downloads", [int]$数 = 40)
+  $S = "$UBDesk\素材一覧"; New-Item -ItemType Directory -Force $S | Out-Null; Remove-Item "$S\*" -ErrorAction SilentlyContinue
+  $i = 0; $map = @()
+  Get-ChildItem -LiteralPath $フォルダ -File -Recurse | Where-Object { $_.Extension -match '\.(mp4|mov|jpg|jpeg|png|webp)$' } | Sort-Object LastWriteTime -Descending | Select-Object -First $数 | % {
+    $i++; $n = "{0:D3}" -f $i
+    if ($_.Extension -match 'mp4|mov') { ffmpeg -hide_banner -loglevel error -ss 2 -i $_.FullName -frames:v 1 -vf "scale=320:180" -y "$S\$n.jpg" }
+    else { ffmpeg -hide_banner -loglevel error -i $_.FullName -frames:v 1 -vf "scale=320:180:force_original_aspect_ratio=increase,crop=320:180" -y "$S\$n.jpg" }
+    $map += "$n  $($_.FullName)"
+  }
+  [IO.File]::WriteAllLines("$S\番号と名前.txt", $map, $UBEnc)
+  $rows = [math]::Ceiling($i / 8)
+  ffmpeg -hide_banner -loglevel error -framerate 1 -i "$S\%03d.jpg" -vf "tile=8x$($rows)" -frames:v 1 -y "$UBDesk\素材一覧.jpg"
+  Write-Host "できました：デスクトップの 素材一覧.jpg（$i 個。左上から1,2,3…の順）" -ForegroundColor Green
+}
+
 # 宇宙銀行：Filmoraを使わずに、ダウンロードの動画素材＋テロップで vMMDD.mp4 を作り、そのまま完成まで作る
 # 準備）制作\MMDD\テロップ_MMDD.txt にテロップを書く（1枚ごとに空行で区切る。行の頭に「小）」を付けると小さい文字）
 #       素材の番号は「素材一覧」で作った デスクトップ\素材一覧\番号と名前.txt の番号
@@ -153,12 +172,17 @@ function 宇宙テロップ {
   $parts = @(); $k = 0
   foreach ($n in $素材) {
     if (-not $map.ContainsKey($n)) { Write-Host "番号 $n が番号と名前.txt にありません" -ForegroundColor Red; return }
-    $src = "$HOME\Downloads\$($map[$n])"
+    $src = if ([IO.Path]::IsPathRooted($map[$n])) { $map[$n] } else { "$HOME\Downloads\$($map[$n])" }
     if (-not (Test-Path -LiteralPath $src)) { Write-Host "見つかりません：$src" -ForegroundColor Red; return }
     $k++; $o = "$tmp\{0:D3}.mp4" -f $k
-    $d = (_UBDur $src) * $遅く; $fo = [math]::Max($d - 1, 0)
     Write-Host "素材 $n を準備中：$($map[$n])" -ForegroundColor Cyan
-    ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=$($fo):d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+    if ($src -match '\.(jpg|jpeg|png|webp)$') {
+      # 画像は20秒の静止画（前後フェード）
+      ffmpeg -hide_banner -loglevel error -loop 1 -t 20 -i $src -an -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=19:d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+    } else {
+      $d = (_UBDur $src) * $遅く; $fo = [math]::Max($d - 1, 0)
+      ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=$($fo):d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+    }
     $parts += $o
   }
   # 素材を2回つなぐ（テロップの下の素材もループ部分に入るように）
@@ -220,7 +244,7 @@ function 曲探し {
   }
 }
 
-Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／宇宙テロップ／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
+Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／宇宙テロップ／素材一覧／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
 '@
 Set-Content -Path $dst -Value $code -Encoding UTF8
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force
