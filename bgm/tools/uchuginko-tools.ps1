@@ -221,9 +221,9 @@ function 宇宙テロップ {
       $r++
     }
   }
-  [IO.File]::WriteAllText("$tmp\filter.txt", ($f -join ",`n"), $UBEnc)
+  $vf = $f -join ","
   Write-Host "テロップを入れています（$($slides.Count)枚・1枚 $秒 秒）…" -ForegroundColor Cyan
-  ffmpeg -hide_banner -loglevel error -stats -i "$tmp\base.mp4" -filter_script:v "$tmp\filter.txt" -c:v libx264 -b:v 2000k -preset fast -an -y "v$日付.mp4"
+  ffmpeg -hide_banner -loglevel error -stats -i "$tmp\base.mp4" -vf $vf -c:v libx264 -b:v 2000k -preset fast -an -y "v$日付.mp4"
   if (-not (Test-Path -LiteralPath "$W\v$日付.mp4")) { Write-Host "テロップ入りの映像が作れませんでした（上の赤い文字を送ってください）" -ForegroundColor Red; return }
   $ip = [math]::Ceiling($tele) + 2
   Write-Host "できました：v$日付.mp4（テロップ終了 $tele 秒 → inpoint $ip）" -ForegroundColor Green
