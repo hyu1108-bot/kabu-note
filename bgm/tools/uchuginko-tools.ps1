@@ -129,6 +129,73 @@ function 宇宙完成 {
   Write-Host "できました：$W\$out（非公開でアップして著作権の欄を確認）" -ForegroundColor Green
 }
 
+# 宇宙銀行：Filmoraを使わずに、ダウンロードの動画素材＋テロップで vMMDD.mp4 を作り、そのまま完成まで作る
+# 準備）制作\MMDD\テロップ_MMDD.txt にテロップを書く（1枚ごとに空行で区切る。行の頭に「小）」を付けると小さい文字）
+#       素材の番号は「素材一覧」で作った デスクトップ\素材一覧\番号と名前.txt の番号
+# 例）宇宙テロップ 1108 -素材 3,7,12,15,21,22
+#     宇宙テロップ 1107 -素材 1,2,3,4,5,6 -長さ 09:00:00
+#     -秒 20（テロップ1枚の秒数）  -遅く 2（素材を何倍ゆっくりにするか）  -完成しない（vMMDD.mp4 だけ作る）
+function 宇宙テロップ {
+  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int[]]$素材, [double]$秒 = 20, [double]$遅く = 2, [string]$長さ = "03:33:33", [switch]$完成しない)
+  $W = "$UBDesk\制作\$日付"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
+  $tf = "$W\テロップ_$日付.txt"
+  if (-not (Test-Path -LiteralPath $tf)) { Write-Host "$tf がありません。メモ帳でテロップを書いて保存してください（1枚ごとに空行で区切る）" -ForegroundColor Red; return }
+  $mapf = "$UBDesk\素材一覧\番号と名前.txt"
+  if (-not (Test-Path -LiteralPath $mapf)) { Write-Host "$mapf がありません（先に素材一覧を作る）" -ForegroundColor Red; return }
+  $map = @{}; Get-Content -LiteralPath $mapf -Encoding UTF8 | % { if ($_ -match '^(\d+)\s+(.+)$') { $map[[int]$matches[1]] = $matches[2] } }
+  $font = @("yumindb.ttf", "yumin.ttf", "msmincho.ttc") | % { "$env:WINDIR\Fonts\$_" } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+  if (-not $font) { Write-Host "游明朝のフォントが見つかりません" -ForegroundColor Red; return }
+  $ff = ($font -replace '\\', '/') -replace ':', '\:'
+  # 1) 素材を 1920x1080・25fps・ゆっくり・前後フェードにそろえる
+  $tmp = "$W\_tmp"; New-Item -ItemType Directory -Force $tmp | Out-Null; Remove-Item "$tmp\*" -ErrorAction SilentlyContinue
+  $parts = @(); $k = 0
+  foreach ($n in $素材) {
+    if (-not $map.ContainsKey($n)) { Write-Host "番号 $n が番号と名前.txt にありません" -ForegroundColor Red; return }
+    $src = "$HOME\Downloads\$($map[$n])"
+    if (-not (Test-Path -LiteralPath $src)) { Write-Host "見つかりません：$src" -ForegroundColor Red; return }
+    $k++; $o = "$tmp\{0:D3}.mp4" -f $k
+    $d = (_UBDur $src) * $遅く; $fo = [math]::Max($d - 1, 0)
+    Write-Host "素材 $n を準備中：$($map[$n])" -ForegroundColor Cyan
+    ffmpeg -hide_banner -loglevel error -i $src -an -vf "setpts=$遅く*PTS,scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,fps=25,format=yuv420p,fade=t=in:st=0:d=1,fade=t=out:st=$($fo):d=1" -c:v libx264 -b:v 2000k -preset fast -y $o
+    $parts += $o
+  }
+  # 素材を2回つなぐ（テロップの下の素材もループ部分に入るように）
+  $l = @(); foreach ($p in ($parts + $parts)) { $l += _UBLine $p }
+  [IO.File]::WriteAllLines("$tmp\list.txt", $l, $UBEnc)
+  ffmpeg -hide_banner -loglevel error -f concat -safe 0 -i "$tmp\list.txt" -c copy -y "$tmp\base.mp4"
+  # 2) テロップ（1行ずつ中央ぞろえ・游明朝・クリーム色＋黒ふち・1秒フェード）
+  $slides = ((Get-Content -LiteralPath $tf -Encoding UTF8 -Raw) -replace "`r", "").Trim() -split "\n\s*\n"
+  $tele = 0.5 + $slides.Count * $秒
+  if ((_UBDur "$tmp\base.mp4") -lt $tele + 60) { Write-Host "素材が短すぎます（テロップ $tele 秒より1分以上長くなるよう、素材の番号を足してください）" -ForegroundColor Red; return }
+  $f = @(); $i = 0; $j = 0
+  foreach ($s in $slides) {
+    $i++; $S = 0.5 + ($i - 1) * $秒; $E = $S + $秒
+    $a = "if(lt(t,$S+1),t-$S,if(lt(t,$E-1),1,$E-t))"
+    $big = @(); $small = @()
+    foreach ($ln in ($s -split "\n")) { if ($ln -match '^小）(.+)$') { $small += $matches[1] } elseif ($ln.Trim()) { $big += $ln.Trim() } }
+    $lh = 100; $y0 = 540 - ($big.Count * $lh) / 2
+    $r = 0
+    foreach ($t in $big) {
+      $j++; [IO.File]::WriteAllText("$tmp\t$j.txt", $t, $UBEnc)
+      $f += "drawtext=fontfile='$ff':textfile='_tmp/t$j.txt':fontsize=68:fontcolor=0xF2DDB0:borderw=5:bordercolor=black:x=(w-text_w)/2:y=$($y0 + $r * $lh):alpha='$a':enable='between(t,$S,$E)'"
+      $r++
+    }
+    foreach ($t in $small) {
+      $j++; [IO.File]::WriteAllText("$tmp\t$j.txt", $t, $UBEnc)
+      $f += "drawtext=fontfile='$ff':textfile='_tmp/t$j.txt':fontsize=40:fontcolor=0xF2DDB0:borderw=3:bordercolor=black:x=(w-text_w)/2:y=$($y0 + $r * $lh + 20):alpha='$a':enable='between(t,$S,$E)'"
+      $r++
+    }
+  }
+  [IO.File]::WriteAllText("$tmp\filter.txt", ($f -join ",`n"), $UBEnc)
+  Write-Host "テロップを入れています（$($slides.Count)枚・1枚 $秒 秒）…" -ForegroundColor Cyan
+  ffmpeg -hide_banner -loglevel error -stats -i "$tmp\base.mp4" -filter_script:v "$tmp\filter.txt" -c:v libx264 -b:v 2000k -preset fast -an -y "v$日付.mp4"
+  if (-not (Test-Path -LiteralPath "$W\v$日付.mp4")) { Write-Host "テロップ入りの映像が作れませんでした（上の赤い文字を送ってください）" -ForegroundColor Red; return }
+  $ip = [math]::Ceiling($tele) + 2
+  Write-Host "できました：v$日付.mp4（テロップ終了 $tele 秒 → inpoint $ip）" -ForegroundColor Green
+  if ($完成しない) { "次：宇宙完成 $日付 $ip"; return }
+  宇宙完成 $日付 $ip -長さ $長さ -映像 "v$日付.mp4"
+}
+
 # 申し立ての時刻に流れていた曲を調べる（宇宙銀行・成功神殿どちらでも）
 # 例）曲探し 1020 01:25:04 01:26:44
 #     曲探し 神殿1028 00:41:10
@@ -151,4 +218,4 @@ function 曲探し {
   }
 }
 
-Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
+Write-Host "宇宙銀行ツールを読み込みました（宇宙音源／宇宙完成／宇宙テロップ／神殿音源／神殿完成／曲探し）" -ForegroundColor DarkYellow
