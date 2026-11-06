@@ -151,17 +151,28 @@ function 素材一覧 {
 # 宇宙銀行：Filmoraを使わずに、ダウンロードの動画素材＋テロップで vMMDD.mp4 を作り、そのまま完成まで作る
 # 準備）制作\MMDD\テロップ_MMDD.txt にテロップを書く（1枚ごとに空行で区切る。行の頭に「小）」を付けると小さい文字）
 #       素材の番号は「素材一覧」で作った デスクトップ\素材一覧\番号と名前.txt の番号
-# 例）宇宙テロップ 1108 -素材 3,7,12,15,21,22
+# 例）宇宙テロップ 1108                  （素材の指定なし＝「1108日曜日」などのフォルダの素材を名前順に全部使う）
+#     宇宙テロップ 1108 -素材 3,7,12,15,21,22
 #     宇宙テロップ 1107 -素材 1,2,3,4,5,6 -長さ 09:00:00
 #     -秒 20（テロップ1枚の秒数）  -遅く 2（素材を何倍ゆっくりにするか）  -完成しない（vMMDD.mp4 だけ作る）
 function 宇宙テロップ {
-  param([Parameter(Mandatory)][string]$日付, [Parameter(Mandatory)][int[]]$素材, [double]$秒 = 20, [double]$遅く = 2, [string]$長さ = "03:33:33", [switch]$完成しない)
+  param([Parameter(Mandatory)][string]$日付, [int[]]$素材 = @(), [double]$秒 = 20, [double]$遅く = 2, [string]$長さ = "03:33:33", [switch]$完成しない)
   $W = "$UBDesk\制作\$日付"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
   $tf = "$W\テロップ_$日付.txt"
   if (-not (Test-Path -LiteralPath $tf)) { Write-Host "$tf がありません。メモ帳でテロップを書いて保存してください（1枚ごとに空行で区切る）" -ForegroundColor Red; return }
-  $mapf = "$UBDesk\素材一覧\番号と名前.txt"
-  if (-not (Test-Path -LiteralPath $mapf)) { Write-Host "$mapf がありません（先に素材一覧を作る）" -ForegroundColor Red; return }
-  $map = @{}; Get-Content -LiteralPath $mapf -Encoding UTF8 | % { if ($_ -match '^(\d+)\s+(.+)$') { $map[[int]$matches[1]] = $matches[2] } }
+  $map = @{}
+  if ($素材.Count -eq 0) {
+    # 番号の指定がなければ、ダウンロード・デスクトップの「MMDD〇〇」フォルダの素材を名前順に全部使う
+    $sd = Get-ChildItem "$HOME\Downloads", $UBDesk -Directory -Recurse -Depth 2 -Filter "$日付*" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notlike "*\制作\*" } | Select-Object -First 1
+    if (-not $sd) { Write-Host "ダウンロードかデスクトップに「$日付〇〇」の素材フォルダがありません" -ForegroundColor Red; return }
+    $k0 = 0; Get-ChildItem -LiteralPath $sd.FullName -File | Where-Object { $_.Extension -match '\.(mp4|mov|jpg|jpeg|png|webp)$' } | Sort-Object Name | % { $k0++; $map[$k0] = $_.FullName }
+    $素材 = @(1..$k0)
+    Write-Host "素材フォルダ：$($sd.FullName)（$k0 個）" -ForegroundColor Cyan
+  } else {
+    $mapf = "$UBDesk\素材一覧\番号と名前.txt"
+    if (-not (Test-Path -LiteralPath $mapf)) { Write-Host "$mapf がありません（先に素材一覧を作る）" -ForegroundColor Red; return }
+    Get-Content -LiteralPath $mapf -Encoding UTF8 | % { if ($_ -match '^(\d+)\s+(.+)$') { $map[[int]$matches[1]] = $matches[2] } }
+  }
   $font = @("yumindb.ttf", "yumin.ttf", "msmincho.ttc") | % { "$env:WINDIR\Fonts\$_" } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
   if (-not $font) { Write-Host "游明朝のフォントが見つかりません" -ForegroundColor Red; return }
   $ff = ($font -replace '\\', '/') -replace ':', '\:'
