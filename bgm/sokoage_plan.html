@@ -1,0 +1,281 @@
+<title>宇宙銀行 底上げ計画</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* layout: one reading column; summary first, then evidence charts, ruler, schedule, tasks, record */
+:root{
+  --bg:#f4f5f9; --surface:#ffffff; --ink:#141b33; --muted:#59627f; --line:#dce0ec;
+  --gold:#a67a14; --gold-soft:#f4ead0; --navy:#1d2a5c;
+  --bad:#b23a31; --bad-soft:#f9e4e1; --ok:#2a7a52; --ok-soft:#def2e7; --mid:#6b7391; --mid-soft:#e8eaf2;
+  --display:"Shippori Mincho","Yu Mincho","Hiragino Mincho ProN",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0c1124; --surface:#151c38; --ink:#eef0f8; --muted:#a4acc8; --line:#2a3358;
+  --gold:#e2b751; --gold-soft:#3a3218; --navy:#c9d2f5;
+  --bad:#f08f84; --bad-soft:#44201d; --ok:#74d3a0; --ok-soft:#173a2a; --mid:#aab1cc; --mid-soft:#252d4d;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0c1124; --surface:#151c38; --ink:#eef0f8; --muted:#a4acc8; --line:#2a3358;
+  --gold:#e2b751; --gold-soft:#3a3218; --navy:#c9d2f5;
+  --bad:#f08f84; --bad-soft:#44201d; --ok:#74d3a0; --ok-soft:#173a2a; --mid:#aab1cc; --mid-soft:#252d4d;
+  color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.75}
+.wrap{max-width:880px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.35}
+h1{font-size:clamp(28px,6vw,40px)}
+h2{font-size:24px;padding-bottom:8px;border-bottom:2px solid var(--gold)}
+h3{font-size:18px}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:700}
+.lead{font-size:18px;max-width:34em}
+.muted{color:var(--muted);font-size:14px}
+section{display:flex;flex-direction:column;gap:18px}
+.tnum{font-variant-numeric:tabular-nums}
+
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.goal strong{font-family:var(--display);font-size:clamp(20px,4.4vw,26px);line-height:1.5}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.three>div{min-width:0;border-top:3px solid var(--navy);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.three b{font-size:17px}
+@media (max-width:640px){.three{grid-template-columns:1fr}}
+
+.finding{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.num{font-family:var(--display);color:var(--gold);font-size:15px;font-weight:700}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr) 4.6em;gap:10px;align-items:center}
+.bar .lab{font-size:14px;line-height:1.4}
+.bar .lab small{display:block;color:var(--muted);font-size:12px}
+.track{position:relative;height:18px;background:var(--mid-soft);border-radius:4px}
+.fill{position:absolute;inset:0 auto 0 0;background:var(--gold);border-radius:0 4px 4px 0}
+.fill.bad{background:var(--bad)} .fill.ok{background:var(--ok)}
+.val{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;font-size:15px}
+.mark{position:absolute;top:-5px;bottom:-5px;width:0;border-left:2px dashed var(--ink)}
+.legend{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
+.chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.mid{background:var(--mid-soft);color:var(--mid)} .chip.gold{background:var(--gold-soft);color:var(--gold)}
+@media (max-width:520px){.bar{grid-template-columns:minmax(0,1fr) 4.6em}.bar .lab{grid-column:1/-1}}
+.take{border-left:3px solid var(--gold);padding-left:12px;font-weight:500}
+
+.formula{font-family:var(--display);font-size:clamp(17px,3.8vw,22px);background:var(--gold-soft);border-radius:8px;padding:14px 18px;text-align:center}
+.scale{display:grid;grid-template-columns:2fr 1fr 1fr;text-align:center;font-size:14px;border-radius:8px;overflow:hidden}
+.scale div{padding:10px 6px;min-width:0}
+.scale .a{background:var(--bad-soft);color:var(--bad)} .scale .b{background:var(--mid-soft);color:var(--mid)} .scale .c{background:var(--ok-soft);color:var(--ok)}
+.scale b{display:block;font-size:16px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface)}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);white-space:nowrap}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rules{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+
+.week{display:flex;flex-direction:column;gap:8px}
+.week>h3{color:var(--navy)}
+.day{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.day.off{background:transparent;border-style:dashed}
+.date{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.3}
+.date small{display:block;font-family:var(--body);font-weight:400;font-size:12px;color:var(--muted)}
+.what{display:flex;flex-direction:column;gap:3px;min-width:0}
+.what b{font-size:16px}
+.what span{font-size:13px;color:var(--muted)}
+
+.tasks{display:flex;flex-direction:column;gap:6px}
+.task{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer}
+.task input{width:20px;height:20px;margin-top:4px;flex:none;accent-color:var(--gold)}
+.task:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.task span{min-width:0}
+.task small{display:block;color:var(--muted);font-size:13px}
+.task:has(input:checked) span{color:var(--muted);text-decoration:line-through}
+</style>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">2026年11月13日（金）〜 11月26日（木）</div>
+  <h1>宇宙銀行 底上げ計画</h1>
+  <div class="goal">
+    <span class="muted">この2週間でやること</span>
+    <strong>当たった言葉と暗い夜空に戻して、10月後半の水準に戻るかを数字で確かめる</strong>
+    <span>目標：10本のうち6本以上が「曜日比80%以上」</span>
+  </div>
+  <div class="three">
+    <div><b>見る数字は1つ</b><span class="muted">曜日比（その曜日のいつもと比べて何%か）</span></div>
+    <div><b>変えるのは1か所</b><span class="muted">背景・タイトルの形は固定。言葉だけを見る</span></div>
+    <div><b>増える作業は週1回</b><span class="muted">水曜に5分の書き出し。計算はAIがやる</span></div>
+  </div>
+</header>
+
+<section>
+  <h2>数字で分かった4つのこと</h2>
+
+  <div class="finding">
+    <div class="num">その1</div>
+    <h3>伸びるかどうかは「言葉の系統」で決まっている</h3>
+    <p class="muted">動画1本あたりの表示回数（真ん中の値）。10/9〜11/1公開の動画</p>
+    <div class="bars">
+      <div class="bar" title="楽に受け取る：約16,000"><div class="lab">楽に受け取る<small>もう〜しなくていい・あっさり・ふわっと</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">16,000</div></div>
+      <div class="bar" title="不安をほどく・安心：約10,600"><div class="lab">不安をほどく・安心<small>急な出費・不安を手放す</small></div><div class="track"><div class="fill" style="width:66%"></div></div><div class="val">10,600</div></div>
+      <div class="bar" title="景色・たとえ：約8,000"><div class="lab">景色・たとえ<small>湧き水・空から降ってくる</small></div><div class="track"><div class="fill" style="width:50%"></div></div><div class="val">8,000</div></div>
+      <div class="bar" title="願い・約束だけ：約3,200"><div class="lab">願い・約束だけ<small>高額当選を願う・毎月入金</small></div><div class="track"><div class="fill" style="width:20%"></div></div><div class="val">3,200</div></div>
+    </div>
+    <p class="take">いちばん上といちばん下で5倍の差。歴代の人気動画は「一生・心配いらない」の安心が続く言葉でした。</p>
+  </div>
+
+  <div class="finding">
+    <div class="num">その2</div>
+    <h3>11/5からの落ちこみは、外れた言葉の3本だけだった</h3>
+    <p class="muted">表示回数が、その曜日のいつもと比べて何%だったか。点線が80%</p>
+    <div class="bars">
+      <div class="bar" title="木11/5：52%"><div class="lab">木 11/5<small>お金を無限に受け取る</small></div><div class="track"><div class="fill bad" style="width:43.3%"></div><div class="mark" style="left:66.7%"></div></div><div class="val">52%</div></div>
+      <div class="bar" title="金11/6：39%"><div class="lab">金 11/6<small>お金に愛される自分</small></div><div class="track"><div class="fill bad" style="width:32.5%"></div><div class="mark" style="left:66.7%"></div></div><div class="val">39%</div></div>
+      <div class="bar" title="土11/7：86%"><div class="lab">土 11/7<small>一生お金に恵まれる</small></div><div class="track"><div class="fill ok" style="width:71.7%"></div><div class="mark" style="left:66.7%"></div></div><div class="val">86%</div></div>
+      <div class="bar" title="日11/8：87%"><div class="lab">日 11/8<small>がんばらずにお金を受け取る</small></div><div class="track"><div class="fill ok" style="width:72.5%"></div><div class="mark" style="left:66.7%"></div></div><div class="val">87%</div></div>
+      <div class="bar" title="火11/10：42%"><div class="lab">火 11/10<small>1万円が貯まりはじめる</small></div><div class="track"><div class="fill bad" style="width:35%"></div><div class="mark" style="left:66.7%"></div></div><div class="val">42%</div></div>
+    </div>
+    <div class="legend"><span><span class="chip bad">✕ 外れ</span> 80%未満</span><span><span class="chip ok">○ ふつう以上</span> 80%以上</span></div>
+    <p class="take">当たりの系統の言葉を使った土・日は、ほぼいつもどおり。チャンネル全体が落ちたとはまだ言えません。</p>
+  </div>
+
+  <div class="finding">
+    <div class="num">その3</div>
+    <h3>クリック率は落ちていない。差は「表示されたかどうか」</h3>
+    <p>11/5からの5本のクリック率は6.6〜7.0%で、いつもと同じです。サムネの見た目が悪くなったのではなく、YouTubeが広げてくれなかっただけです。</p>
+    <p class="take">クリック率は追わなくて大丈夫。見るのは視聴回数と表示回数です。</p>
+  </div>
+
+  <div class="finding">
+    <div class="num">その4</div>
+    <h3>動画の寿命は2日。3日後の数字で判定できる</h3>
+    <p class="muted">水曜10/14の動画の、1日ごとの視聴回数</p>
+    <div class="bars">
+      <div class="bar" title="初日：1,365回"><div class="lab">初日</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">1,365</div></div>
+      <div class="bar" title="2日目：439回"><div class="lab">2日目</div><div class="track"><div class="fill" style="width:32.2%"></div></div><div class="val">439</div></div>
+      <div class="bar" title="3日目：57回"><div class="lab">3日目</div><div class="track"><div class="fill" style="width:4.2%"></div></div><div class="val">57</div></div>
+      <div class="bar" title="4日目：35回"><div class="lab">4日目</div><div class="track"><div class="fill" style="width:2.6%"></div></div><div class="val">35</div></div>
+      <div class="bar" title="5日目：24回"><div class="lab">5日目</div><div class="track"><div class="fill" style="width:1.8%"></div></div><div class="val">24</div></div>
+    </div>
+    <p class="take">公開した日の数字で一喜一憂しなくて大丈夫。何も出さない日の土台は、1日700〜900回です。</p>
+  </div>
+</section>
+
+<section>
+  <h2>ものさし（感覚のかわりに使うもの）</h2>
+  <div class="formula">曜日比 ＝ 公開3日後の視聴回数 ÷ その曜日の基準</div>
+  <div class="scale">
+    <div class="a"><b>✕ 外れ</b>80%未満</div>
+    <div class="b"><b>ふつう</b>80〜120%</div>
+    <div class="c"><b>◎ 当たり</b>120%以上</div>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>曜日</th><th class="r">視聴の基準</th><th class="r">表示の基準</th><th>もとにした3本（10/15〜11/3）</th></tr></thead>
+    <tbody>
+      <tr><td>火</td><td class="r">1,969</td><td class="r">12,212</td><td>3,132／1,299／1,969</td></tr>
+      <tr><td>木</td><td class="r">2,329</td><td class="r">14,668</td><td>2,544／1,823／2,329</td></tr>
+      <tr><td>金</td><td class="r">1,610</td><td class="r">11,845</td><td>2,221／1,488／1,610</td></tr>
+      <tr><td>土（9時間）</td><td class="r">1,006</td><td class="r">6,950</td><td>1,006／2,658／628</td></tr>
+      <tr><td>日</td><td class="r">2,011</td><td class="r">12,052</td><td>1,417／2,115／2,011</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules">
+    <li><b>1回では決めない。</b>同じ結果が2回出たら決める（同じ曜日でも0.6〜1.6倍はふつうにぶれます）</li>
+    <li><b>ほかの曜日とは比べない。</b>曜日によって強さがちがうためです</li>
+    <li><b>2週間、変えないもの：</b>暗い夜空の背景／タイトルの頭はサムネと同じ言葉／【〇曜夜用】／17:00公開</li>
+  </ul>
+</section>
+
+<section>
+  <h2>スケジュール</h2>
+  <p class="muted"><span class="chip gold">A</span> 安心がずっと続く言葉　<span class="chip mid">B</span> 楽に受け取る言葉</p>
+
+  <div class="week">
+    <h3>今週（11/13〜11/15）</h3>
+    <div class="day"><div class="date">11/13<small>金・17:00</small></div><div class="what"><b>お金がふわっと入ってくる <span class="chip mid">B</span></b><span>帯：金曜｜力をゆるめて眠る夜</span></div></div>
+    <div class="day"><div class="date">11/14<small>土・9時間</small></div><div class="what"><b>もうお金の心配いりません <span class="chip gold">A</span></b><span>帯：再生できた人だけ｜朝まで9時間（限定の帯を1回試す）</span></div></div>
+    <div class="day"><div class="date">11/15<small>日・17:00</small></div><div class="what"><b>お金の不安を静かに手放す <span class="chip gold">A</span></b><span>帯：日曜｜明日が軽くなる夜　／　SUNOのダウンロード枠がリセット</span></div></div>
+  </div>
+
+  <div class="week">
+    <h3>1週目（11/16〜11/22）</h3>
+    <div class="day off"><div class="date">11/16<small>月</small></div><div class="what"><b>お休み</b></div></div>
+    <div class="day"><div class="date">11/17<small>火・17:00</small></div><div class="what"><b>あっさり入金が叶う <span class="chip mid">B</span></b><span>帯：火曜｜あっさり叶って、OK　／　ショート15:00</span></div></div>
+    <div class="day off"><div class="date">11/18<small>水</small></div><div class="what"><b>書き出し（5分）→ 1回目のふり返り</b><span>金・土・日の3本の判定が出ます。火11/24・木11/26の言葉をここで決めます</span></div></div>
+    <div class="day"><div class="date">11/19<small>木・17:00</small></div><div class="what"><b>苦労なしでお金が入ってくる <span class="chip mid">B</span></b><span>帯：木曜｜もう苦労しなくていい</span></div></div>
+    <div class="day"><div class="date">11/20<small>金・17:00</small></div><div class="what"><b>お金が勝手に入ってくる <span class="chip mid">B</span></b><span>帯：金曜｜一週間おつかれさま</span></div></div>
+    <div class="day"><div class="date">11/21<small>土・9時間</small></div><div class="what"><b>一生お金に困らない安定 <span class="chip gold">A</span></b><span>帯：11/14の結果で決める</span></div></div>
+    <div class="day"><div class="date">11/22<small>日・17:00</small></div><div class="what"><b>一生お金に恵まれる <span class="chip gold">A</span></b><span>帯：日曜｜一人じゃない夜</span></div></div>
+  </div>
+
+  <div class="week">
+    <h3>2週目（11/23〜11/26）とまとめ</h3>
+    <div class="day off"><div class="date">11/23<small>月</small></div><div class="what"><b>お休み</b></div></div>
+    <div class="day"><div class="date">11/24<small>火・17:00</small></div><div class="what"><b>11/18に決める</b><span>戻っていたら、Aの言葉を平日に置く「入れかえテスト」</span></div></div>
+    <div class="day off"><div class="date">11/25<small>水</small></div><div class="what"><b>書き出し（5分）→ 2回目のふり返り</b><span>メンバーさんへ満月ワークシート（約束の特典）</span></div></div>
+    <div class="day"><div class="date">11/26<small>木・17:00</small></div><div class="what"><b>11/18に決める</b></div></div>
+    <div class="day off"><div class="date">11/30<small>月</small></div><div class="what"><b>最後の書き出し → 決める日</b><span>また使う言葉・使わない言葉／帯の限定の言葉／週5本を続けるか</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>タスク表</h2>
+  <p class="muted">チェックは、このブラウザの中だけに残ります。</p>
+
+  <h3>今日・明日</h3>
+  <div class="tasks">
+    <label class="task"><input type="checkbox" id="t-export0" checked><span>1回目の書き出し<small>11/13 済み</small></span></label>
+    <label class="task"><input type="checkbox" id="t-1113"><span>金曜1113を作って17:00に予約<small>テロップ → Filmora → 完成 → 目で確認 → 非公開アップ → 予約</small></span></label>
+    <label class="task"><input type="checkbox" id="t-1114"><span>土曜1114（9時間）を作って予約<small>朝に「IDチェック 1109」の著作権欄を見る。タイトルの頭は【土曜夜用】か【途中広告なし】</small></span></label>
+    <label class="task"><input type="checkbox" id="t-1115"><span>日曜1115を作って予約</span></label>
+  </div>
+
+  <h3>動画を出す日に毎回</h3>
+  <div class="tasks">
+    <label class="task"><input type="checkbox" id="t-r1"><span>サムネの言葉は予定表から選ぶ（考えない）</span></label>
+    <label class="task"><input type="checkbox" id="t-r2"><span>背景は暗い夜空。タイトルの頭はサムネと同じ言葉</span></label>
+    <label class="task"><input type="checkbox" id="t-r3"><span>アップの前に、完成した動画を目で見る</span></label>
+    <label class="task"><input type="checkbox" id="t-r4"><span>予約の公開設定が「スケジュール」か見る</span></label>
+  </div>
+
+  <h3>決まった日</h3>
+  <div class="tasks">
+    <label class="task"><input type="checkbox" id="t-1118"><span>水 11/18：書き出し → チャットで「書き出した」<small>インサイト → 詳細モード → 過去28日 → Google スプレッドシート</small></span></label>
+    <label class="task"><input type="checkbox" id="t-1125a"><span>水 11/25：書き出し</span></label>
+    <label class="task"><input type="checkbox" id="t-1125b"><span>水 11/25：メンバーさんへ満月ワークシート</span></label>
+    <label class="task"><input type="checkbox" id="t-1130"><span>月 11/30：最後の書き出し → 次の2週間を決める</span></label>
+  </div>
+
+  <h3>時間があるときに1回だけ（急ぎません）</h3>
+  <div class="tasks">
+    <label class="task"><input type="checkbox" id="t-ts1"><span>チャンネル全体のトラフィック ソースのスクリーンショット<small>過去7日と過去28日。どこから来る人が減ったかが分かります</small></span></label>
+    <label class="task"><input type="checkbox" id="t-ts2"><span>3/29の【※強制金運UP】の回のトラフィック ソース<small>半年たっても1日約60回見られている理由が分かります</small></span></label>
+    <label class="task"><input type="checkbox" id="t-band"><span>帯のテスト（やるなら）<small>「テストと比較」で、帯だけ変えたサムネ2枚を比べる</small></span></label>
+  </div>
+</section>
+
+<section>
+  <h2>記録表</h2>
+  <p class="muted">数字は水曜のふり返りでAIが書きこみます。</p>
+  <div class="scroll"><table>
+    <thead><tr><th>日</th><th>サムネの言葉</th><th>系統</th><th class="r">基準</th><th class="r">3日後の視聴</th><th class="r">曜日比</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>金 11/13</td><td>お金がふわっと入ってくる</td><td>B</td><td class="r">1,610</td><td class="r">—</td><td class="r">—</td><td>11/18</td></tr>
+      <tr><td>土 11/14</td><td>もうお金の心配いりません</td><td>A</td><td class="r">1,006</td><td class="r">—</td><td class="r">—</td><td>11/18</td></tr>
+      <tr><td>日 11/15</td><td>お金の不安を静かに手放す</td><td>A</td><td class="r">2,011</td><td class="r">—</td><td class="r">—</td><td>11/18</td></tr>
+      <tr><td>火 11/17</td><td>あっさり入金が叶う</td><td>B</td><td class="r">1,969</td><td class="r">—</td><td class="r">—</td><td>11/25</td></tr>
+      <tr><td>木 11/19</td><td>苦労なしでお金が入ってくる</td><td>B</td><td class="r">2,329</td><td class="r">—</td><td class="r">—</td><td>11/25</td></tr>
+      <tr><td>金 11/20</td><td>お金が勝手に入ってくる</td><td>B</td><td class="r">1,610</td><td class="r">—</td><td class="r">—</td><td>11/25</td></tr>
+      <tr><td>土 11/21</td><td>一生お金に困らない安定</td><td>A</td><td class="r">1,006</td><td class="r">—</td><td class="r">—</td><td>11/25</td></tr>
+      <tr><td>日 11/22</td><td>一生お金に恵まれる</td><td>A</td><td class="r">2,011</td><td class="r">—</td><td class="r">—</td><td>11/25</td></tr>
+      <tr><td>火 11/24</td><td>11/18に決める</td><td></td><td class="r">1,969</td><td class="r">—</td><td class="r">—</td><td>11/30</td></tr>
+      <tr><td>木 11/26</td><td>11/18に決める</td><td></td><td class="r">2,329</td><td class="r">—</td><td class="r">—</td><td>11/30</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</div>
+<script>
+document.querySelectorAll('.task input').forEach(function(c){
+  try{var v=localStorage.getItem('sk_'+c.id); if(v!==null) c.checked=(v==='1');}catch(e){}
+  c.addEventListener('change',function(){try{localStorage.setItem('sk_'+c.id,c.checked?'1':'0');}catch(e){}});
+});
+</script>
