@@ -1,0 +1,175 @@
+<title>ドレミのおけいこ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* 1画面のアプリ：上にタブ、まん中に遊ぶ場所。明るい1テーマで固定 */
+:root{
+  --bg:#fff8ec; --card:#ffffff; --ink:#3a2e5c; --soft:#8a7fa8; --line:#3a2e5c;
+  --gold:#ffb703; --ok:#2a9d8f; --ng:#e76f51;
+  --c:#ff595e; --d:#ff924c; --e:#ffca3a; --f:#8ac926; --g:#1982c4; --a:#4267ac; --b:#6a4c93;
+  --font:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;user-select:none}
+.wrap{max-width:560px;margin:0 auto;padding-block:14px 24px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:22px;font-weight:900;margin:0}
+.stars{font-size:20px;font-weight:900;background:var(--card);border-radius:999px;padding:6px 14px;box-shadow:0 2px 0 #e9dcc4}
+.stars span{color:var(--gold)}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+nav button{font:inherit;font-weight:900;font-size:16px;border:3px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:10px 4px;cursor:pointer}
+nav button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.panel{background:var(--card);border-radius:22px;padding:16px;box-shadow:0 3px 0 #e9dcc4;display:flex;flex-direction:column;gap:14px;align-items:center}
+.msg{font-size:22px;font-weight:900;text-align:center;min-height:1.5em;margin:0}
+.sub{font-size:15px;color:var(--soft);text-align:center;margin:0;font-weight:700}
+.big{font-size:64px;font-weight:900;line-height:1;min-height:64px}
+/* けんばん */
+.keys{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;width:100%}
+.key{font:inherit;border:3px solid var(--line);border-radius:0 0 14px 14px;height:190px;background:#fff;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:10px;gap:6px;cursor:pointer;touch-action:manipulation}
+.key .dot{width:26px;height:26px;border-radius:50%}
+.key b{font-size:20px;font-weight:900;color:var(--ink)}
+.key.on{transform:translateY(4px);filter:brightness(.92)}
+/* こたえボタン */
+.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+.choice{font:inherit;font-size:26px;font-weight:900;color:#fff;border:none;border-radius:16px;padding:16px 0;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.18);touch-action:manipulation}
+.choice:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.choice:disabled{opacity:.35}
+.act{font:inherit;font-weight:900;font-size:20px;border:none;border-radius:999px;background:var(--gold);color:var(--ink);padding:14px 28px;cursor:pointer;box-shadow:0 4px 0 #d18f00}
+.act.sec{background:#efe6fb;box-shadow:0 4px 0 #cbbbe6;font-size:16px;padding:10px 20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.dots{display:flex;gap:6px}
+.dots i{width:14px;height:14px;border-radius:50%;background:#eadff7}
+.dots i.ok{background:var(--ok)} .dots i.ng{background:var(--ng)}
+svg{width:100%;max-width:420px;height:auto}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+.ok{color:var(--ok)} .ng{color:var(--ng)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.pop{animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>ドレミのおけいこ</h1>
+    <div class="stars">⭐ <span id="starCount">0</span></div>
+  </header>
+  <nav>
+    <button id="tabPlay" aria-pressed="true">ひいてみる</button>
+    <button id="tabEar" aria-pressed="false">おとあて</button>
+    <button id="tabRead" aria-pressed="false">がくふよみ</button>
+  </nav>
+
+  <section class="panel" id="play">
+    <p class="msg">おしてみよう！</p>
+    <div class="big" id="playName">　</div>
+    <div class="keys" id="keys"></div>
+    <div class="row"><button class="act sec" id="songBtn">♪ かえるのうた をきく</button></div>
+  </section>
+
+  <section class="panel" id="quiz" hidden>
+    <p class="sub" id="quizHint"></p>
+    <div id="quizStage"></div>
+    <p class="msg" id="quizMsg"></p>
+    <div class="choices" id="choices"></div>
+    <div class="dots" id="dots"></div>
+    <div class="row" id="quizBtns"></div>
+  </section>
+</div>
+
+<script>
+const NOTES=[
+ {k:"ど",f:261.63,c:"var(--c)"},{k:"れ",f:293.66,c:"var(--d)"},{k:"み",f:329.63,c:"var(--e)"},
+ {k:"ふぁ",f:349.23,c:"var(--f)"},{k:"そ",f:392.00,c:"var(--g)"},{k:"ら",f:440.00,c:"var(--a)"},
+ {k:"し",f:493.88,c:"var(--b)"},{k:"ど",f:523.25,c:"var(--c)"}];
+const NAME=i=>NOTES[i].k;
+let ac;
+function tone(i,len=0.9){
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  if(ac.state==="suspended")ac.resume();
+  const t=ac.currentTime, g=ac.createGain(); g.connect(ac.destination);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.35,t+.01); g.gain.exponentialRampToValueAtTime(.001,t+len);
+  [[1,"triangle",1],[2,"sine",.3],[3,"sine",.12]].forEach(([m,type,v])=>{
+    const o=ac.createOscillator(),og=ac.createGain(); o.type=type;o.frequency.value=NOTES[i].f*m;og.gain.value=v;
+    o.connect(og).connect(g);o.start(t);o.stop(t+len);});
+}
+function sfx(ok){ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  const seq=ok?[659,880]:[300,240]; seq.forEach((f,n)=>{const t=ac.currentTime+n*.12,o=ac.createOscillator(),g=ac.createGain();
+  o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.22);});}
+
+/* ほし */
+let stars=0; try{stars=+localStorage.getItem("doremiStars")||0}catch(e){}
+const starEl=document.getElementById("starCount"); starEl.textContent=stars;
+function addStar(n){stars+=n;starEl.textContent=stars;starEl.parentElement.classList.remove("pop");void starEl.offsetWidth;starEl.parentElement.classList.add("pop");
+  try{localStorage.setItem("doremiStars",stars)}catch(e){}}
+
+/* けんばん */
+const keysEl=document.getElementById("keys"), playName=document.getElementById("playName");
+NOTES.forEach((n,i)=>{const b=document.createElement("button");b.className="key";b.id="key"+i;b.setAttribute("aria-label",n.k);
+  b.innerHTML=`<span class="dot" style="background:${n.c}"></span><b>${n.k}</b>`;
+  b.addEventListener("pointerdown",e=>{e.preventDefault();press(i)});keysEl.appendChild(b);});
+function press(i){tone(i);playName.textContent=NAME(i);playName.style.color=NOTES[i].c;
+  const k=document.getElementById("key"+i);k.classList.add("on");setTimeout(()=>k.classList.remove("on"),180);}
+const SONG=[0,1,2,3,2,1,0,-1,2,3,4,5,4,3,2];
+document.getElementById("songBtn").onclick=()=>{SONG.forEach((n,i)=>{if(n>=0)setTimeout(()=>press(n),i*420)})};
+
+/* がくふ */
+function staff(i){
+  const base=130, h=10; // ミ(下の線)=130、1段=10
+  const y=base-(i-2)*h;
+  let s=`<svg viewBox="0 0 300 170" role="img" aria-label="がくふ">`;
+  for(let l=0;l<5;l++)s+=`<line x1="10" x2="290" y1="${base-l*20}" y2="${base-l*20}" stroke="#3a2e5c" stroke-width="2"/>`;
+  s+=`<text x="16" y="${base+12}" font-size="104" fill="#3a2e5c">𝄞</text>`;
+  if(i===0)s+=`<line x1="150" x2="200" y1="150" y2="150" stroke="#3a2e5c" stroke-width="2"/>`;
+  s+=`<ellipse cx="175" cy="${y}" rx="13" ry="9.5" transform="rotate(-20 175 ${y})" fill="#3a2e5c"/>`;
+  s+= i<6 ? `<line x1="187" x2="187" y1="${y-2}" y2="${y-62}" stroke="#3a2e5c" stroke-width="3"/>`
+          : `<line x1="163" x2="163" y1="${y+2}" y2="${y+62}" stroke="#3a2e5c" stroke-width="3"/>`;
+  return s+"</svg>";
+}
+
+/* クイズ */
+const $=id=>document.getElementById(id);
+let mode="play", qs=[], qi=0, right=0, answer=0, locked=false;
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+function setTab(m){mode=m;["Play","Ear","Read"].forEach(t=>$("tab"+t).setAttribute("aria-pressed",String(t.toLowerCase()===m)));
+  $("play").hidden=m!=="play";$("quiz").hidden=m==="play";if(m!=="play")startRound();}
+$("tabPlay").onclick=()=>setTab("play");$("tabEar").onclick=()=>setTab("ear");$("tabRead").onclick=()=>setTab("read");
+
+function startRound(){qs=Array.from({length:5},()=>Math.floor(Math.random()*7));qi=0;right=0;
+  $("dots").innerHTML=qs.map(()=>"<i></i>").join("");$("quizBtns").innerHTML="";ask();}
+function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg").className="msg";
+  let opts;
+  if(mode==="ear"){
+    $("quizHint").textContent=`${qi+1}もんめ：きこえた おとは どれかな？`;
+    $("quizStage").innerHTML=`<div class="row"><button class="act" id="hear">🔊 もういちど</button><button class="act sec" id="hintDo">「ど」をきく</button></div>`;
+    $("hear").onclick=()=>tone(answer);$("hintDo").onclick=()=>tone(0);
+    opts=shuffle([answer,...shuffle([0,1,2,3,4,5,6].filter(x=>x!==answer)).slice(0,2)]);
+    setTimeout(()=>tone(answer),250);
+  }else{
+    $("quizHint").textContent=`${qi+1}もんめ：この おんぷは なにかな？`;
+    $("quizStage").innerHTML=staff(answer);
+    opts=[0,1,2,3,4,5,6];
+  }
+  const ch=$("choices");ch.className="choices"+(opts.length===3?" three":"");
+  ch.innerHTML="";opts.forEach(o=>{const b=document.createElement("button");b.className="choice";b.textContent=NAME(o);b.style.background=NOTES[o].c;
+    b.onclick=()=>pick(o,b);ch.appendChild(b);});
+}
+function pick(o,b){if(locked)return;
+  if(mode==="read")tone(o,.5);
+  const d=$("dots").children[qi];
+  if(o===answer){locked=true;right++;d.className="ok";sfx(true);$("quizMsg").textContent="せいかい！ ⭐";$("quizMsg").className="msg ok pop";addStar(1);
+    setTimeout(next,1100);}
+  else{d.className="ng";sfx(false);b.disabled=true;$("quizMsg").textContent="おしい！ もういちど";$("quizMsg").className="msg ng";}
+}
+function next(){qi++;if(qi<qs.length)return ask();
+  $("quizHint").textContent="";$("choices").innerHTML="";
+  const all=$("dots").querySelectorAll(".ng").length===0;
+  $("quizStage").innerHTML=`<div class="big pop">${all?"🏆":"🎵"}</div>`;
+  $("quizMsg").textContent=all?"ぜんぶ いっかいで せいかい！ すごい！":"よく がんばったね！";
+  if(all)addStar(3);
+  $("quizBtns").innerHTML=`<button class="act" id="again">もういっかい</button>`;$("again").onclick=startRound;}
+</script>
