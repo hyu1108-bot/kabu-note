@@ -73,8 +73,8 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
     <button id="tabBeat" aria-pressed="false">②てびょうし</button>
     <button id="tabStairs" aria-pressed="false">③かいだん</button>
     <button id="tabPlay" aria-pressed="false">ひいてみる</button>
-    <button id="tabEar" aria-pressed="false">おとあて</button>
-    <button id="tabRead" aria-pressed="false">がくふよみ</button>
+    <button id="tabEar" aria-pressed="false" hidden>おとあて</button>
+    <button id="tabRead" aria-pressed="false" hidden>がくふよみ</button>
   </nav>
 
   <section class="panel" id="beat" hidden>
@@ -165,12 +165,12 @@ function setTab(m){mode=m;stopBeat();TABS.forEach(t=>$("tab"+t).setAttribute("ar
 TABS.forEach(t=>$("tab"+t).onclick=()=>setTab(t.toLowerCase()));
 
 let pair=[0,0];
-function startRound(){qs=Array.from({length:5},()=>Math.floor(Math.random()*(mode==="stairs"?5:7))+(mode==="stairs"?1:0));qi=0;right=0;
+function startRound(){qs=Array.from({length:3},()=>Math.floor(Math.random()*(mode==="stairs"?2:7))+(mode==="stairs"?1:0));qi=0;right=0;
   $("dots").innerHTML=qs.map(()=>"<i></i>").join("");$("quizBtns").innerHTML="";ask();}
 function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg").className="msg";
   let opts;
   if(mode==="hl"){
-    let a,b;do{a=Math.floor(Math.random()*8);b=Math.floor(Math.random()*8)}while(Math.abs(a-b)<2);
+    let a,b;do{a=Math.floor(Math.random()*8);b=Math.floor(Math.random()*8)}while(Math.abs(a-b)<5);
     pair=[a,b];answer=b>a?"up":"down";
     $("quizHint").textContent=`${qi+1}もんめ：あとの おとは まえより たかい？ ひくい？`;
     $("quizStage").innerHTML=`<div class="row"><button class="act" id="hear">🔊 もういちど</button></div>`;
@@ -187,7 +187,7 @@ function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg
     const playQ=()=>{tone(0,.7);setTimeout(()=>tone(answer,.9),800)};$("hear").onclick=playQ;
     $("climb").onclick=()=>NOTES.forEach((_,i)=>setTimeout(()=>{tone(i,.4);moveWho(i)},i*350));
     const ch=$("choices");ch.className="stairs";ch.innerHTML="";
-    NOTES.slice(0,6).forEach((n,i)=>{const s=document.createElement("button");s.className="step";s.id="step"+i;
+    NOTES.slice(0,3).forEach((n,i)=>{const s=document.createElement("button");s.className="step";s.id="step"+i;
       s.style.background=n.c;s.style.height=(70+i*28)+"px";s.innerHTML=n.k+(i===0?'<span class="who" id="who">🐰</span>':"");
       s.onclick=()=>{if(i===0){tone(0);return}moveWho(i);pick(i,s)};ch.appendChild(s);});
     setTimeout(playQ,250);return;
@@ -224,10 +224,10 @@ function next(){qi++;if(qi<qs.length)return ask();
   $("quizBtns").innerHTML=`<button class="act" id="again">もういっかい</button>`;$("again").onclick=startRound;}
 
 /* てびょうし */
-let bpm=70, beatTimes=[], hits=[], beatTimer=[], running=false;
-const N=8;
-$("slow").onclick=()=>{bpm=70;$("slow").setAttribute("aria-pressed","true");$("fast").setAttribute("aria-pressed","false")};
-$("fast").onclick=()=>{bpm=100;$("fast").setAttribute("aria-pressed","true");$("slow").setAttribute("aria-pressed","false")};
+let bpm=60, beatTimes=[], hits=[], beatTimer=[], running=false;
+const N=4;
+$("slow").onclick=()=>{bpm=60;$("slow").setAttribute("aria-pressed","true");$("fast").setAttribute("aria-pressed","false")};
+$("fast").onclick=()=>{bpm=80;$("fast").setAttribute("aria-pressed","true");$("slow").setAttribute("aria-pressed","false")};
 function drum(t,acc){const o=ac.createOscillator(),g=ac.createGain();o.type="sine";
   o.frequency.setValueAtTime(acc?160:120,t);o.frequency.exponentialRampToValueAtTime(50,t+.15);
   g.gain.setValueAtTime(.8,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.22);}
@@ -247,12 +247,12 @@ $("beatStart").onclick=()=>{
 $("tapBtn").addEventListener("pointerdown",e=>{e.preventDefault();if(!running||!ac)return;
   const now=ac.currentTime;let best=-1,dist=9;
   beatTimes.forEach((t,i)=>{const d=Math.abs(now-t);if(d<dist){dist=d;best=i}});
-  const win=Math.min(.18,30/bpm*.5);
+  const win=Math.min(.3,30/bpm*.6);
   if(best>=0&&dist<win&&!hits[best]){hits[best]=true;$("beatDots").children[best].className="ok";}
 });
 function endBeat(){running=false;const n=hits.filter(Boolean).length;
-  $("beatMsg").textContent=n>=7?`${n}こ ぴったり！ すごい！ ⭐⭐`:n>=4?`${n}こ ぴったり！ いいね ⭐`:`${n}こ ぴったり。もういっかい やってみよう`;
-  if(n>=7)addStar(2);else if(n>=4)addStar(1);
+  $("beatMsg").textContent=n>=4?`${n}こ ぜんぶ ぴったり！ すごい！ ⭐⭐`:n>=2?`${n}こ ぴったり！ いいね ⭐`:`${n}こ ぴったり。もういっかい やってみよう`;
+  if(n>=4)addStar(2);else if(n>=2)addStar(1);
   $("beatStart").textContent="もういっかい";}
 setTab("hl");
 </script>
