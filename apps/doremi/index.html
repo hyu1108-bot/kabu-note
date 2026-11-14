@@ -69,7 +69,7 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
     <div class="stars">⭐ <span id="starCount">0</span></div>
   </header>
   <nav>
-    <button id="tabHl" aria-pressed="true">①たかい？ひくい？</button>
+    <button id="tabHl" aria-pressed="true">①ことり？くま？</button>
     <button id="tabBeat" aria-pressed="false">②てびょうし</button>
     <button id="tabStairs" aria-pressed="false">③かいだん</button>
     <button id="tabPlay" aria-pressed="false">ひいてみる</button>
@@ -170,13 +170,12 @@ function startRound(){qs=Array.from({length:3},()=>Math.floor(Math.random()*(mod
 function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg").className="msg";
   let opts;
   if(mode==="hl"){
-    let a,b;do{a=Math.floor(Math.random()*8);b=Math.floor(Math.random()*8)}while(Math.abs(a-b)<5);
-    pair=[a,b];answer=b>a?"up":"down";
-    $("quizHint").textContent=`${qi+1}もんめ：あとの おとは まえより たかい？ ひくい？`;
-    $("quizStage").innerHTML=`<div class="row"><button class="act" id="hear">🔊 もういちど</button></div>`;
-    const playPair=()=>{tone(a,.7);setTimeout(()=>tone(b,.9),750)};$("hear").onclick=playPair;setTimeout(playPair,250);
+    answer=Math.random()<.5?"up":"down";
+    $("quizHint").textContent=`${qi+1}もんめ：ことりの こえ？ くまの こえ？`;
+    $("quizStage").innerHTML=`<p class="sub">まず きいてみよう</p><div class="row"><button class="act sec" id="bird">🐦 ことり（ピヨピヨ）</button><button class="act sec" id="bear">🐻 くま（ノッシノッシ）</button></div><div class="row"><button class="act" id="hear">🔊 もんだいを きく</button></div>`;
+    const play=()=>animal(answer);$("hear").onclick=play;$("bird").onclick=()=>animal("up");$("bear").onclick=()=>animal("down");setTimeout(play,250);
     const ch=$("choices");ch.className="choices three";ch.style.gridTemplateColumns="1fr 1fr";ch.innerHTML="";
-    [["up","⬆ たかい","var(--c)"],["down","⬇ ひくい","var(--g)"]].forEach(([v,t,c])=>{const bt=document.createElement("button");
+    [["up","🐦","var(--e)"],["down","🐻","var(--d)"]].forEach(([v,t,c])=>{const bt=document.createElement("button");
       bt.className="choice hl";bt.textContent=t;bt.style.background=c;bt.onclick=()=>pick(v,bt);ch.appendChild(bt);});
     return;
   }
@@ -207,6 +206,11 @@ function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg
   ch.innerHTML="";opts.forEach(o=>{const b=document.createElement("button");b.className="choice";b.textContent=NAME(o);b.style.background=NOTES[o].c;
     b.onclick=()=>pick(o,b);ch.appendChild(b);});
 }
+function animal(k){ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
+  const seq=k==="up"?[[1047,0],[1319,.15],[1047,.3],[1319,.45]]:[[110,0],[98,.55]];
+  seq.forEach(([f,d])=>{const t=ac.currentTime+d,o=ac.createOscillator(),g=ac.createGain();o.type=k==="up"?"sine":"triangle";o.frequency.value=f;
+    const len=k==="up"?.12:.5;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(k==="up"?.25:.6,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+len);
+    o.connect(g).connect(ac.destination);o.start(t);o.stop(t+len+.02);});}
 function moveWho(i){const w=$("who"),s=$("step"+i);if(w&&s){s.appendChild(w)}}
 function pick(o,b){if(locked)return;
   if(mode==="read"||mode==="stairs")tone(o,.5);
