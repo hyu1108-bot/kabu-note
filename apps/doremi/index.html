@@ -1,4 +1,4 @@
-<title>ドレミのおけいこ</title>
+<title>でんしゃでドレミ</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
 <style>
@@ -28,6 +28,9 @@ nav button{font-size:14px}
 .tapbtn{font:inherit;font-weight:900;font-size:34px;width:180px;height:180px;border-radius:50%;border:none;background:var(--c);color:#fff;box-shadow:0 6px 0 #c23b40;cursor:pointer;touch-action:manipulation}
 .tapbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #c23b40}
 .jump{animation:jump .25s ease}
+.rail{height:30px;border-bottom:6px solid #7a6a55;background:repeating-linear-gradient(90deg,transparent 0 22px,#b9a88f 22px 28px) bottom/100% 8px no-repeat;overflow:hidden;position:relative}
+.rail span{position:absolute;bottom:2px;font-size:22px;white-space:nowrap;animation:run 9s linear infinite}
+@keyframes run{from{left:-90px}to{left:100%}}
 @keyframes jump{50%{transform:translateY(-22px)}}
 .hl{font-size:30px;padding:22px 0}
 .stairs{display:flex;align-items:flex-end;gap:4px;width:100%;height:220px}
@@ -65,11 +68,12 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
 
 <div class="wrap">
   <header>
-    <h1>ドレミのおけいこ</h1>
+    <h1>🚃 でんしゃで ドレミ</h1>
     <div class="stars">⭐ <span id="starCount">0</span></div>
   </header>
+  <div class="rail" aria-hidden="true"><span>🚃🚃🚃</span></div>
   <nav>
-    <button id="tabHl" aria-pressed="true">①ことり？くま？</button>
+    <button id="tabHl" aria-pressed="true">①ピー？ボー？</button>
     <button id="tabBeat" aria-pressed="false">②てびょうし</button>
     <button id="tabStairs" aria-pressed="false">③かいだん</button>
     <button id="tabPlay" aria-pressed="false">ひいてみる</button>
@@ -78,12 +82,12 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
   </nav>
 
   <section class="panel" id="beat" hidden>
-    <p class="sub">たいこに あわせて ボタンを トン！</p>
+    <p class="sub">でんしゃの おとに あわせて ガタン！</p>
     <div class="row"><button class="act sec" id="slow" aria-pressed="true">🐢 ゆっくり</button><button class="act sec" id="fast" aria-pressed="false">🐇 ふつう</button></div>
-    <div class="big" id="frog">🐸</div>
+    <div class="big" id="frog">🚃</div>
     <div class="dots" id="beatDots"></div>
     <p class="msg" id="beatMsg">「はじめる」を おしてね</p>
-    <button class="tapbtn" id="tapBtn">トン！</button>
+    <button class="tapbtn" id="tapBtn">ガタン！</button>
     <button class="act" id="beatStart">はじめる</button>
   </section>
 
@@ -171,11 +175,11 @@ function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg
   let opts;
   if(mode==="hl"){
     answer=Math.random()<.5?"up":"down";
-    $("quizHint").textContent=`${qi+1}もんめ：ことりの こえ？ くまの こえ？`;
-    $("quizStage").innerHTML=`<p class="sub">まず きいてみよう</p><div class="row"><button class="act sec" id="bird">🐦 ことり（ピヨピヨ）</button><button class="act sec" id="bear">🐻 くま（ノッシノッシ）</button></div><div class="row"><button class="act" id="hear">🔊 もんだいを きく</button></div>`;
+    $("quizHint").textContent=`${qi+1}もんめ：しんかんせん？ きかんしゃ？`;
+    $("quizStage").innerHTML=`<p class="sub">まず きいてみよう</p><div class="row"><button class="act sec" id="bird">🚄 しんかんせん（ピーッ）</button><button class="act sec" id="bear">🚂 きかんしゃ（ボーッ）</button></div><div class="row"><button class="act" id="hear">🔊 もんだいを きく</button></div>`;
     const play=()=>animal(answer);$("hear").onclick=play;$("bird").onclick=()=>animal("up");$("bear").onclick=()=>animal("down");setTimeout(play,250);
     const ch=$("choices");ch.className="choices three";ch.style.gridTemplateColumns="1fr 1fr";ch.innerHTML="";
-    [["up","🐦","var(--e)"],["down","🐻","var(--d)"]].forEach(([v,t,c])=>{const bt=document.createElement("button");
+    [["up","🚄","var(--e)"],["down","🚂","var(--d)"]].forEach(([v,t,c])=>{const bt=document.createElement("button");
       bt.className="choice hl";bt.textContent=t;bt.style.background=c;bt.onclick=()=>pick(v,bt);ch.appendChild(bt);});
     return;
   }
@@ -187,7 +191,7 @@ function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg
     $("climb").onclick=()=>NOTES.forEach((_,i)=>setTimeout(()=>{tone(i,.4);moveWho(i)},i*350));
     const ch=$("choices");ch.className="stairs";ch.innerHTML="";
     NOTES.slice(0,3).forEach((n,i)=>{const s=document.createElement("button");s.className="step";s.id="step"+i;
-      s.style.background=n.c;s.style.height=(70+i*28)+"px";s.innerHTML=n.k+(i===0?'<span class="who" id="who">🐰</span>':"");
+      s.style.background=n.c;s.style.height=(70+i*28)+"px";s.innerHTML=n.k+(i===0?'<span class="who" id="who">🚃</span>':"");
       s.onclick=()=>{if(i===0){tone(0);return}moveWho(i);pick(i,s)};ch.appendChild(s);});
     setTimeout(playQ,250);return;
   }
@@ -207,9 +211,9 @@ function ask(){locked=false;answer=qs[qi];$("quizMsg").textContent="";$("quizMsg
     b.onclick=()=>pick(o,b);ch.appendChild(b);});
 }
 function animal(k){ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
-  const seq=k==="up"?[[1047,0],[1319,.15],[1047,.3],[1319,.45]]:[[110,0],[98,.55]];
+  const seq=k==="up"?[[1319,0]]:[[131,0],[165,0]];
   seq.forEach(([f,d])=>{const t=ac.currentTime+d,o=ac.createOscillator(),g=ac.createGain();o.type=k==="up"?"sine":"triangle";o.frequency.value=f;
-    const len=k==="up"?.12:.5;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(k==="up"?.25:.6,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+len);
+    const len=k==="up"?.9:1.1;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(k==="up"?.25:.6,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+len);
     o.connect(g).connect(ac.destination);o.start(t);o.stop(t+len+.02);});}
 function moveWho(i){const w=$("who"),s=$("step"+i);if(w&&s){s.appendChild(w)}}
 function pick(o,b){if(locked)return;
@@ -245,7 +249,7 @@ $("beatStart").onclick=()=>{
   for(let i=0;i<4+N;i++){const t=t0+i*sp;drum(t,i%4===0);
     if(i>=4)beatTimes.push(t);
     beatTimer.push(setTimeout(()=>{const f=$("frog");f.classList.remove("jump");void f.offsetWidth;f.classList.add("jump");
-      $("beatMsg").textContent=i<4?`よく きいてね… ${i+1}`:"いっしょに トン！";},(t-ac.currentTime)*1000));}
+      $("beatMsg").textContent=i<4?`よく きいてね… ガタン ゴトン`:(i%2?"ゴトン！":"ガタン！");},(t-ac.currentTime)*1000));}
   beatTimer.push(setTimeout(endBeat,(t0+(4+N)*sp-ac.currentTime)*1000));
 };
 $("tapBtn").addEventListener("pointerdown",e=>{e.preventDefault();if(!running||!ac)return;
