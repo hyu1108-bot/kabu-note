@@ -65,9 +65,10 @@ function 神殿完成 {
 # 例）宇宙音源 1103 1104                 （それぞれ3時間33分33秒。日ごとに順番を変える）
 #     宇宙音源 1102 1103 1104 -ライブ 1102 （1102は月曜ライブ用＝全曲を1回ずつの長さ）
 #     宇宙音源 1107 -長さ 09:00:00          （土曜の9時間）
+#     宇宙音源 1119 1120 -新曲 1116ゆったり_   （名前が「1116ゆったり_」で始まる新曲を時間で約55%混ぜる。-割合 0.6 で6割）
 function 宇宙音源 {
   [CmdletBinding(PositionalBinding = $false)]
-  param([Parameter(Mandatory, Position = 0, ValueFromRemainingArguments)][string[]]$日付, [string]$ライブ = "", [string]$長さ = "03:33:33")
+  param([Parameter(Mandatory, Position = 0, ValueFromRemainingArguments)][string[]]$日付, [string]$ライブ = "", [string]$長さ = "03:33:33", [string]$新曲 = "", [double]$割合 = 0.55)
   if ($長さ -notmatch '^\d+:\d\d:\d\d$') { Write-Host "長さは 03:33:33 の形で書いてください（いま：$長さ）" -ForegroundColor Red; return }
   $all = @(Get-ChildItem -LiteralPath "$UBDesk\IDチェック済み", "$UBDesk\IDチェック済み金庫" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '\.(mp3|m4a|wav)$' })
   if ($all.Count -lt 10) { Write-Host "曲が $($all.Count) 曲しかありません。デスクトップの「IDチェック済み」「IDチェック済み金庫」を確認してください" -ForegroundColor Red; return }
@@ -78,15 +79,32 @@ function 宇宙音源 {
   foreach ($day in $日付) {
     $live = ($day -eq $ライブ)
     $W = "$UBDesk\制作\$day"; New-Item -ItemType Directory -Force $W | Out-Null; Set-Location $W
-    $order = $all | Get-Random -Count $all.Count
     $list = @(); $tt = @(); $t = 0
     if ($live) { $end = $one } else { $end = _UBSec $長さ }
-    while ($t -lt $end - 1) {
-      foreach ($f in $order) {
+    if ($新曲) {
+      # 新曲（名前が $新曲 で始まる曲）を、時間で $割合 くらいになるように混ぜる。足りなければ新曲をくり返さず、古い曲で埋める
+      $nw = @($all | Where-Object { $_.Name.StartsWith($新曲) } | Get-Random -Count 9999)
+      $od = @($all | Where-Object { -not $_.Name.StartsWith($新曲) } | Get-Random -Count 9999)
+      if ($nw.Count -eq 0) { Write-Host "名前が「$新曲」で始まる曲が「IDチェック済み」にありません" -ForegroundColor Red; return }
+      $i = 0; $j = 0; $tn = 0
+      while ($t -lt $end - 1) {
+        if ($i -lt $nw.Count -and ($tn -lt $割合 * ($t + 1) -or $od.Count -eq 0)) { $f = $nw[$i]; $i++; $tn += $dur[$f.FullName] }
+        elseif ($od.Count -gt 0) { $f = $od[$j % $od.Count]; $j++ }
+        else { $f = $nw[$i % $nw.Count]; $i++ }
         $list += _UBLine $f.FullName
         $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), $f.Name
         $t += $dur[$f.FullName]
-        if ($t -ge $end - 1) { break }
+      }
+      Write-Host ("$day：新曲 {0} 曲・時間で約 {1:P0}" -f [math]::Min($i, $nw.Count), ($tn / $t)) -ForegroundColor Cyan
+    } else {
+      $order = $all | Get-Random -Count $all.Count
+      while ($t -lt $end - 1) {
+        foreach ($f in $order) {
+          $list += _UBLine $f.FullName
+          $tt += "{0:hh\:mm\:ss}  {1}" -f [TimeSpan]::FromSeconds($t), $f.Name
+          $t += $dur[$f.FullName]
+          if ($t -ge $end - 1) { break }
+        }
       }
     }
     [IO.File]::WriteAllLines("$W\order_$day.txt", $list, $UBEnc)
