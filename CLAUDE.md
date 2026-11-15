@@ -43,6 +43,10 @@
   3. **水曜11/18**：本人に過去28日を書き出してもらい、計画書の記録表とページ（https://claude.ai/artifact/EswA5n1s7q6tWHuwkJnrky 、`bgm/sokoage_plan.html`）に書きこんで同じURLに公開し直す。金1113・土1114・日1115の3日後の数字で判定
   4. 来週の言葉（火11/17 あっさり入金が叶う／木11/19 苦労なしでお金が入ってくる／金11/20 お金が勝手に入ってくる／土11/21 9h／日11/22 一生お金に恵まれる）は下の11/13の予定。**アンケート（11/14・86票で過去最多）で「ずっと欲しかったものを買う」44%** → テロップ・言葉の材料にしてよい
   5. 11/25：メンバーさんへ満月ワークシート
+- **★11/16 SUNOの新しいプロンプト「ゆったり」を本人が決めた（これでいく）**：きっかけは本人が気になったチャンネル Abundance Energy（登録31.3万・77本・約55分・文字なしの明るいサムネ・963Hz/1111Hz・11/11ポータルなど日付の出来事・Spotify/Apple Musicで配信）の「ゆったりした音楽」。もっとスローに → 高い音が続く → 高い音を外して決定：
+  `extremely slow ambient, beatless, no rhythm, 40 bpm, warm and deep, low to mid register, soft dark pads swelling and fading slowly like breathing, a few gentle low harp notes far apart with long silence between them, soft low drone underneath, round mellow tones, calm, grounding, peaceful, floating, meditative, deep sleep, instrumental`
+  Exclude：`piano, guitar, flute, shakuhachi, drums, percussion, vocals, lyrics, synth lead, EDM, lo-fi beat, strings, orchestra, cinematic, high-pitched, shimmer, sparkle, chimes, bells, glockenspiel, celesta, music box, wind chimes`
+  （チャリンがほしくなったら Exclude から chimes を消し `a rare soft coin-like chime once in a while` を足す）。MP3とWAVを両方DL（WAVは音楽配信用）→ 黒画面で1本にしてIDチェック → 合格なら「IDチェック済み」。古い7〜8月の曲の入れかえ候補。開運日（一粒万倍日・天赦日・満月11/25・冬至）をタイトルに入れる案、文字なしサムネのテスト案（11/27以降）も出した（未決）
 - **11/15朝の数字（本人の画面）**：土1114（9h、最終的なサムネは**「もうお金の心配いりません」**＋帯「土曜9時間｜力をぬいて受け取る」、タイトル【土曜夜用】もうお金の心配いりません💰432Hz 朝…）＝公開から約半日で**530回・コメント10**／金1113＝861回・コメント7・$5.20／木1112＝871回・$6.10。**本人「まわらなかった」（初日1,000回を超えないとよいとは言えない、が本人の目安）**。判定は計画書どおり3日後の数字で、1回では決めない
 - **11/14済み**：土1114の雰囲気違い5曲（0801_071６②(1)・0803_【 決定】0717②(17)・0805_金運0721⑤(11)・0805_金運0721⑤(2)・1015金庫C_1015_金庫 (4)）を「雰囲気違い」へ移動済み（中身12曲を確認）。**同じ仲間（`0805_金運0721⑤`・`0801_0716②` の別番号）が「IDチェック済み」に残っている可能性** → 違和感が出たらまず疑う。古い曲をまとめて分けるかは新曲が入ってから。9時間の再生リスト「朝まで9時間｜眠りながら金運アップ 432Hz 睡眠用BGM【宇宙銀行】」を作った（動画を入れたかは未確認）
 - **★11/14 本人の好み（テロップ）**：「乗りこえてきました」のような励ましは「たまたまだった」と響かない。「不安は来ていない日の心配」のような理屈も「全然安心できない」。**本人の本当の言葉（「痛みを感じながら出費したり、不安を感じながら思い切ってやるしかない日々」）をそのまま使い、本当にあったことだけを書く**と通った。テロップの枚数を減らしたいときは減らしてよい（全体を出し直すときは、何枚目かを上から全部書いて出す。部分だけ出すと「はい？」と伝わらなかった）
