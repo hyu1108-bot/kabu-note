@@ -84,13 +84,13 @@ function 宇宙音源 {
     $list = @(); $tt = @(); $t = 0
     if ($live) { $end = $one } else { $end = _UBSec $長さ }
     if ($新曲) {
-      # 新曲（名前が $新曲 で始まる曲）を、時間で $割合 くらいになるように混ぜる。足りなければ新曲をくり返さず、古い曲で埋める
+      # 新曲（名前が $新曲 で始まる曲）を、時間で $割合 くらいになるように混ぜる。1曲目は必ず今までの曲（11/19本人の希望）。足りなければ新曲をくり返さず、古い曲で埋める
       $nw = @($all | Where-Object { $_.Name.StartsWith($新曲) } | Get-Random -Count 9999)
       $od = @($all | Where-Object { -not $_.Name.StartsWith($新曲) } | Get-Random -Count 9999)
       if ($nw.Count -eq 0) { Write-Host "名前が「$新曲」で始まる曲が「IDチェック済み」にありません" -ForegroundColor Red; return }
       $i = 0; $j = 0; $tn = 0
       while ($t -lt $end - 1) {
-        if ($i -lt $nw.Count -and ($tn -lt $割合 * ($t + 1) -or $od.Count -eq 0)) { $f = $nw[$i]; $i++; $tn += $dur[$f.FullName] }
+        if ($i -lt $nw.Count -and (($t -gt 0 -and $tn -lt $割合 * ($t + 1)) -or $od.Count -eq 0)) { $f = $nw[$i]; $i++; $tn += $dur[$f.FullName] }
         elseif ($od.Count -gt 0) { $f = $od[$j % $od.Count]; $j++ }
         else { $f = $nw[$i % $nw.Count]; $i++ }
         $list += _UBLine $f.FullName
